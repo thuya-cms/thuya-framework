@@ -1,7 +1,8 @@
-import { Router } from "express";
+import IContentType from "./content/content-type";
 
 interface IModule {
-    router: Router
+    id: string,
+    contentTypes?: IContentType[]
 }
 
 export default IModule;

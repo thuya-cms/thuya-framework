@@ -6,12 +6,13 @@ class ThuyaApp {
     private _expressApp: express.Application;
     private _port: String = "8080";
     private _expressServer?: http.Server;
-
+    private _modules: IModule[];
 
 
     constructor() {
         this._expressApp = express();
         this._expressServer = undefined;
+        this._modules = [];
     }
 
 
@@ -19,7 +20,7 @@ class ThuyaApp {
     /**
      * Start the Thuya CMS application.
      * 
-     * @throws Will thow an exception if the app is already running.
+     * @throws will thow an exception if the app is already running
      */
     public start(): void {
         if (this._expressServer)
@@ -33,7 +34,7 @@ class ThuyaApp {
     /**
      * Stop the Thuya CMS application.
      * 
-     * @throws Will thow an exception if the app is not running.
+     * @throws will thow an exception if the app is not running
      */
     public stop(): void {
         if (!this._expressServer) 
@@ -46,9 +47,29 @@ class ThuyaApp {
      * Adds a module for use to the Thuya application.
      * 
      * @param module the module to use
+     * @throws will throw an exception if a module with the same id is already in use
      */
     public use(module: IModule): void {
-        this._expressApp.use("/", module.router);
+        console.debug(`Using module: ${module.id}`);
+
+        if (this._modules.find(existingModule => module.id === existingModule.id)) 
+            throw new Error(`Module with id ${module.id} is already in use.`);
+
+        this.importContentTypes(module);
+        this._modules.push(module);
+    }
+
+
+    private importContentTypes(module: IModule) {
+        if (module.contentTypes) {
+            module.contentTypes.forEach(contentType => {
+                console.debug(`Register content type: ${contentType.id}`);
+
+                this._expressApp.get("/" + contentType.id, (req, res, next) => {
+                    res.send(`Reading list of: ${contentType.id}`);
+                });
+            });
+        }
     }
 }
 

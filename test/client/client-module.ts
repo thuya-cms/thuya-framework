@@ -1,18 +1,10 @@
-import { Router } from "express";
+import IContentType from "../../content/content-type";
 import IModule from "../../module";
+import ClientContentType from "./client-content-type";
 
 class ClientModule implements IModule {
-    router: Router;
-    
-    
-
-    constructor() {
-        this.router = Router();
-
-        this.router.get("/test", (req, res, next) => {
-            res.send("Test request.")
-        });
-    }
+    id: string = "client-module";
+    contentTypes: IContentType[] = [ClientContentType];
 }
 
 export default new ClientModule();
