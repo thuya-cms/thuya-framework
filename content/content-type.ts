@@ -1,5 +1,8 @@
 interface IContentType {
-    id: string
+    id: string;
+    parts: {
+        name: string 
+    }[]
 }
 
 export default IContentType;

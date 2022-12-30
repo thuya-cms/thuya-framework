@@ -1,5 +1,6 @@
 import express, { Router } from 'express';
 import http from 'http';
+import contentManager from './content/content-manager';
 import IModule from './module';
 
 class ThuyaApp {
@@ -65,8 +66,12 @@ class ThuyaApp {
             module.contentTypes.forEach(contentType => {
                 console.debug(`Register content type: ${contentType.id}`);
 
-                this._expressApp.get("/" + contentType.id, (req, res, next) => {
-                    res.send(`Reading list of: ${contentType.id}`);
+                this._expressApp.get("/" + contentType.id, (req, res) => {
+                    res.json(contentManager.list(contentType));
+                });
+
+                this._expressApp.get("/" + contentType.id + "/:id", (req, res) => {
+                    res.json(contentManager.get(contentType, req.params["id"]));
                 });
             });
         }
