@@ -3,24 +3,13 @@ import http from 'http';
 import IModule from './module';
 
 class ThuyaApp {
-    private static _instance: ThuyaApp;
-    
     private _expressApp: express.Application;
     private _port: String = "8080";
     private _expressServer?: http.Server;
 
-    
-
-    public static getInstance(): ThuyaApp {
-        if (!this._instance)
-            this._instance = new ThuyaApp();
-
-        return this._instance;
-    }
 
 
-
-    private constructor() {
+    constructor() {
         this._expressApp = express();
         this._expressServer = undefined;
     }
@@ -63,4 +52,4 @@ class ThuyaApp {
     }
 }
 
-export default ThuyaApp.getInstance();
+export default new ThuyaApp();

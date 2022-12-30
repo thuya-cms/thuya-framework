@@ -4,6 +4,7 @@ import IModule from "../../module";
 class ClientModule implements IModule {
     router: Router;
     
+    
 
     constructor() {
         this.router = Router();
@@ -14,4 +15,4 @@ class ClientModule implements IModule {
     }
 }
 
-export default ClientModule;
+export default new ClientModule();
