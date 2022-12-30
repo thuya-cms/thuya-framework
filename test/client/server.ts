@@ -1,4 +1,5 @@
 import thuya from '../../index';
+import ClientModule from './client-module';
 
-let thuyaApp = thuya.getInstance();
-thuyaApp.start();
+thuya.use(new ClientModule());
+thuya.start();

@@ -1,5 +1,6 @@
-import express from 'express';
+import express, { Router } from 'express';
 import http from 'http';
+import IModule from './module';
 
 class ThuyaApp {
     private static _instance: ThuyaApp;
@@ -8,6 +9,7 @@ class ThuyaApp {
     private _port: String = "8080";
     private _expressServer?: http.Server;
 
+    
 
     public static getInstance(): ThuyaApp {
         if (!this._instance)
@@ -17,10 +19,12 @@ class ThuyaApp {
     }
 
 
+
     private constructor() {
         this._expressApp = express();
         this._expressServer = undefined;
     }
+
 
 
     /**
@@ -48,6 +52,15 @@ class ThuyaApp {
 
         this._expressServer.close();
     }
+
+    /**
+     * Adds a module for use to the Thuya application.
+     * 
+     * @param module the module to use
+     */
+    public use(module: IModule): void {
+        this._expressApp.use("/", module.router);
+    }
 }
 
-export default ThuyaApp;
+export default ThuyaApp.getInstance();
