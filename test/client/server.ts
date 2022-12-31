@@ -1,5 +1,7 @@
 import thuya from '../../index';
 import clientModule from './client-module';
+import localPersistency from './local-persistency';
 
-thuya.use(clientModule);
+thuya.usePersistency(localPersistency);
+thuya.useModule(clientModule);
 thuya.start();

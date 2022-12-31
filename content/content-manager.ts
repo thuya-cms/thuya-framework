@@ -1,17 +1,10 @@
+import factory from "../factory";
+import IPersistency from "../persistency/persistency";
 import IContentType from "./content-type";
 
 class ContentManager {
     public list(contentType: IContentType): any[] {
-        let dummyContentItem: any = {};
-        let result: any[] = [];
-        
-        contentType.parts.forEach(contentPart => {
-            dummyContentItem[contentPart.name] = `${contentPart.name} value`;
-        });
-
-        result.push(dummyContentItem);
-
-        return result;
+        return factory.getPersistency().list(contentType);
     }
 
     public get(contentType: IContentType, id: string): any {
@@ -22,6 +15,10 @@ class ContentManager {
         });
 
         return result;
+    }
+
+    public create(contentType: IContentType, data: any): void {
+        factory.getPersistency().create(contentType, data);
     }
 }
 
