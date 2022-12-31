@@ -5,6 +5,7 @@ import contentManager from './content/content-manager';
 import factory from './factory';
 import IModule from './module';
 import IPersistency from './persistency/persistency';
+import { of as contentItemOf } from './content/content-item';
 
 class ThuyaApp {
     private _expressApp: express.Application;
@@ -88,15 +89,26 @@ class ThuyaApp {
                 console.debug(`Register content type: ${contentType.id}`);
 
                 this._expressApp.get("/" + contentType.id, (req, res) => {
-                    res.json(contentManager.list(contentType));
+                    let data: any = [];
+
+                    contentManager.list(contentType).forEach(contentItem => {
+                        data.push({ id: contentItem.id, ...contentItem.getData() });
+                    });
+
+                    res.json(data);
                 });
 
                 this._expressApp.get("/" + contentType.id + "/:id", (req, res) => {
-                    res.json(contentManager.get(contentType, req.params["id"]));
+                    let data = contentManager.get(contentType, req.params["id"]);
+
+                    res.json({
+                        id: req.params["id"],
+                        ...data.getData()
+                    });
                 });
                 
                 this._expressApp.post("/" + contentType.id, (req, res) => {
-                    contentManager.create(contentType, req.body);
+                    contentManager.create(contentType, contentItemOf(req.body));
                 });
             });
         }

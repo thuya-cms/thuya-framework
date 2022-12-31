@@ -7,5 +7,5 @@ content-type: application/json
 
 {
     "id": "1",
-    "time": "Item 1"
+    "title": "Item 1"
 }

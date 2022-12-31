@@ -1,6 +1,6 @@
 interface IContentType {
     id: string;
-    parts: {
+    fields: {
         name: string 
     }[]
 }
