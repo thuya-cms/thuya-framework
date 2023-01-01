@@ -2,6 +2,10 @@ GET http://localhost:8080/client-content-type HTTP/1.1
 
 ###
 
+GET http://localhost:8080/client-content-type/1 HTTP/1.1
+
+###
+
 POST http://localhost:8080/client-content-type HTTP/1.1
 content-type: application/json
 

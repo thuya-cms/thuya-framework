@@ -16,12 +16,13 @@ class ContentManager {
 
     public get(contentType: IContentType, id: string): IContentItem<any> {
         let result: any = {};
+        let resultContentItem: IContentItem<any>;
         
         contentType.fields.forEach(contentPart => {
             result[contentPart.name] = `${contentPart.name} value`;
         });
 
-        return result;
+        return contentItemOf(result);
     }
 
     public create(contentType: IContentType, contentItem: IContentItem<any>): void {

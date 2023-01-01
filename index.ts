@@ -1,11 +1,13 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import http from 'http';
+import mung from 'express-mung';
 import contentManager from './content/content-manager';
 import factory from './factory';
 import IModule from './module';
 import IPersistency from './persistency/persistency';
 import { of as contentItemOf } from './content/content-item';
+import IContentType from './content/content-type';
 
 class ThuyaApp {
     private _expressApp: express.Application;
@@ -88,31 +90,62 @@ class ThuyaApp {
             module.contentTypes.forEach(contentType => {
                 console.debug(`Register content type: ${contentType.id}`);
 
-                this._expressApp.get("/" + contentType.id, (req, res) => {
-                    let data: any = [];
-
-                    contentManager.list(contentType).forEach(contentItem => {
-                        data.push({ id: contentItem.id, ...contentItem.getData() });
-                    });
-
-                    res.json(data);
-                });
-
-                this._expressApp.get("/" + contentType.id + "/:id", (req, res) => {
-                    let data = contentManager.get(contentType, req.params["id"]);
-
-                    res.json({
-                        id: req.params["id"],
-                        ...data.getData()
-                    });
-                });
-                
-                this._expressApp.post("/" + contentType.id, (req, res) => {
-                    contentManager.create(contentType, contentItemOf(req.body));
-                    res.status(201);
-                });
+                this.registerMiddlewares(contentType);
+                this.registerRESTMethods(contentType);
             });
         }
+    }
+
+    private registerMiddlewares(contentType: IContentType): void {
+        if (!contentType.middlewares) return;
+        
+        contentType.middlewares.forEach(middleware => {
+            switch (middleware.event) {
+                case "list":
+                    this._expressApp.get("/" + contentType.id, mung.json((body, req, res) => {
+                        middleware.function(body, req, res);
+                    }));
+                    break;
+                case "get":
+                    this._expressApp.get("/" + contentType.id + "/:id", mung.json((body, req, res) => {
+                        middleware.function(body, req, res);
+                    }));
+                    break;
+                case "create":
+                    this._expressApp.post("/" + contentType.id, mung.json((body, req, res) => {
+                        middleware.function(body, req, res);
+                    }));
+                    break;
+                default:
+                    throw new Error("Unknown middleware event.");
+            }
+        });
+    }
+
+    private registerRESTMethods(contentType: IContentType): void {
+        this._expressApp.get("/" + contentType.id, (req, res) => {
+            let data: any = [];
+
+            contentManager.list(contentType).forEach(contentItem => {
+                data.push({ id: contentItem.id, ...contentItem.getData() });
+            });
+
+            res.json(data);
+        });
+
+        this._expressApp.get("/" + contentType.id + "/:id", (req, res) => {
+            let data = contentManager.get(contentType, req.params["id"]);
+
+            res.json({
+                id: req.params["id"],
+                ...data.getData()
+            });
+        });
+
+        this._expressApp.post("/" + contentType.id, (req, res) => {
+            contentManager.create(contentType, contentItemOf(req.body));
+            res.status(201);
+        });
     }
 }
 
