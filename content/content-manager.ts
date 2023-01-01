@@ -3,9 +3,9 @@ import IContentItem, { of as contentItemOf } from "./content-item";
 import IContentType from "./content-type";
 
 class ContentManager {
-    public list(contentType: IContentType): IContentItem[] {
+    public list(contentType: IContentType): IContentItem<any>[] {
         const persistencyData = factory.getPersistency().list(contentType);
-        let result: IContentItem[] = [];
+        let result: IContentItem<any>[] = [];
 
         persistencyData.forEach(data => {
             result.push(contentItemOf(data));
@@ -14,7 +14,7 @@ class ContentManager {
         return result;
     }
 
-    public get(contentType: IContentType, id: string): IContentItem {
+    public get(contentType: IContentType, id: string): IContentItem<any> {
         let result: any = {};
         
         contentType.fields.forEach(contentPart => {
@@ -24,7 +24,7 @@ class ContentManager {
         return result;
     }
 
-    public create(contentType: IContentType, contentItem: IContentItem): void {
+    public create(contentType: IContentType, contentItem: IContentItem<any>): void {
         let data: any = {};
         
         data["id"] = contentItem.id;

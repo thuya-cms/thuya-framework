@@ -1,24 +1,39 @@
-interface IContentItem {
+interface IContentItem<T> {
     id: string;
 
-    getData(): any;
-    setData(data: any): void;
+    getData(): T;
 }
 
-function of(data: any): IContentItem {
-    return {
-        id: data.id,
-        getData() {
-            let dataWithoutId = { ...data };
-            delete dataWithoutId["id"];
+class AnyContentItem implements IContentItem<any> {
+    private data: any[];
 
-            return dataWithoutId;
-        },
-        setData(data) {
-            throw new Error("Method not implemented.");
-        },
-    };
+    id: string;
+
+
+
+    constructor() {
+        this.id = "";
+        this.data = [];
+    }
+
+
+
+    getData(): any[] {
+        return this.data;
+    }
+
+    setData(data: any): void {
+        this.data = data;
+    }
+}
+
+function of(data: any): IContentItem<any> {
+    const anyContentItem = new AnyContentItem();
+    anyContentItem.id = data.id;
+    anyContentItem.setData(data);
+    
+    return anyContentItem;
 }
 
 export default IContentItem;
-export { of };
+export { of, AnyContentItem };
