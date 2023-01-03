@@ -6,7 +6,17 @@ class LocalPersistency implements IPersistency {
 
 
     get(contentType: IContentType, id: string) {
-        throw new Error("Method not implemented.");
+        const localData = this._localStore.find(data => data.contentTypeId === contentType.id);
+        
+        if (!localData)
+            return null;
+        
+        const localContentItem = localData.data.find(localDataItem => localDataItem.id === id);
+
+        if (!localContentItem)
+            return null;
+
+        return localContentItem;
     }
 
     list(contentType: IContentType): any[] {

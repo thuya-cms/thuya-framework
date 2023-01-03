@@ -15,14 +15,9 @@ class ContentManager {
     }
 
     public get(contentType: IContentType, id: string): IContentItem<any> {
-        let result: any = {};
-        let resultContentItem: IContentItem<any>;
-        
-        contentType.fields.forEach(contentPart => {
-            result[contentPart.name] = `${contentPart.name} value`;
-        });
+        const persistencyData = factory.getPersistency().get(contentType, id);
 
-        return contentItemOf(result);
+        return contentItemOf(persistencyData);
     }
 
     public create(contentType: IContentType, contentItem: IContentItem<any>): void {
