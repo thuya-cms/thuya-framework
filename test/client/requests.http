@@ -1,11 +1,4 @@
-GET http://localhost:8080/client-content-type HTTP/1.1
-
-###
-
-GET http://localhost:8080/client-content-type/1 HTTP/1.1
-
-###
-
+### Create client content item
 POST http://localhost:8080/client-content-type HTTP/1.1
 content-type: application/json
 
@@ -13,3 +6,39 @@ content-type: application/json
     "id": "1",
     "title": "Title 1"
 }
+
+### Get client content items 
+GET http://localhost:8080/client-content-type HTTP/1.1
+
+### Get one client content item 
+GET http://localhost:8080/client-content-type/1 HTTP/1.1
+
+
+### Create content type
+POST http://localhost:8080/content-type HTTP/1.1
+content-type: application/json
+
+{
+    "id": "page",
+    "fields": [{
+        "name": "title"
+    }, {
+        "name": "description"
+    }]
+}
+
+### Get content types
+GET http://localhost:8080/content-type HTTP/1.1
+
+### Create page content item
+POST http://localhost:8080/page HTTP/1.1
+content-type: application/json
+
+{
+    "id": "1",
+    "title": "Page 1",
+    "description": "Page 1 description"
+}
+
+### List page content items
+GET http://localhost:8080/page HTTP/1.1

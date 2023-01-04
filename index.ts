@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
 import bodyParser from 'body-parser';
 import http from 'http';
 import mung from 'express-mung';
@@ -21,6 +21,9 @@ class ThuyaApp {
         this._expressApp = express();
         this._expressApp.use(bodyParser.json());	
 		this._expressApp.use(bodyParser.urlencoded({ extended: false }));
+        
+        this._expressApp.get("/content-type", this.listContentTypes);
+        this._expressApp.post("/content-type", this.createContentType.bind(this));
 
         this._expressServer = undefined;
         this._modules = [];
@@ -29,7 +32,7 @@ class ThuyaApp {
 
 
     /**
-     * Start the Thuya CMS application.
+     * Load content types and start the Thuya CMS application.
      * 
      * @throws will throw an exception if the app is already running
      * @throws will throw an exception if there is no persistency implementation set
@@ -40,6 +43,8 @@ class ThuyaApp {
 
         // Check if persistency is registered.
         factory.getPersistency();
+
+        this.loadContentTypes();
 
         this._expressServer = this._expressApp.listen(this._port, () => {
             console.debug(`Thuya application started on port ${this._port}`);
@@ -90,11 +95,17 @@ class ThuyaApp {
             module.contentTypes.forEach(contentType => {
                 console.debug(`Register content type: ${contentType.id}`);
 
-                this.registerBeforeMiddlewares(contentType);
-                this.registerAfterMiddlewares(contentType);
-                this.registerRESTMethods(contentType);
+                contentManager.contentTypeManager.add(contentType);
             });
         }
+    }
+
+    private loadContentTypes() {
+        contentManager.contentTypeManager.list().forEach(contentType => {
+            this.registerBeforeMiddlewares(contentType);
+            this.registerAfterMiddlewares(contentType);
+            this.registerRESTMethods(contentType);
+        });
     }
 
     private registerBeforeMiddlewares(contentType: IContentType): void {
@@ -107,16 +118,19 @@ class ThuyaApp {
                         middleware.function(req, res, next);
                     });
                     break;
+
                 case ContentTypeMiddlewareEvent.get:
                     this._expressApp.get("/" + contentType.id + "/:id", (req, res, next) => {
                         middleware.function(req, res, next);
                     });
                     break;
+
                 case ContentTypeMiddlewareEvent.create:
                     this._expressApp.post("/" + contentType.id, (req, res, next) => {
                         middleware.function(req, res, next);
                     });
                     break;
+
                 default:
                     throw new Error("Unknown middleware event.");
             }
@@ -133,16 +147,19 @@ class ThuyaApp {
                         middleware.function(body, req, res);
                     }));
                     break;
+
                 case ContentTypeMiddlewareEvent.get:
                     this._expressApp.get("/" + contentType.id + "/:id", mung.json((body, req, res) => {
                         middleware.function(body, req, res);
                     }));
                     break;
+
                 case ContentTypeMiddlewareEvent.create:
                     this._expressApp.post("/" + contentType.id, mung.json((body, req, res) => {
                         middleware.function(body, req, res);
                     }));
                     break;
+
                 default:
                     throw new Error("Unknown middleware event.");
             }
@@ -153,7 +170,7 @@ class ThuyaApp {
         this._expressApp.get("/" + contentType.id, (req, res) => {
             let data: any = [];
 
-            contentManager.list(contentType).forEach(contentItem => {
+            contentManager.contentItemManager.list(contentType).forEach(contentItem => {
                 data.push({ id: contentItem.id, ...contentItem.getData() });
             });
 
@@ -161,7 +178,7 @@ class ThuyaApp {
         });
 
         this._expressApp.get("/" + contentType.id + "/:id", (req, res) => {
-            let data = contentManager.get(contentType, req.params["id"]);
+            let data = contentManager.contentItemManager.get(contentType, req.params["id"]);
 
             res.json({
                 id: req.params["id"],
@@ -170,9 +187,36 @@ class ThuyaApp {
         });
 
         this._expressApp.post("/" + contentType.id, (req, res) => {
-            contentManager.create(contentType, contentItemOf(req.body));
+            contentManager.contentItemManager.create(contentType, contentItemOf(req.body));
             res.status(201);
         });
+    }
+
+    private listContentTypes(req: Request, res: Response) {
+        const contentTypes: IContentType[] = contentManager.contentTypeManager.list();
+        let contentTypeData: any[] = [];
+
+        contentTypes.forEach(contentType => {
+            contentTypeData.push({
+                id: contentType.id,
+                fields: contentType.fields
+            });
+        })
+
+        res.json(contentTypeData);
+    }
+
+    private createContentType(req: Request, res: Response) {
+        const contentType: IContentType = {
+            id: req.body.id,
+            fields: req.body.fields
+        };
+        
+        contentManager.contentTypeManager.create(contentType);
+
+        this.registerRESTMethods(contentType);
+
+        res.status(201);
     }
 }
 

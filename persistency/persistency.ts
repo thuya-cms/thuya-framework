@@ -1,9 +1,10 @@
 import IContentType from "../content/content-type";
+import IContentItemPersistency from "./content-item-persistency";
+import IContentTypePersistency from "./content-type-persistency";
 
 interface IPersistency {
-    get(contentType: IContentType, id: string): any;
-    list(contentType: IContentType): any[];
-    create(contentType: IContentType, data: any): void;
+    contentTypePersistency: IContentTypePersistency;
+    contentItemPersistency: IContentItemPersistency;
 }
 
 export default IPersistency;
