@@ -1,6 +1,6 @@
 import factory from "../factory";
 import IContentItem, { of as contentItemOf } from "./content-item";
-import IContentType from "./content-type";
+import IContentType, { ContentTypeFieldType } from "./content-type";
 
 class ContentItemManager {
     public list(contentType: IContentType): IContentItem<any>[] {
@@ -32,6 +32,26 @@ class ContentItemManager {
             if (field.required) {
                 if (!contentItem.getData()[field.name])
                     throw new Error(`Property "${field.name}" is required.`)       
+            }
+
+            switch (field.type) {
+                case ContentTypeFieldType.string:
+                    // Everything is a valid string.
+                    break;
+
+                case ContentTypeFieldType.number:
+                    if (Number.isNaN(Number(contentItem.getData()[field.name])))
+                        throw new Error(`Value of property "${field.name}" is not a number.`);
+                    break;
+
+                case ContentTypeFieldType.date:
+                    // Date needs to be provided as the number of milliseconds since 1970 January 1.
+                    if (Number.isNaN(Number(contentItem.getData()[field.name])))
+                        throw new Error(`Value of property "${field.name}" is not a date in milliseconds since 1970 January 1.`);
+                    break;
+
+                default:
+                    throw new Error(`Unknow filed type for property ${field.name}.`);
             }
         });
         

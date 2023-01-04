@@ -4,10 +4,17 @@ enum ContentTypeMiddlewareEvent {
     create
 }
 
+enum ContentTypeFieldType {
+    string,
+    number,
+    date
+}
+
 interface IContentType {
     id: string;
     fields: {
         name: string,
+        type: ContentTypeFieldType,
         required?: boolean
     }[],
     middlewares?: {
@@ -23,4 +30,4 @@ interface IContentType {
 }
 
 export default IContentType;
-export { ContentTypeMiddlewareEvent };
+export { ContentTypeMiddlewareEvent, ContentTypeFieldType };

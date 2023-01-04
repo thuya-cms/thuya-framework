@@ -1,12 +1,16 @@
 import { NextFunction, Request, Response } from 'express';
-import IContentType, { ContentTypeMiddlewareEvent } from "../../content/content-type";
+import IContentType, { ContentTypeMiddlewareEvent, ContentTypeFieldType } from "../../content/content-type";
 
 class ClientContentType implements IContentType {
     id: string = "client-content-type";
     
     fields = [{
         name: "title",
+        type: ContentTypeFieldType.string,
         required: true
+    }, {
+        name: "numValue",
+        type: ContentTypeFieldType.number
     }];
 
     middlewares = {
