@@ -5,7 +5,8 @@ class ClientContentType implements IContentType {
     id: string = "client-content-type";
     
     fields = [{
-        name: "title"
+        name: "title",
+        required: true
     }];
 
     middlewares = {
@@ -24,8 +25,8 @@ class ClientContentType implements IContentType {
 
 
     validateContent(req: Request, res: Response, next: NextFunction) {
-        if (!req.body.title)
-            res.status(500).send("Title is mandatory.");
+        if (req.body.title && req.body.title.toString().startsWith("A"))
+            res.status(500).send("Cannot strat with A.");
         else
             next();
     }

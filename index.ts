@@ -187,8 +187,14 @@ class ThuyaApp {
         });
 
         this._expressApp.post("/" + contentType.id, (req, res) => {
-            contentManager.contentItemManager.create(contentType, contentItemOf(req.body));
-            res.status(201);
+            try {
+                contentManager.contentItemManager.create(contentType, contentItemOf(req.body));
+                res.status(201);
+            }
+
+            catch (error: any) {
+                res.status(500).send(error.message);
+            }
         });
     }
 

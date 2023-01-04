@@ -7,7 +7,8 @@ enum ContentTypeMiddlewareEvent {
 interface IContentType {
     id: string;
     fields: {
-        name: string 
+        name: string,
+        required?: boolean
     }[],
     middlewares?: {
         before: {

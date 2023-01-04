@@ -20,17 +20,37 @@ class ContentItemManager {
         return contentItemOf(persistencyData);
     }
 
+    /**
+     * Create a new content item of a goven content type.
+     * 
+     * @param contentType content type of the content item 
+     * @param contentItem the content item to create
+     * @throws will throw an exception if data is not valid
+     */
     public create(contentType: IContentType, contentItem: IContentItem<any>): void {
+        contentType.fields.forEach(field => {
+            if (field.required) {
+                if (!contentItem.getData()[field.name])
+                    throw new Error(`Property "${field.name}" is required.`)       
+            }
+        });
+        
+        let data: any = this.flattenContentItemData(contentItem, contentType);
+
+        factory.getPersistency().contentItemPersistency.create(contentType, data);
+    }
+
+
+    private flattenContentItemData(contentItem: IContentItem<any>, contentType: IContentType) {
         let data: any = {};
-        
+
         data["id"] = contentItem.id;
-        
+
         for (const property in contentItem.getData()) {
             if (contentType.fields.find(field => field.name === property))
                 data[property] = contentItem.getData()[property];
         }
-
-        factory.getPersistency().contentItemPersistency.create(contentType, data);
+        return data;
     }
 }
 
