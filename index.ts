@@ -2,7 +2,7 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import http from 'http';
 import factory from './factory';
-import IPersistency from './persistency/persistency';
+import IPersistency from './persistency/persistency.interface';
 
 class ThuyaApp {
     private _expressApp: express.Application;

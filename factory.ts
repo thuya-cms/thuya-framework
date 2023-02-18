@@ -1,4 +1,4 @@
-import IPersistency from "./persistency/persistency";
+import IPersistency from "./persistency/persistency.interface";
 
 class Factory {
     private _persistency?: IPersistency;
