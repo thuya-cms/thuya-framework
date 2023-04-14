@@ -1,8 +1,9 @@
-import express from 'express';
+import express, { Router } from 'express';
 import bodyParser from 'body-parser';
 import http from 'http';
 import factory from './factory';
 import IPersistency from './persistency/persistency.interface';
+import IModule from './module';
 
 class ThuyaApp {
     private _expressApp: express.Application;
@@ -32,7 +33,7 @@ class ThuyaApp {
             throw new Error("App is already running.");
 
         // Check if persistency is registered.
-        factory.getPersistency();
+        factory.getContentTypePersistency();
 
         this._expressServer = this._expressApp.listen(this._port, () => {
             console.debug(`Thuya application started on port ${this._port}`);
@@ -59,6 +60,26 @@ class ThuyaApp {
      */
     public usePersistency(persistency: IPersistency): void {
         factory.setPersistency(persistency);
+    }
+
+    /**
+     * Import a module.
+     * 
+     * @param module the module to import
+     */
+    public useModule(module: IModule) {
+        module.getContentTypes().forEach(contentType => {
+
+        });
+
+        this.applyControllers(module);
+    }
+
+
+    private applyControllers(module: IModule) {
+        module.getControllers().forEach(controller => {
+            this._expressApp.use(controller.getRouter());
+        });
     }
 }
 

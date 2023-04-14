@@ -23,7 +23,7 @@ class Factory {
      * 
      * @throws will throw an exception if there is no persistency implementation injected
      */
-    public getPersistency(): IPersistency {
+    public getContentTypePersistency(): IPersistency {
         if (!this._persistency)
             throw new Error("No persistency implementation injected.");
 

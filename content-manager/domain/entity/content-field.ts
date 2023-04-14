@@ -13,7 +13,7 @@ enum ContentFieldType {
 }
 
 class ContentField {
-    private displayOptions: string[] = [];
+    private displayOptions: { key: string, value: any }[] = [];
     private isRequired: boolean = false;
     private handlers: ((contentField: ContentField) => void)[] = [];
 
@@ -52,14 +52,17 @@ class ContentField {
         return this.isRequired;
     }
     
-    addDisplayOption(displayOption: string) {
-        if (!displayOption || this.displayOptions.includes(displayOption))
+    addDisplayOption(key: string, value: any) {
+        if (!key || !value || this.displayOptions.find(existingDisplayOption => existingDisplayOption.key === key))
             throw new IdentifiableError(ErrorCode.InvalidDisplayOption, "Invalid display option.");
 
-        this.displayOptions.push(displayOption);
+        this.displayOptions.push({
+            key: key,
+            value: value
+        });
     }
 
-    getDisplayOptions(): string[] {
+    getDisplayOptions(): { key: string, value: any }[] {
         return this.displayOptions;
     }
 
@@ -72,4 +75,4 @@ class ContentField {
     }
 }
 
-export default ContentField;
+export { ContentField, ErrorCode, ContentFieldType };
