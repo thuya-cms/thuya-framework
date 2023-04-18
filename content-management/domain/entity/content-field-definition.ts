@@ -1,3 +1,4 @@
+import Entity from "../../../common/entity";
 import IdentifiableError from "../../../identitfiable-error";
 
 enum ErrorCode {
@@ -12,17 +13,22 @@ enum ContentFieldType {
     Date = "date"
 }
 
-class ContentField {
+type ContentFieldTypes = string | Date | number | string[] | Date[] | number[]; 
+type ContentFieldHandler = (contentFieldData: ContentFieldTypes) => void;
+
+class ContentFieldDefinition extends Entity {
     private displayOptions: { key: string, value: any }[] = [];
     private isRequired: boolean = false;
-    private handlers: ((contentField: ContentField) => void)[] = [];
+    private handlers: ContentFieldHandler[] = [];
 
     
     
     constructor(
-            private id: string, 
+            id: string, 
             private name: string, 
             private type: ContentFieldType) {
+        super(id);
+        
         if (!name) 
             throw new IdentifiableError(ErrorCode.InvalidName, "Name cannot be initial.");
 
@@ -31,10 +37,6 @@ class ContentField {
     }
 
 
-
-    getId(): string {
-        return this.id;
-    }
 
     getName(): string {
         return this.name;
@@ -66,13 +68,13 @@ class ContentField {
         return this.displayOptions;
     }
 
-    addHandler(handler: (contentField: ContentField) => void) {
+    addHandler(handler: ContentFieldHandler) {
         this.handlers.push(handler);
     }
 
-    getHandlers(): ((contentField: ContentField) => void)[] {
+    getHandlers(): ContentFieldHandler[] {
         return this.handlers;
     }
 }
 
-export { ContentField, ErrorCode, ContentFieldType };
+export { ContentFieldDefinition, ErrorCode, ContentFieldType, ContentFieldTypes };

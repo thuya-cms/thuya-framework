@@ -1,33 +1,32 @@
+import Entity from "../../../common/entity";
 import IdentifiableError from "../../../identitfiable-error";
-import { ContentField } from "./content-field";
+import { ContentFieldDefinition } from "./content-field-definition";
 
 enum ErrorCode {
     InvalidName = "invalid-name",
     InvalidContentField = "invalid-content-field"
 }
 
-class ContentPart {
-    private contentFields: ContentField[] = [];
-    private handlers: ((contentPart: ContentPart) => void)[] = [];
+class ContentFieldGroupDefinition<T> extends Entity {
+    private contentFields: ContentFieldDefinition[] = [];
+    private handlers: ((contentFieldGroupData: T) => void)[] = [];
 
 
 
-    constructor(private id: string, private name: string) {
+    constructor(id: string, private name: string) {
+        super(id);
+        
         if (!name) 
             throw new IdentifiableError(ErrorCode.InvalidName, "Name cannot be initial.");
     }
 
 
 
-    getId(): string {
-        return this.id;
-    }
-
     getName(): string {
         return this.name;
     }
     
-    addContentField(contentField: ContentField) {
+    addContentField(contentField: ContentFieldDefinition) {
         if (!contentField)
             throw new IdentifiableError(ErrorCode.InvalidContentField, "Content field cannot be undefined.");
 
@@ -37,17 +36,17 @@ class ContentPart {
         this.contentFields.push(contentField);
     }
 
-    getContentFields(): ContentField[] {
+    getContentFields(): ContentFieldDefinition[] {
         return this.contentFields;
     }
 
-    addHandler(handler: (contentPart: ContentPart) => void) {
+    addHandler(handler: (contentFieldGroupData: T) => void) {
         this.handlers.push(handler);
     }
 
-    getHandlers(): ((contentPart: ContentPart) => void)[] {
+    getHandlers(): ((contentFieldGroupData: T) => void)[] {
         return this.handlers;
     }
 }
 
-export { ContentPart, ErrorCode };
+export { ContentFieldGroupDefinition, ErrorCode };
