@@ -1,14 +1,15 @@
 import { NextFunction, Request, Response } from "express";
-import listAllContent from "../domain/usecase/list-all-content";
-import createContent from "../domain/usecase/create-content";
-import readContentDefinition from "../domain/usecase/read-content-definition";
-import readContent from "../domain/usecase/read-content";
-import deleteContent from "../domain/usecase/delete-content";
+import listContent from "../domain/usecase/content/list-content";
+import createContent from "../domain/usecase/content/create-content";
+import readContentDefinition from "../domain/usecase/content-definition/read-content-definition";
+import readContent from "../domain/usecase/content/read-content";
+import deleteContent from "../domain/usecase/content/delete-content";
+import updateContent from "../domain/usecase/content/update-content";
 
 class ExpressContentManager {
-    listAllContent(request: Request, response: Response, next: NextFunction) {
+    listContent(request: Request, response: Response, next: NextFunction) {
         let contentName = this.getContentName(request);
-        let content = listAllContent.execute(contentName);
+        let content = listContent.execute(contentName);
 
         response.json(content).status(200);
 
@@ -64,6 +65,27 @@ class ExpressContentManager {
         try {
             let contentDefinition = readContentDefinition.execute(contentName);
             deleteContent.execute(contentDefinition, id);
+
+            response.sendStatus(200);
+
+            next();
+        }
+
+        catch (error: any) {
+            response.json({
+                code: error.code,
+                message: error.message
+            }).status(500);
+        }
+    }
+
+    updateContent(request: Request, response: Response, next: NextFunction) {
+        let contentName = this.getContentName(request);
+        let content = request.body;
+
+        try {
+            let contentDefinition = readContentDefinition.execute(contentName);
+            updateContent.execute(contentDefinition, content);
 
             response.sendStatus(200);
 

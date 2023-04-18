@@ -1,9 +1,9 @@
 import moment from "moment";
-import IdentifiableError from "../../../identitfiable-error";
-import { ContentDefinition } from "../entity/content-definition";
-import factory from "../factory";
-import { ContentFieldDefinition, ContentFieldType } from "../entity/content-field-definition";
-import logger from "../../../util/logger";
+import IdentifiableError from "../../../../identitfiable-error";
+import { ContentDefinition } from "../../entity/content-definition";
+import factory from "../../factory";
+import { ContentFieldDefinition, ContentFieldType } from "../../entity/content-field-definition";
+import logger from "../../../../util/logger";
 
 enum ErrorCode {
     InvalidNumber = "invalid-number",

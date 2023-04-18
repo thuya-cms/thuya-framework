@@ -1,6 +1,7 @@
 import { ContentDefinition } from "../entity/content-definition";
 
 interface IContentManagementPersistency {
+    updateContent(contentName: string, content: any): void;
     deleteContent(contentName: string, id: string): void;
     readContent(contentName: string, id: string): any;
     readContentDefinition(contentName: string): ContentDefinition<any> | undefined;

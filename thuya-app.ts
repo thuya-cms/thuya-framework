@@ -66,10 +66,11 @@ class ThuyaApp {
     private registerContentDefinition(contentDefinition: ContentDefinition<any>) {
         contentDefinitionManager.createContentDefinition(contentDefinition);
 
-        this._expressApp.get("/" + contentDefinition.getName(), expressContentManager.listAllContent.bind(expressContentManager));
+        this._expressApp.get("/" + contentDefinition.getName(), expressContentManager.listContent.bind(expressContentManager));
         this._expressApp.get("/" + contentDefinition.getName() + "/:id", expressContentManager.readContent.bind(expressContentManager));
         this._expressApp.post("/" + contentDefinition.getName(), expressContentManager.createContent.bind(expressContentManager));
         this._expressApp.delete("/" + contentDefinition.getName() + "/:id", expressContentManager.deleteContent.bind(expressContentManager));
+        this._expressApp.patch("/" + contentDefinition.getName(), expressContentManager.updateContent.bind(expressContentManager));
     }
 }
 

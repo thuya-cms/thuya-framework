@@ -1,9 +1,9 @@
-import factory from "../factory";
+import factory from "../../factory";
 
-class ListAllContent {
+class ListContent {
     execute(contentName: string): any[] {
         return factory.getPersistency().listContent(contentName);
     }
 }
 
-export default new ListAllContent();
+export default new ListContent();

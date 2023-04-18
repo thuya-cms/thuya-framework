@@ -1,6 +1,6 @@
-import logger from '../../../util/logger';
-import { ContentDefinition } from '../entity/content-definition';
-import factory from '../factory';
+import logger from '../../../../util/logger';
+import { ContentDefinition } from '../../entity/content-definition';
+import factory from '../../factory';
 
 class CreateContentDefinition {
     execute(contentDefinition: ContentDefinition<any>) {

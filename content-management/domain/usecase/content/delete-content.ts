@@ -1,5 +1,5 @@
-import { ContentDefinition } from "../entity/content-definition";
-import factory from "../factory";
+import { ContentDefinition } from "../../entity/content-definition";
+import factory from "../../factory";
 
 class DeleteContent<T> {
     execute(contentDefinition: ContentDefinition<T>, id: string) {

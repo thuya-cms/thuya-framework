@@ -1,7 +1,7 @@
-import IdentifiableError from "../../../identitfiable-error";
-import logger from "../../../util/logger";
-import { ContentDefinition } from "../entity/content-definition";
-import factory from "../factory";
+import IdentifiableError from "../../../../identitfiable-error";
+import logger from "../../../../util/logger";
+import { ContentDefinition } from "../../entity/content-definition";
+import factory from "../../factory";
 
 enum ErrorCode {
     NotFound = "not-found",
