@@ -3,6 +3,7 @@ import listAllContent from "../domain/usecase/list-all-content";
 import createContent from "../domain/usecase/create-content";
 import readContentDefinition from "../domain/usecase/read-content-definition";
 import readContent from "../domain/usecase/read-content";
+import deleteContent from "../domain/usecase/delete-content";
 
 class ExpressContentManager {
     listAllContent(request: Request, response: Response, next: NextFunction) {
@@ -45,6 +46,27 @@ class ExpressContentManager {
     
             response.json({id: id}).status(201);
     
+            next();
+        }
+
+        catch (error: any) {
+            response.json({
+                code: error.code,
+                message: error.message
+            }).status(500);
+        }
+    }
+
+    deleteContent(request: Request, response: Response, next: NextFunction) {
+        let contentName = this.getContentName(request);
+        let id = request.params.id;
+
+        try {
+            let contentDefinition = readContentDefinition.execute(contentName);
+            deleteContent.execute(contentDefinition, id);
+
+            response.sendStatus(200);
+
             next();
         }
 

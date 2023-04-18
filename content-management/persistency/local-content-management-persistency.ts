@@ -31,6 +31,20 @@ class LocalContentManagementPersistency implements IContentManagementPersistency
         return content.id;
     }
 
+    deleteContent(contentName: string, id: string): void {
+        let contentList = this.content.find(content => content.contentName === contentName);
+        
+        if (!contentList)
+            throw new Error("Content not found.");
+
+        let contentIndex = contentList.content.findIndex(content => content["id"] === id);
+
+        if (contentIndex === -1)
+            throw new Error("Content not found.");
+
+        contentList.content.splice(contentIndex, 1);
+    }
+
     readContentDefinition(contentName: string): ContentDefinition<any> | undefined {
         logger.debug(`Reading '${ contentName }' content definition from local store.`);
         return this.contentDefinitions.find(contentDefinition => contentDefinition.getName() === contentName);

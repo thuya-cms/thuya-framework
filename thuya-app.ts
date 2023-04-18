@@ -69,6 +69,7 @@ class ThuyaApp {
         this._expressApp.get("/" + contentDefinition.getName(), expressContentManager.listAllContent.bind(expressContentManager));
         this._expressApp.get("/" + contentDefinition.getName() + "/:id", expressContentManager.readContent.bind(expressContentManager));
         this._expressApp.post("/" + contentDefinition.getName(), expressContentManager.createContent.bind(expressContentManager));
+        this._expressApp.delete("/" + contentDefinition.getName() + "/:id", expressContentManager.deleteContent.bind(expressContentManager));
     }
 }
 
