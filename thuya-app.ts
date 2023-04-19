@@ -62,6 +62,10 @@ class ThuyaApp {
         });
     }
 
+    public getExpressApp(): express.Application {
+        return this._expressApp;
+    }
+
 
     private registerContentDefinition(contentDefinition: ContentDefinition<any>) {
         contentDefinitionManager.createContentDefinition(contentDefinition);

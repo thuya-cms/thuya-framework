@@ -5,10 +5,11 @@ import readContentDefinition from "../domain/usecase/content-definition/read-con
 import readContent from "../domain/usecase/content/read-content";
 import deleteContent from "../domain/usecase/content/delete-content";
 import updateContent from "../domain/usecase/content/update-content";
+import expressHelper from "../../common/utility/express-helper";
 
 class ExpressContentManager {
     listContent(request: Request, response: Response, next: NextFunction) {
-        let contentName = this.getContentName(request);
+        let contentName = expressHelper.getContentName(request);
         let content = listContent.execute(contentName);
 
         response.json(content).status(200);
@@ -17,7 +18,7 @@ class ExpressContentManager {
     }
 
     readContent(request: Request, response: Response, next: NextFunction) {
-        let contentName = this.getContentName(request);
+        let contentName = expressHelper.getContentName(request);
         let id = request.params.id;
 
         try {
@@ -38,7 +39,7 @@ class ExpressContentManager {
     }
     
     createContent(request: Request, response: Response, next: NextFunction) {
-        let contentName = this.getContentName(request);
+        let contentName = expressHelper.getContentName(request);
         let content = request.body;
 
         try {
@@ -59,7 +60,7 @@ class ExpressContentManager {
     }
 
     deleteContent(request: Request, response: Response, next: NextFunction) {
-        let contentName = this.getContentName(request);
+        let contentName = expressHelper.getContentName(request);
         let id = request.params.id;
 
         try {
@@ -80,7 +81,7 @@ class ExpressContentManager {
     }
 
     updateContent(request: Request, response: Response, next: NextFunction) {
-        let contentName = this.getContentName(request);
+        let contentName = expressHelper.getContentName(request);
         let content = request.body;
 
         try {
@@ -98,11 +99,6 @@ class ExpressContentManager {
                 message: error.message
             }).status(500);
         }
-    }
-
-
-    private getContentName(request: Request) {
-        return request.url.split("/")[1];
     }
 }
 
