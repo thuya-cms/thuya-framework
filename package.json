@@ -2,11 +2,9 @@
   "name": "@thuya/framework",
   "version": "1.0.0",
   "description": "Thuya CMS - Framework",
-  "main": "index.ts",
+  "main": "thuya-app.ts",
   "scripts": {
-    "compile": "npx tsc",
-    "run:mock": "npx tsc && node dist/test/client/server.js",
-    "run:dev": "concurrently \"npx tsc --watch\" \"nodemon -q dist/server.js\""
+    "compile": "npx tsc"
   },
   "repository": {
     "type": "git",
