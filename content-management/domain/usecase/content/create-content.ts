@@ -35,15 +35,17 @@ class CreateContent<T> {
 
     private validateContentData(contentDefinition: ContentDefinition<T>, content: T) {
         contentDefinition.getContentFields().forEach(contentField => {
-            let fieldValue: any;
+            let fieldValue: any = this.getFieldValue(contentField, contentDefinition.getName(), content);
+
+            contentField.getHandlers().forEach(handler => {
+                handler(fieldValue);
+            });
 
             switch (contentField.getType()) {
                 case ContentFieldType.Text:
                     break;
 
                 case ContentFieldType.Numeric:
-                    fieldValue = this.getFieldValue(contentField, contentDefinition.getName(), content);
-
                     if (Number.isNaN(Number(fieldValue))) {
                         logger.error(`Invalid number: ${fieldValue}.`);
                         throw new IdentifiableError(ErrorCode.InvalidNumber, "Provided value is not a number.");
@@ -52,8 +54,6 @@ class CreateContent<T> {
                     break;
 
                 case ContentFieldType.Date:
-                    fieldValue = this.getFieldValue(contentField, contentDefinition.getName(), content);
-
                     if (moment(fieldValue).isValid()) {
                         logger.error(`Invalid date: ${fieldValue}.`);
                         throw new IdentifiableError(ErrorCode.InvalidDate, "Provided value is not a date.");
