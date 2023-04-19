@@ -1,10 +1,16 @@
+import moment from "moment";
 import Entity from "../../../common/entity";
 import IdentifiableError from "../../../identitfiable-error";
+import logger from "../../../util/logger";
+import expressHelper from "../../../common/utility/express-helper";
 
 enum ErrorCode {
     InvalidName = "invalid-name",
     InvalidType = "invalid-type",
-    InvalidDisplayOption = "invalid-display-option"
+    InvalidDisplayOption = "invalid-display-option",
+    InvalidNumber = "invalid-number",
+    InvalidDate = "invalid-date",
+    ValueRequired = "value-required"
 }
 
 enum ContentFieldType {
@@ -74,6 +80,59 @@ class ContentFieldDefinition extends Entity {
 
     getHandlers(): ContentFieldHandler[] {
         return this.handlers;
+    }
+
+    validateValue(content: any, contentName: string) {
+        let fieldValue: any = this.getFieldValue(this, contentName, content);
+
+        if (this.isRequired && (!fieldValue || fieldValue === ""))
+            throw new IdentifiableError(ErrorCode.ValueRequired, `Field '${ this.getName() }' is required.`);
+
+        this.getHandlers().forEach(handler => {
+            handler(fieldValue);
+        });
+
+        switch (this.getType()) {
+            case ContentFieldType.Text:
+                break;
+
+            case ContentFieldType.Numeric:
+                if (Number.isNaN(Number(fieldValue))) {
+                    logger.error(`Invalid number: ${fieldValue}.`);
+                    throw new IdentifiableError(ErrorCode.InvalidNumber, "Provided value is not a number.");
+                }
+
+                break;
+
+            case ContentFieldType.Date:
+                if (moment(fieldValue).isValid()) {
+                    logger.error(`Invalid date: ${fieldValue}.`);
+                    throw new IdentifiableError(ErrorCode.InvalidDate, "Provided value is not a date.");
+                }
+
+                break;
+
+            default:
+                throw new Error("Assert: invalid field type.");
+        }
+    }
+
+
+    private getFieldValue(contentField: ContentFieldDefinition, contentName: string, content: any) {
+        let fieldNameLowerCase = expressHelper.adjustContentFieldName(contentField, contentName);
+        let propertyNameAsKey: keyof typeof content | undefined;
+
+        for (const contentProperty in content) {
+            if (contentProperty.toLowerCase() === fieldNameLowerCase) {
+                propertyNameAsKey = contentProperty;
+                break;
+            }
+        }  
+
+        if (!propertyNameAsKey)
+            return undefined;
+
+        return content[propertyNameAsKey];
     }
 }
 

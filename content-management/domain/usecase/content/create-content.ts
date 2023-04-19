@@ -4,6 +4,7 @@ import { ContentDefinition } from "../../entity/content-definition";
 import factory from "../../factory";
 import { ContentFieldDefinition, ContentFieldType } from "../../entity/content-field-definition";
 import logger from "../../../../util/logger";
+import expressHelper from "../../../../common/utility/express-helper";
 
 enum ErrorCode {
     InvalidNumber = "invalid-number",
@@ -13,12 +14,11 @@ enum ErrorCode {
 class CreateContent<T> {
     execute(contentDefinition: ContentDefinition<T>, content: T): string {
         try {
-            let persistency = factory.getPersistency();
+            expressHelper.deleteNotExistingProperties(content, contentDefinition);
+            contentDefinition.getContentFields().forEach(contentField => 
+                contentField.validateValue(content, contentDefinition.getName()));
     
-            this.deleteNotExistingProperties(content, contentDefinition);
-            this.validateContentData(contentDefinition, content);
-    
-            let id = persistency.createContent(contentDefinition.getName(), content);
+            let id = factory.getPersistency().createContent(contentDefinition.getName(), content);
 
             logger.info(`Content of type '${ contentDefinition.getName() }' is created successfully.`);
 
@@ -30,84 +30,6 @@ class CreateContent<T> {
             
             throw error;
         }
-    }
-
-
-    private validateContentData(contentDefinition: ContentDefinition<T>, content: T) {
-        contentDefinition.getContentFields().forEach(contentField => {
-            let fieldValue: any = this.getFieldValue(contentField, contentDefinition.getName(), content);
-
-            contentField.getHandlers().forEach(handler => {
-                handler(fieldValue);
-            });
-
-            switch (contentField.getType()) {
-                case ContentFieldType.Text:
-                    break;
-
-                case ContentFieldType.Numeric:
-                    if (Number.isNaN(Number(fieldValue))) {
-                        logger.error(`Invalid number: ${fieldValue}.`);
-                        throw new IdentifiableError(ErrorCode.InvalidNumber, "Provided value is not a number.");
-                    }
-
-                    break;
-
-                case ContentFieldType.Date:
-                    if (moment(fieldValue).isValid()) {
-                        logger.error(`Invalid date: ${fieldValue}.`);
-                        throw new IdentifiableError(ErrorCode.InvalidDate, "Provided value is not a date.");
-                    }
-
-                    break;
-
-                default:
-                    throw new Error("Assert: invalid field type.");
-            }
-        });
-    }
-
-    private getFieldValue(contentField: ContentFieldDefinition, contentName: string, content: T) {
-        let fieldNameLowerCase = this.adjustContentFieldName(contentField, contentName);
-        let propertyNameAsKey: keyof typeof content | undefined;
-
-        for (const contentProperty in content) {
-            if (contentProperty.toLowerCase() === fieldNameLowerCase) {
-                propertyNameAsKey = contentProperty;
-                break;
-            }
-        }  
-
-        if (!propertyNameAsKey)
-            return undefined;
-
-        return content[propertyNameAsKey];
-    }
-
-    private deleteNotExistingProperties(content: T, contentDefinition: ContentDefinition<T>) {
-        for (const contentProperty in content) {
-            if (!this.contentFieldExists(contentDefinition, contentProperty))
-                delete content[contentProperty];
-        }
-    }
-
-    /**
-     * Check if a content property exists as a content field in the content definition.
-     * 
-     * @param contentDefinition the content definition
-     * @param contentProperty the property in the content to check
-     * @returns true if the property exists as a content field
-     */
-    private contentFieldExists(contentDefinition: ContentDefinition<T>, contentProperty: Extract<keyof T, string>) {
-        let contentFields = contentDefinition.getContentFields();
-
-        return contentFields.find(contentField => this.adjustContentFieldName(contentField, contentDefinition.getName()) === contentProperty.toLowerCase());
-    }
-
-    private adjustContentFieldName(contentField: ContentFieldDefinition, contentName: string) {
-        return contentField.getName().toLowerCase()
-            .replace(contentName, "")
-            .replace(/-/g, "");
     }
 }
 
