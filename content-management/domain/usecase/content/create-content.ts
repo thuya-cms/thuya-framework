@@ -15,8 +15,10 @@ class CreateContent<T> {
     execute(contentDefinition: ContentDefinition<T>, content: T): string {
         try {
             expressHelper.deleteNotExistingProperties(content, contentDefinition);
-            contentDefinition.getContentFields().forEach(contentField => 
-                contentField.validateValue(content, contentDefinition.getName()));
+            contentDefinition.getContentFields().forEach(contentField => {
+                let fieldValue = expressHelper.getFieldValue(contentField, contentDefinition.getName(), content);
+                contentField.validateValue(fieldValue);
+            });
     
             let id = factory.getPersistency().createContent(contentDefinition.getName(), content);
 

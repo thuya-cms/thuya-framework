@@ -19,6 +19,23 @@ class ExpressHelper {
                 delete content[contentProperty];
         }
     }
+
+    getFieldValue(contentField: ContentFieldDefinition, contentName: string, content: any) {
+        let fieldNameLowerCase = this.adjustContentFieldName(contentField, contentName);
+        let propertyNameAsKey: keyof typeof content | undefined;
+
+        for (const contentProperty in content) {
+            if (contentProperty.toLowerCase() === fieldNameLowerCase) {
+                propertyNameAsKey = contentProperty;
+                break;
+            }
+        }  
+
+        if (!propertyNameAsKey)
+            return undefined;
+
+        return content[propertyNameAsKey];
+    }
     
 
     private contentFieldExists(contentDefinition: ContentDefinition<any>, contentProperty: Extract<keyof any, string>) {

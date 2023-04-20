@@ -10,6 +10,7 @@ enum ErrorCode {
     InvalidDisplayOption = "invalid-display-option",
     InvalidNumber = "invalid-number",
     InvalidDate = "invalid-date",
+    InvalidArray = "invalid-array",
     ValueRequired = "value-required"
 }
 
@@ -25,6 +26,7 @@ type ContentFieldHandler = (contentFieldData: ContentFieldTypes) => void;
 class ContentFieldDefinition extends Entity {
     private displayOptions: { key: string, value: any }[] = [];
     private isRequired: boolean = false;
+    private isArrayOf: ContentFieldDefinition | undefined;
     private handlers: ContentFieldHandler[] = [];
 
     
@@ -82,16 +84,54 @@ class ContentFieldDefinition extends Entity {
         return this.handlers;
     }
 
-    validateValue(content: any, contentName: string) {
-        let fieldValue: any = this.getFieldValue(this, contentName, content);
+    setIsArrayOf(contentFieldDefinition: ContentFieldDefinition) {
+        this.isArrayOf = contentFieldDefinition;
+    }
 
+    getIsArrayOf(): ContentFieldDefinition | undefined {
+        return this.isArrayOf;
+    }
+
+    validateValue(fieldValue: any) {
+        this.validateRequired(fieldValue);
+        this.validateType(fieldValue);
+        this.executeHandlers(fieldValue);
+    }
+
+
+    private validateRequired(fieldValue: any) {
         if (this.isRequired && (!fieldValue || fieldValue === ""))
-            throw new IdentifiableError(ErrorCode.ValueRequired, `Field '${ this.getName() }' is required.`);
+            throw new IdentifiableError(ErrorCode.ValueRequired, `Field '${this.getName()}' is required.`);
+    }
 
+    private executeHandlers(fieldValue: any) {
         this.getHandlers().forEach(handler => {
             handler(fieldValue);
         });
+    }
 
+    private validateType(fieldValue: any) {
+        let isArrayOf = this.isArrayOf;
+        
+        if (!fieldValue) return;
+
+        if (isArrayOf) {
+            if (!Array.isArray(fieldValue)) {
+                logger.error(`Invalid array: ${fieldValue}.`);
+                throw new IdentifiableError(ErrorCode.InvalidArray, "Provided value is not an array.");
+            }
+
+            let array: any[] = fieldValue;
+
+            array.forEach(arrayElementValue => {
+                isArrayOf!.validateValue(arrayElementValue);
+            });
+        } else {
+            this.validateSingleField(fieldValue);
+        }
+    }
+
+    private validateSingleField(fieldValue: any) {
         switch (this.getType()) {
             case ContentFieldType.Text:
                 break;
@@ -115,24 +155,6 @@ class ContentFieldDefinition extends Entity {
             default:
                 throw new Error("Assert: invalid field type.");
         }
-    }
-
-
-    private getFieldValue(contentField: ContentFieldDefinition, contentName: string, content: any) {
-        let fieldNameLowerCase = expressHelper.adjustContentFieldName(contentField, contentName);
-        let propertyNameAsKey: keyof typeof content | undefined;
-
-        for (const contentProperty in content) {
-            if (contentProperty.toLowerCase() === fieldNameLowerCase) {
-                propertyNameAsKey = contentProperty;
-                break;
-            }
-        }  
-
-        if (!propertyNameAsKey)
-            return undefined;
-
-        return content[propertyNameAsKey];
     }
 }
 
