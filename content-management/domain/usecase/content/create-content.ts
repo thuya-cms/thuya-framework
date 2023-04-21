@@ -1,5 +1,5 @@
 import moment from "moment";
-import IdentifiableError from "../../../../identitfiable-error";
+import IdentifiableError from "../../../../identifiable-error";
 import { ContentDefinition } from "../../entity/content-definition";
 import factory from "../../factory";
 import { ContentFieldDefinition, ContentFieldType } from "../../entity/content-field-definition";

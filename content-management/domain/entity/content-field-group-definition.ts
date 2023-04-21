@@ -1,5 +1,5 @@
 import Entity from "../../../common/entity";
-import IdentifiableError from "../../../identitfiable-error";
+import IdentifiableError from "../../../identifiable-error";
 import { ContentFieldDefinition } from "./content-field-definition";
 
 enum ErrorCode {

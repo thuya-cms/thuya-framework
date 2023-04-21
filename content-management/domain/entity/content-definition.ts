@@ -1,5 +1,5 @@
 import Entity from "../../../common/entity";
-import IdentifiableError from "../../../identitfiable-error";
+import IdentifiableError from "../../../identifiable-error";
 import { ContentFieldDefinition } from "./content-field-definition";
 import { ContentFieldGroupDefinition } from "./content-field-group-definition";
 import idContentFieldDefinition from "./id-content-field-definition";

@@ -1,6 +1,6 @@
 import moment from "moment";
 import Entity from "../../../common/entity";
-import IdentifiableError from "../../../identitfiable-error";
+import IdentifiableError from "../../../identifiable-error";
 import logger from "../../../util/logger";
 import expressHelper from "../../../common/utility/express-helper";
 

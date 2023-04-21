@@ -6,10 +6,13 @@
   "types": "dist/thuya-app.d.ts",
   "files": ["dist/**/*"],
   "scripts": {
-    "prepare" : "npm run build",
+    "prepublish" : "npm run build",
+    
     "build": "npx tsc",
     "build:dev": "npx tsc -p tsconfig-dev.json",
-    "run:dev": "node dist/test/server.js"
+    "run:dev": "node dist/test/server.js",
+
+    "link": "npm link"
   },
   "repository": {
     "type": "git",

@@ -6,6 +6,7 @@ import ContentProvider from './content-provider';
 import { ContentDefinition } from './content-management/domain/entity/content-definition';
 import expressContentManager from './content-management/app/express-content-manager';
 import contentDefinitionManager from './content-management/app/content-definition-manager';
+import Module from './module';
 
 class ThuyaApp {
     private _expressApp: express.Application;
@@ -51,19 +52,20 @@ class ThuyaApp {
         this._expressServer.close();
     }
 
+    public useModule(module: Module) {
+        module.setupMiddlewares(this._expressApp);
+        module.getContentProviders().forEach(contentProvider => this.useContentProvider(contentProvider));
+    }
+
     /**
      * Add a new content provider to the application.
      * 
      * @param contentProvider the content provider to add
      */
-    public addContentProvider(contentProvider: ContentProvider) {
+    public useContentProvider(contentProvider: ContentProvider) {
         contentProvider.getContentDefinitions().forEach(contentDefinition => {
             this.registerContentDefinition(contentDefinition);
         });
-    }
-
-    public getExpressApp(): express.Application {
-        return this._expressApp;
     }
 
 
