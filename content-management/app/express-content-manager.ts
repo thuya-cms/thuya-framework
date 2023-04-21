@@ -23,7 +23,7 @@ class ExpressContentManager {
 
         try {
             let contentDefinition = readContentDefinition.execute(contentName);
-            let content = readContent.execute(contentDefinition, id);
+            let content = readContent.byId(contentDefinition, id);
 
             response.json(content).status(200);
 

@@ -8,9 +8,20 @@ enum ErrorCode {
 }
 
 class ReadContent<T> {
-    execute(contentDefinition: ContentDefinition<T>, id: string): T {
+    byId(contentDefinition: ContentDefinition<T>, id: string): T {
         try {
             return factory.getPersistency().readContent(contentDefinition.getName(), id);
+        }
+
+        catch (error: any) {
+            logger.error(error.message);
+            throw new IdentifiableError(ErrorCode.NotFound, "Failed to read content.");
+        }
+    }
+
+    byFieldValue(contentDefinition: ContentDefinition<T>, fieldValue: { name: string, value: any }): T {
+        try {
+            return factory.getPersistency().readContentByFieldValue(fieldValue, contentDefinition.getName());
         }
 
         catch (error: any) {

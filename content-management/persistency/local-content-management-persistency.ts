@@ -84,6 +84,20 @@ class LocalContentManagementPersistency implements IContentManagementPersistency
 
         return content;
     }
+
+    readContentByFieldValue(fieldValue: { name: string; value: any; }, contentName: string) {
+        let contentList = this.content.find(content => content.contentName === contentName);
+        
+        if (!contentList)
+            throw new Error("Content not found.");
+
+        let content = contentList.content.find(content => content[fieldValue.name] === fieldValue.value);
+
+        if (!content)
+            throw new Error("Content not found.");
+
+        return content;
+    }
 }
 
 export default new LocalContentManagementPersistency();
