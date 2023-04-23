@@ -7,7 +7,7 @@ class ExpressHelper {
         return request.url.split("/")[1];
     }
 
-    adjustContentFieldName(contentField: ContentFieldDefinition, contentName: string) {
+    adjustContentFieldName(contentField: ContentFieldDefinition, contentName: string): string {
         return contentField.getName().toLowerCase()
             .replace(contentName, "")
             .replace(/-/g, "");
@@ -20,7 +20,7 @@ class ExpressHelper {
         }
     }
 
-    getFieldValue(contentField: ContentFieldDefinition, contentName: string, content: any) {
+    getContentPropertyName(contentField: ContentFieldDefinition, contentName: string, content: any): keyof typeof content | undefined {
         let fieldNameLowerCase = this.adjustContentFieldName(contentField, contentName);
         let propertyNameAsKey: keyof typeof content | undefined;
 
@@ -31,7 +31,13 @@ class ExpressHelper {
             }
         }  
 
-        if (!propertyNameAsKey)
+        return propertyNameAsKey;
+    }
+
+    getFieldValue(contentField: ContentFieldDefinition, contentName: string, content: any) {
+        let propertyNameAsKey = this.getContentPropertyName(contentField, contentName, content);
+
+        if (!propertyNameAsKey) 
             return undefined;
 
         return content[propertyNameAsKey];

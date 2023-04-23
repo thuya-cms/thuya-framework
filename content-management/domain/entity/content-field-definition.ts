@@ -20,14 +20,16 @@ enum ContentFieldType {
     Date = "date"
 }
 
-type ContentFieldTypes = string | Date | number | string[] | Date[] | number[]; 
-type ContentFieldHandler = (contentFieldData: ContentFieldTypes) => void;
+type ContentFieldValue = string | Date | number | string[] | Date[] | number[]; 
+type ContentFieldValidator = (contentFieldData: ContentFieldValue) => void;
+type ContentFieldDetermination = (contentFieldData: ContentFieldValue) => ContentFieldValue;
 
 class ContentFieldDefinition extends Entity {
     private displayOptions: { key: string, value: any }[] = [];
     private isRequired: boolean = false;
     private isArrayOf: ContentFieldDefinition | undefined;
-    private handlers: ContentFieldHandler[] = [];
+    private validators: ContentFieldValidator[] = [];
+    private determinations: ContentFieldDetermination[] = [];
 
     
     
@@ -76,12 +78,20 @@ class ContentFieldDefinition extends Entity {
         return this.displayOptions;
     }
 
-    addHandler(handler: ContentFieldHandler) {
-        this.handlers.push(handler);
+    addValidator(validator: ContentFieldValidator) {
+        this.validators.push(validator);
     }
 
-    getHandlers(): ContentFieldHandler[] {
-        return this.handlers;
+    getValidators(): ContentFieldValidator[] {
+        return this.validators;
+    }
+    
+    addDetermination(determination: ContentFieldDetermination) {
+        this.determinations.push(determination);
+    }
+
+    getDeterminations(): ContentFieldDetermination[] {
+        return this.determinations;
     }
 
     setIsArrayOf(contentFieldDefinition: ContentFieldDefinition) {
@@ -92,10 +102,15 @@ class ContentFieldDefinition extends Entity {
         return this.isArrayOf;
     }
 
-    validateValue(fieldValue: any) {
+    validateValue(fieldValue: ContentFieldValue) {
         this.validateRequired(fieldValue);
         this.validateType(fieldValue);
-        this.executeHandlers(fieldValue);
+        this.executeValidators(fieldValue);
+        
+    }
+
+    updateValue(fieldValue: ContentFieldValue): ContentFieldValue {
+        return this.executeDeterminations(fieldValue);
     }
 
 
@@ -104,10 +119,20 @@ class ContentFieldDefinition extends Entity {
             throw new IdentifiableError(ErrorCode.ValueRequired, `Field '${this.getName()}' is required.`);
     }
 
-    private executeHandlers(fieldValue: any) {
-        this.getHandlers().forEach(handler => {
-            handler(fieldValue);
+    private executeValidators(fieldValue: any) {
+        this.getValidators().forEach(validator => {
+            validator(fieldValue);
         });
+    }
+    
+    private executeDeterminations(fieldValue: any): ContentFieldValue {
+        let updatedValue = fieldValue;
+
+        this.getDeterminations().forEach(determination => {
+            updatedValue = determination(updatedValue);
+        });
+
+        return updatedValue;
     }
 
     private validateType(fieldValue: any) {
@@ -158,4 +183,4 @@ class ContentFieldDefinition extends Entity {
     }
 }
 
-export { ContentFieldDefinition, ErrorCode, ContentFieldType, ContentFieldTypes };
+export { ContentFieldDefinition, ErrorCode, ContentFieldType, ContentFieldValue as ContentFieldTypes };
