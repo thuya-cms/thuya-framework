@@ -8,9 +8,13 @@ enum ErrorCode {
     InvalidName = "invalid-name",
 }
 
+type ContentFieldOptions = {
+    isRequired?: boolean
+}
+
 class ContentDefinition<T> extends Entity {
     private contentParts: ContentFieldGroupDefinition<any>[] = [];
-    private contentFields: ContentFieldDefinition[] = [];
+    private contentFields: { name: string, contentFieldDefinition: ContentFieldDefinition, options: ContentFieldOptions }[] = [];
     private handlers: ((contentData: T) => void)[] = [];
 
 
@@ -23,7 +27,7 @@ class ContentDefinition<T> extends Entity {
         if (!name) 
             throw new IdentifiableError(ErrorCode.InvalidName, "Name cannot be initial.");
 
-        this.addContentField(idContentFieldDefinition);
+        this.addContentField("id", idContentFieldDefinition);
     }
 
 
@@ -40,11 +44,15 @@ class ContentDefinition<T> extends Entity {
         return this.contentParts;
     }
 
-    addContentField(contentField: ContentFieldDefinition) {
-        this.contentFields.push(contentField);
+    addContentField(name: string, contentField: ContentFieldDefinition, options?: ContentFieldOptions) {
+        this.contentFields.push({
+            name: name,
+            contentFieldDefinition: contentField,
+            options: options || {}
+        });
     }
 
-    getContentFields(): ContentFieldDefinition[] {
+    getContentFields(): { name: string, contentFieldDefinition: ContentFieldDefinition, options: ContentFieldOptions }[] {
         return this.contentFields;
     }
 

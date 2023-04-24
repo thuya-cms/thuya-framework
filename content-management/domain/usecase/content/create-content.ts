@@ -1,14 +1,11 @@
-import moment from "moment";
-import IdentifiableError from "../../../../identifiable-error";
 import { ContentDefinition } from "../../entity/content-definition";
 import factory from "../../factory";
-import { ContentFieldDefinition, ContentFieldType } from "../../entity/content-field-definition";
 import logger from "../../../../util/logger";
 import expressHelper from "../../../../common/utility/express-helper";
+import IdentifiableError from "../../../../identifiable-error";
 
 enum ErrorCode {
-    InvalidNumber = "invalid-number",
-    InvalidDate = "invalid-date"
+    Required = "required",
 }
 
 class CreateContent<T> {
@@ -18,13 +15,15 @@ class CreateContent<T> {
 
             expressHelper.deleteNotExistingProperties(content, contentDefinition);
             contentDefinition.getContentFields().forEach(contentField => {
-                let propertyName = expressHelper.getContentPropertyName(contentField, contentDefinition.getName(), content);
-                let fieldValue = expressHelper.getFieldValue(contentField, contentDefinition.getName(), content);
-                contentField.validateValue(fieldValue);
-                fieldValue = contentField.updateValue(fieldValue);
+                let fieldValue = expressHelper.getFieldValue(contentField.name, content);
+                
+                if (contentField.options.isRequired && !fieldValue)
+                    throw new IdentifiableError(ErrorCode.Required, `Field ${ contentField.name } is required.`);
 
-                if (propertyName)
-                    finalContent[propertyName] = fieldValue;
+                contentField.contentFieldDefinition.validateValue(fieldValue);
+                fieldValue = contentField.contentFieldDefinition.executeDeterminations(fieldValue);
+
+                finalContent[contentField.name] = fieldValue;
             });
     
             let id = factory.getPersistency().createContent(contentDefinition.getName(), finalContent);
@@ -43,3 +42,4 @@ class CreateContent<T> {
 }
 
 export default new CreateContent();
+export { ErrorCode };

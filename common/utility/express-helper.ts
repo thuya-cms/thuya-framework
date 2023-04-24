@@ -34,11 +34,8 @@ class ExpressHelper {
         return propertyNameAsKey;
     }
 
-    getFieldValue(contentField: ContentFieldDefinition, contentName: string, content: any) {
-        let propertyNameAsKey = this.getContentPropertyName(contentField, contentName, content);
-
-        if (!propertyNameAsKey) 
-            return undefined;
+    getFieldValue(fieldName: string, content: any) {
+        let propertyNameAsKey: keyof any = fieldName;
 
         return content[propertyNameAsKey];
     }
@@ -47,7 +44,7 @@ class ExpressHelper {
     private contentFieldExists(contentDefinition: ContentDefinition<any>, contentProperty: Extract<keyof any, string>) {
         let contentFields = contentDefinition.getContentFields();
 
-        return contentFields.find(contentField => this.adjustContentFieldName(contentField, contentDefinition.getName()) === contentProperty.toLowerCase());
+        return contentFields.find(contentField => this.adjustContentFieldName(contentField.contentFieldDefinition, contentDefinition.getName()) === contentProperty.toLowerCase());
     }
 }
 

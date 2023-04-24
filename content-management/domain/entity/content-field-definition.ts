@@ -26,7 +26,6 @@ type ContentFieldDetermination = (contentFieldData: ContentFieldValue) => Conten
 
 class ContentFieldDefinition extends Entity {
     private displayOptions: { key: string, value: any }[] = [];
-    private isRequired: boolean = false;
     private isArrayOf: ContentFieldDefinition | undefined;
     private validators: ContentFieldValidator[] = [];
     private determinations: ContentFieldDetermination[] = [];
@@ -54,14 +53,6 @@ class ContentFieldDefinition extends Entity {
 
     getType(): ContentFieldType {
         return this.type;
-    }
-
-    setIsRequired(isRequired: boolean) {
-        this.isRequired = isRequired;
-    }
-
-    getIsRequired(): boolean {
-        return this.isRequired;
     }
     
     addDisplayOption(key: string, value: any) {
@@ -103,29 +94,12 @@ class ContentFieldDefinition extends Entity {
     }
 
     validateValue(fieldValue: ContentFieldValue) {
-        this.validateRequired(fieldValue);
         this.validateType(fieldValue);
         this.executeValidators(fieldValue);
         
     }
 
-    updateValue(fieldValue: ContentFieldValue): ContentFieldValue {
-        return this.executeDeterminations(fieldValue);
-    }
-
-
-    private validateRequired(fieldValue: any) {
-        if (this.isRequired && (!fieldValue || fieldValue === ""))
-            throw new IdentifiableError(ErrorCode.ValueRequired, `Field '${this.getName()}' is required.`);
-    }
-
-    private executeValidators(fieldValue: any) {
-        this.getValidators().forEach(validator => {
-            validator(fieldValue);
-        });
-    }
-    
-    private executeDeterminations(fieldValue: any): ContentFieldValue {
+    executeDeterminations(fieldValue: ContentFieldValue): ContentFieldValue {
         let updatedValue = fieldValue;
 
         this.getDeterminations().forEach(determination => {
@@ -133,6 +107,13 @@ class ContentFieldDefinition extends Entity {
         });
 
         return updatedValue;
+    }
+
+
+    private executeValidators(fieldValue: any) {
+        this.getValidators().forEach(validator => {
+            validator(fieldValue);
+        });
     }
 
     private validateType(fieldValue: any) {
