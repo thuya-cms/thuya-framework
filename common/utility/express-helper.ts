@@ -1,5 +1,5 @@
 import { Request } from "express";
-import { ContentFieldDefinition } from "../../content-management/domain/entity/content-field-definition";
+import { ContentFieldDefinition } from "../../content-management/domain/entity/content-field-definition/content-field-definition";
 import { ContentDefinition } from "../../content-management/domain/entity/content-definition";
 
 class ExpressHelper {

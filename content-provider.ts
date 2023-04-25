@@ -1,11 +1,9 @@
 import { ContentDefinition } from "./content-management/domain/entity/content-definition";
-import { ContentFieldDefinition } from "./content-management/domain/entity/content-field-definition";
-import { ContentFieldGroupDefinition } from "./content-management/domain/entity/content-field-group-definition";
+import { ContentFieldDefinition } from "./content-management/domain/entity/content-field-definition/content-field-definition";
 
 abstract class ContentProvider {
     constructor() {
         this.createContentFieldDefinitions();
-        this.createContentFieldGroupDefinitions();
         this.createContentDefinitions();
     }
 
@@ -15,17 +13,12 @@ abstract class ContentProvider {
         return [];
     }
 
-    getContentFieldGroupDefinitions(): ContentFieldGroupDefinition<any>[] {
-        return [];
-    }
-
     getContentDefinitions(): ContentDefinition<any>[] {
         return [];
     }
 
 
     protected createContentFieldDefinitions() {}
-    protected createContentFieldGroupDefinitions() {}
     protected createContentDefinitions() {}
 }
 
