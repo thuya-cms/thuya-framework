@@ -23,4 +23,4 @@ class NumericContentFieldDefinition extends ContentFieldDefinition {
     }
 }
 
-export default NumericContentFieldDefinition;
+export { NumericContentFieldDefinition, ErrorCode };

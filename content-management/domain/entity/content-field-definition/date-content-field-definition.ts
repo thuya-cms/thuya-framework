@@ -27,4 +27,4 @@ class DateContentFieldDefinition extends ContentFieldDefinition {
     }
 }
 
-export default DateContentFieldDefinition;
+export { DateContentFieldDefinition, ErrorCode };

@@ -1,1 +1,1 @@
-export * from "./utility/logger";
+export { default as logger } from "./utility/logger";

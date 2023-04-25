@@ -33,4 +33,4 @@ class ArrayContentFieldDefinition extends ContentFieldDefinition {
     }
 }
 
-export default ArrayContentFieldDefinition;
+export { ArrayContentFieldDefinition, ErrorCode };
