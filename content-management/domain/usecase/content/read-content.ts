@@ -1,5 +1,5 @@
 import IdentifiableError from "../../../../identifiable-error";
-import logger from "../../../../util/logger";
+import logger from "../../../../common/utility/logger";
 import { ContentDefinition } from "../../entity/content-definition";
 import factory from "../../factory";
 

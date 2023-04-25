@@ -1,4 +1,4 @@
-import logger from "../../util/logger";
+import logger from "../../common/utility/logger";
 import { ContentDefinition } from "../domain/entity/content-definition";
 import IContentManagementPersistency from "../domain/usecase/persistency.interface";
 import {v4 as uuidv4} from 'uuid';

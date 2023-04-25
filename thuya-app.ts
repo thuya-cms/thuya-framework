@@ -1,7 +1,7 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import http from 'http';
-import logger from './util/logger';
+import logger from './common/utility/logger';
 import ContentProvider from './content-provider';
 import { ContentDefinition } from './content-management/domain/entity/content-definition';
 import expressContentManager from './content-management/app/express-content-manager';

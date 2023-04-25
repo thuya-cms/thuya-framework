@@ -1,5 +1,5 @@
 import IdentifiableError from "../../../../identifiable-error";
-import logger from "../../../../util/logger";
+import logger from "../../../../common/utility/logger";
 import { ContentFieldDefinition, ContentFieldType, ContentFieldValue } from "./content-field-definition";
 
 enum ErrorCode {

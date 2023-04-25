@@ -2,8 +2,8 @@
   "name": "@thuya/framework",
   "version": "1.0.2",
   "description": "Thuya CMS - Framework",
-  "main": "dist/thuya-app.js",
-  "types": "dist/thuya-app.d.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "files": ["dist/**/*"],
   "scripts": {
     "prepublish" : "npm run build",
