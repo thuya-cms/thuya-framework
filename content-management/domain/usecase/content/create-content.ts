@@ -3,9 +3,11 @@ import factory from "../../factory";
 import logger from "../../../../common/utility/logger";
 import expressHelper from "../../../../common/utility/express-helper";
 import IdentifiableError from "../../../../identifiable-error";
+import contentManager from "../../../app/content-manager";
 
 enum ErrorCode {
     Required = "required",
+    NotUnique = "not-unique"
 }
 
 class CreateContent<T> {
@@ -19,6 +21,10 @@ class CreateContent<T> {
                 
                 if (contentField.options.isRequired && !fieldValue)
                     throw new IdentifiableError(ErrorCode.Required, `Field ${ contentField.name } is required.`);
+
+                if (contentField.options.isUnique) {
+                    this.validateUniqueness(contentDefinition, contentField, fieldValue);
+                }
 
                 contentField.contentFieldDefinition.validateValue(fieldValue);
                 fieldValue = contentField.contentFieldDefinition.executeDeterminations(fieldValue);
@@ -38,6 +44,22 @@ class CreateContent<T> {
             
             throw error;
         }
+    }
+
+    
+    private validateUniqueness(contentDefinition: ContentDefinition<T>, contentField: { name: string; contentFieldDefinition: import("c:/Users/I323151/Documents/thuya/thuya-framework/content-management/domain/entity/content-field-definition/content-field-definition").ContentFieldDefinition; options: { isRequired?: boolean | undefined; isUnique?: boolean | undefined; }; }, fieldValue: any) {
+        let duplicate: any;
+
+        try {
+            duplicate = contentManager.readContentByFieldValue(contentDefinition.getName(), { name: contentField.name, value: fieldValue });
+        }
+
+        catch (error) {
+            duplicate = undefined; // No duplicate.
+        }
+
+        if (duplicate)
+            throw new IdentifiableError(ErrorCode.NotUnique, `Field ${contentField.name} is not unique.`);
     }
 }
 

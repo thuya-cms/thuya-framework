@@ -8,7 +8,8 @@ enum ErrorCode {
 }
 
 type ContentFieldOptions = {
-    isRequired?: boolean
+    isRequired?: boolean,
+    isUnique?: boolean
 }
 
 class ContentDefinition<T> extends Entity {
