@@ -15,11 +15,13 @@ class DateContentFieldDefinition extends ContentFieldDefinition {
     
 
     override validateValue(fieldValue: ContentFieldValue): void {
-        if (Array.isArray(fieldValue))
+        if (Array.isArray(fieldValue)) {
+            logger.debug(`Invalid date "%s" for field "%s".`, fieldValue, this.getName());
             throw new IdentifiableError(ErrorCode.InvalidDate, "Provided value is not a date.");
+        }
 
         if (moment(fieldValue).isValid()) {
-            logger.error(`Invalid date: ${fieldValue}.`);
+            logger.debug(`Invalid date "%s" for field "%s".`, fieldValue, this.getName());
             throw new IdentifiableError(ErrorCode.InvalidDate, "Provided value is not a date.");
         }
         

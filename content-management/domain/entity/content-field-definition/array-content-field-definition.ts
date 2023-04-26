@@ -19,7 +19,7 @@ class ArrayContentFieldDefinition extends ContentFieldDefinition {
 
     override validateValue(fieldValue: ContentFieldValue): void {
         if (!Array.isArray(fieldValue)) {
-            logger.error(`Invalid array: ${fieldValue}.`);
+            logger.debug(`Invalid array value "%s" for "%s".`, fieldValue, this.getName());
             throw new IdentifiableError(ErrorCode.InvalidArray, "Provided value is not an array.");
         }
 

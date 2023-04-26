@@ -1,3 +1,4 @@
+import { logger } from "../../../../common";
 import Entity from "../../../../common/entity";
 import IdentifiableError from "../../../../common/identifiable-error";
 
@@ -29,11 +30,15 @@ abstract class ContentFieldDefinition extends Entity {
             private type: ContentFieldType) {
         super(id);
         
-        if (!name) 
-            throw new IdentifiableError(ErrorCode.InvalidName, "Name cannot be initial.");
+        if (!name) {
+            logger.error(`Content field definition name is required.`);
+            throw new IdentifiableError(ErrorCode.InvalidName, "Content field definition name is required.");
+        }
 
-        if (!Object.values(ContentFieldType).includes(type))
-            throw new IdentifiableError(ErrorCode.InvalidType, "Type is invalid.");
+        if (!Object.values(ContentFieldType).includes(type)) {
+            logger.error(`Content field definition type is invalid.`);
+            throw new IdentifiableError(ErrorCode.InvalidType, "Content field definition type is invalid.");
+        }
     }
 
 
@@ -66,6 +71,8 @@ abstract class ContentFieldDefinition extends Entity {
         this.getValidators().forEach(validator => {
             validator(fieldValue);
         });
+
+        logger.debug(`Content for "%s" field is valid.`, this.getName());
     }
 
     executeDeterminations(fieldValue: ContentFieldValue): ContentFieldValue {

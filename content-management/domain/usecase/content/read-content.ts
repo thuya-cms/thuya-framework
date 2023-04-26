@@ -14,7 +14,6 @@ class ReadContent<T> {
         }
 
         catch (error: any) {
-            logger.error(error.message);
             throw new IdentifiableError(ErrorCode.NotFound, "Failed to read content.");
         }
     }
@@ -25,7 +24,6 @@ class ReadContent<T> {
         }
 
         catch (error: any) {
-            logger.error(error.message);
             throw new IdentifiableError(ErrorCode.NotFound, "Failed to read content.");
         }
     }

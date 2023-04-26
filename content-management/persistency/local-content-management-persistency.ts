@@ -1,4 +1,3 @@
-import logger from "../../common/utility/logger";
 import { ContentDefinition } from "../domain/entity/content-definition";
 import IContentManagementPersistency from "../domain/usecase/persistency.interface";
 import {v4 as uuidv4} from 'uuid';
@@ -61,7 +60,6 @@ class LocalContentManagementPersistency implements IContentManagementPersistency
     }
 
     readContentDefinition(contentName: string): ContentDefinition<any> | undefined {
-        logger.debug(`Reading '${ contentName }' content definition from local store.`);
         return this.contentDefinitions.find(contentDefinition => contentDefinition.getName() === contentName);
     }
 

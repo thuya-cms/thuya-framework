@@ -6,7 +6,7 @@ class CreateContentDefinition {
     execute(contentDefinition: ContentDefinition<any>) {
         factory.getPersistency().createContentDefinition(contentDefinition);
 
-        logger.info(`Content definition '${ contentDefinition.getName() }' created successfully.`);
+        logger.info(`Content definition "%s" created successfully.`, contentDefinition.getName());
     }
 }
 

@@ -1,3 +1,4 @@
+import { logger } from "../../common";
 import IdentifiableError from "../../common/identifiable-error";
 import { ArrayContentFieldDefinition, ContentDefinition, ContentFieldDefinition, DateContentFieldDefinition, NumericContentFieldDefinition, TextContentFieldDefinition } from "../domain";
 import createContentDefinition from "../domain/usecase/content-definition/create-content-definition";
@@ -53,7 +54,8 @@ class ContentDefinitionManager {
                 break;
 
             default:
-                throw new IdentifiableError(ErrorCode.InvalidFieldType, `Field type ${contentFieldDefinitionDTO.getType()} is not valid.`);
+                logger.error(`Field type "%s" is not valid.`, contentFieldDefinitionDTO.getType())
+                throw new IdentifiableError(ErrorCode.InvalidFieldType, `Field type "${contentFieldDefinitionDTO.getType()}" is not valid.`);
         }
 
         contentFieldDefinitionDTO.getValidators().forEach(validator => contentFieldEntity.addValidator(validator));

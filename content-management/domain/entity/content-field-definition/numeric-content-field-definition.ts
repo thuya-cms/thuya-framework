@@ -15,7 +15,7 @@ class NumericContentFieldDefinition extends ContentFieldDefinition {
 
     override validateValue(fieldValue: ContentFieldValue): void {
         if (Number.isNaN(Number(fieldValue))) {
-            logger.error(`Invalid number: ${fieldValue}.`);
+            logger.debug(`Invalid numeric value "%s" for field "%s".`, fieldValue, this.getName());
             throw new IdentifiableError(ErrorCode.InvalidNumber, "Provided value is not a number.");
         }
         
