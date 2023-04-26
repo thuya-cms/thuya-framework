@@ -2,11 +2,11 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import http from 'http';
 import logger from './common/utility/logger';
-import ContentProvider from './content-provider';
-import { ContentDefinition } from './content-management/domain/entity/content-definition';
+import ContentProvider from './content-management/app/content-provider';
 import expressContentManager from './content-management/app/express-content-manager';
 import contentDefinitionManager from './content-management/app/content-definition-manager';
 import Module from './module';
+import ContentDefinitionDTO from './content-management/app/dto/content-definition';
 
 class ThuyaApp {
     private _expressApp: express.Application;
@@ -69,7 +69,7 @@ class ThuyaApp {
     }
 
 
-    private registerContentDefinition(contentDefinition: ContentDefinition<any>) {
+    private registerContentDefinition(contentDefinition: ContentDefinitionDTO<any>) {
         contentDefinitionManager.createContentDefinition(contentDefinition);
 
         this._expressApp.get("/" + contentDefinition.getName(), expressContentManager.listContent.bind(expressContentManager));

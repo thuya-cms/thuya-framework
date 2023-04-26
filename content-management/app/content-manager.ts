@@ -3,7 +3,7 @@ import createContent from "../domain/usecase/content/create-content";
 import readContent from "../domain/usecase/content/read-content";
 
 class ContentManager {
-    readContent(id: string, contentDefinitionName: string): any {
+    readContent(contentDefinitionName: string, id: string,): any {
         let contentDefinition = readContentDefinition.execute(contentDefinitionName);
         return readContent.byId(contentDefinition, id);
     }

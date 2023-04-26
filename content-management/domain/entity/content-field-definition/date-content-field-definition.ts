@@ -9,7 +9,7 @@ enum ErrorCode {
 
 class DateContentFieldDefinition extends ContentFieldDefinition {
     constructor(id: string, name: string) {
-        super(id, name, ContentFieldType.Numeric);
+        super(id, name, ContentFieldType.Date);
     }
 
     

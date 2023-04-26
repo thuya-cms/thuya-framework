@@ -4,4 +4,4 @@ export { ContentFieldDefinition, ErrorCode as ContentFieldDefinitionErrorCode, C
 export { DateContentFieldDefinition, ErrorCode as DateContentFieldDefinitionErrorCode } from "./entity/content-field-definition/date-content-field-definition";
 export { NumericContentFieldDefinition, ErrorCode as NumericContentFieldDefinitionErrorCode } from "./entity/content-field-definition/numeric-content-field-definition";
 export { default as TextContentFieldDefinition } from "./entity/content-field-definition/text-content-field-definition";
-export { default as idContentFieldDefinition } from "./entity/content-field-definition/id-content-field-definition";
+export { default as idContentFieldDefinition } from "../content/id-content-field-definition";

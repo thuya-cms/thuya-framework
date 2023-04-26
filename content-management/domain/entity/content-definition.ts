@@ -1,7 +1,7 @@
 import Entity from "../../../common/entity";
 import IdentifiableError from "../../../identifiable-error";
 import { ContentFieldDefinition } from "./content-field-definition/content-field-definition";
-import idContentFieldDefinition from "./content-field-definition/id-content-field-definition";
+import idContentFieldDefinition from "../../content/id-content-field-definition";
 
 enum ErrorCode {
     InvalidName = "invalid-name",

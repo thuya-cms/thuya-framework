@@ -1,4 +1,4 @@
-import TextContentFieldDefinition from "./text-content-field-definition";
+import TextContentFieldDefinition from "../domain/entity/content-field-definition/text-content-field-definition";
 
 class IdContentFieldDefinition extends TextContentFieldDefinition {
     
