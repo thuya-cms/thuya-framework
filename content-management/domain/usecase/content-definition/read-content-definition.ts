@@ -1,4 +1,4 @@
-import IdentifiableError from "../../../../identifiable-error";
+import IdentifiableError from "../../../../common/identifiable-error";
 import { ContentDefinition } from "../../entity/content-definition";
 import factory from "../../factory";
 

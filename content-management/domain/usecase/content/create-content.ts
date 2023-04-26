@@ -2,7 +2,7 @@ import { ContentDefinition } from "../../entity/content-definition";
 import factory from "../../factory";
 import logger from "../../../../common/utility/logger";
 import expressHelper from "../../../../common/utility/express-helper";
-import IdentifiableError from "../../../../identifiable-error";
+import IdentifiableError from "../../../../common/identifiable-error";
 import contentManager from "../../../app/content-manager";
 
 enum ErrorCode {

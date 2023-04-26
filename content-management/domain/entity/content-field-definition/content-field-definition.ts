@@ -1,5 +1,5 @@
 import Entity from "../../../../common/entity";
-import IdentifiableError from "../../../../identifiable-error";
+import IdentifiableError from "../../../../common/identifiable-error";
 
 enum ErrorCode {
     InvalidName = "invalid-name",

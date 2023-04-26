@@ -1,5 +1,5 @@
 import moment from "moment";
-import IdentifiableError from "../../../../identifiable-error";
+import IdentifiableError from "../../../../common/identifiable-error";
 import logger from "../../../../common/utility/logger";
 import { ContentFieldDefinition, ContentFieldType, ContentFieldValue } from "./content-field-definition";
 

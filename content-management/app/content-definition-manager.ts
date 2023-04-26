@@ -1,4 +1,4 @@
-import IdentifiableError from "../../identifiable-error";
+import IdentifiableError from "../../common/identifiable-error";
 import { ArrayContentFieldDefinition, ContentDefinition, ContentFieldDefinition, DateContentFieldDefinition, NumericContentFieldDefinition, TextContentFieldDefinition } from "../domain";
 import createContentDefinition from "../domain/usecase/content-definition/create-content-definition";
 import ContentDefinitionDTO from "./dto/content-definition";
