@@ -1,6 +1,7 @@
 import { Request } from "express";
 import { ContentFieldDefinition } from "../../content-management/domain/entity/content-field-definition/content-field-definition";
 import { ContentDefinition } from "../../content-management/domain/entity/content-definition";
+import logger from "./logger";
 
 class ExpressHelper {
     getContentName(request: Request) {
@@ -15,8 +16,10 @@ class ExpressHelper {
 
     deleteNotExistingProperties(content: any, contentDefinition: ContentDefinition<any>) {
         for (const contentProperty in content) {
-            if (!this.contentFieldExists(contentDefinition, contentProperty))
+            if (!this.contentFieldExists(contentDefinition, contentProperty)) {
                 delete content[contentProperty];
+                logger.debug(`Field "%s" is removed from "%s".`, contentProperty, contentDefinition.getName());
+            }
         }
     }
 

@@ -28,8 +28,8 @@ class UpdateContent<T> {
             if (contentField.options.isUnique) 
                 this.validateUniqueness(contentDefinition, contentField, fieldValue);
 
-            contentField.contentFieldDefinition.validateValue(fieldValue.bind(contentField.contentFieldDefinition));
-            fieldValue = contentField.contentFieldDefinition.executeDeterminations(fieldValue.bind(contentField.contentFieldDefinition));
+            contentField.contentFieldDefinition.validateValue(fieldValue);
+            fieldValue = contentField.contentFieldDefinition.executeDeterminations(fieldValue);
 
             finalContent[contentField.name] = fieldValue;
 
@@ -38,7 +38,7 @@ class UpdateContent<T> {
 
         factory.getPersistency().updateContent(contentDefinition.getName(), content);
 
-        logger.info(`Content of type '${ contentDefinition.getName() }' is updated successfully.`);
+        logger.info(`Content of type "%s" is updated successfully.`, contentDefinition.getName());
     }
 
 

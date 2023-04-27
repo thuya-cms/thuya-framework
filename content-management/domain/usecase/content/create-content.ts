@@ -28,8 +28,8 @@ class CreateContent<T> {
             if (contentField.options.isUnique) 
                 this.validateUniqueness(contentDefinition, contentField, fieldValue);
 
-            contentField.contentFieldDefinition.validateValue(fieldValue.bind(contentField.contentFieldDefinition));
-            fieldValue = contentField.contentFieldDefinition.executeDeterminations(fieldValue.bind(contentField.contentFieldDefinition));
+            contentField.contentFieldDefinition.validateValue(fieldValue);
+            fieldValue = contentField.contentFieldDefinition.executeDeterminations(fieldValue);
 
             finalContent[contentField.name] = fieldValue;
 

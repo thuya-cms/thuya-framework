@@ -7,6 +7,7 @@ import expressContentManager from './content-management/app/express-content-mana
 import contentDefinitionManager from './content-management/app/content-definition-manager';
 import Module from './module';
 import ContentDefinitionDTO from './content-management/app/dto/content-definition';
+import dotenv from "dotenv";
 
 class ThuyaApp {
     private _expressApp: express.Application;
@@ -16,6 +17,10 @@ class ThuyaApp {
     
 
     constructor() {
+        dotenv.config();
+
+        logger.initializeLogLevel();
+
         this._expressApp = express();
         this._expressApp.use(bodyParser.json());	
 		this._expressApp.use(bodyParser.urlencoded({ extended: false }));

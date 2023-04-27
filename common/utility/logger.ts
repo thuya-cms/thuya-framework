@@ -1,20 +1,39 @@
 import correlator from "express-correlation-id";
 
+enum LogLevel {
+    Error = "ERROR",
+    Info = "INFO",
+    Debug = "DEBUG"
+}
+
 class Logger {
+    private logLevel: LogLevel = LogLevel.Info;
+    
+    
+    
+    initializeLogLevel() {
+        let logLevel: string | undefined = process.env.LOG_LEVEL;
+
+        if (logLevel) 
+            this.logLevel = logLevel as LogLevel;
+        else
+            this.logLevel = LogLevel.Info;
+        
+        console.log(this.getPrefix() + `Log level is %s.`, this.logLevel);
+    }
+
     debug(message: string, ...params: any[]): void {
-        console.debug(this.getPrefix() + message, params);
+        if (this.logLevel === LogLevel.Debug)
+            console.debug(this.getPrefix() + message, ...params);
     }
 
     info(message: string, ...params: any[]) {
-        console.info(this.getPrefix() + message, params);
-    }
-
-    warning(message: string, ...params: any[]): void {
-        console.warn(this.getPrefix() + message, params);
+        if (this.logLevel === LogLevel.Debug || this.logLevel === LogLevel.Info)
+            console.info(this.getPrefix() + message, ...params);
     }
 
     error(message: string, ...params: any[]): void {
-        console.error(this.getPrefix() + message, params);
+        console.error(this.getPrefix() + message, ...params);
     }    
 
 
