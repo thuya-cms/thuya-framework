@@ -20,7 +20,7 @@ class DateContentFieldDefinition extends ContentFieldDefinition {
             throw new IdentifiableError(ErrorCode.InvalidDate, "Provided value is not a date.");
         }
 
-        if (moment(fieldValue).isValid()) {
+        if (!moment(fieldValue).isValid()) {
             logger.debug(`Invalid date "%s" for field "%s".`, fieldValue, this.getName());
             throw new IdentifiableError(ErrorCode.InvalidDate, "Provided value is not a date.");
         }

@@ -32,7 +32,6 @@ class CreateContent<T> {
                 if (contentField.options.isUnique) 
                     this.validateUniqueness(contentDefinition, contentField, fieldValue);
     
-                console.log(fieldValue);
                 contentField.contentFieldDefinition.validateValue(fieldValue);
                 fieldValue = contentField.contentFieldDefinition.executeDeterminations(fieldValue);
     
