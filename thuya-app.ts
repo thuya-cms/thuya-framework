@@ -60,6 +60,7 @@ class ThuyaApp {
     public useModule(module: Module) {
         module.setupMiddlewares(this._expressApp);
         module.getContentProviders().forEach(contentProvider => this.useContentProvider(contentProvider));
+        module.getControllers().forEach(controller => this._expressApp.use(controller.getRouter()));
     }
 
     /**
