@@ -1,10 +1,12 @@
 import { logger } from "../../common";
 import IdentifiableError from "../../common/identifiable-error";
 import { ArrayContentFieldDefinition, ContentDefinition, ContentFieldDefinition, DateContentFieldDefinition, NumericContentFieldDefinition, TextContentFieldDefinition } from "../domain";
+import { GroupContentFieldDefinition } from "../domain/entity/content-field-definition/group-content-field-definition";
 import createContentDefinition from "../domain/usecase/content-definition/create-content-definition";
 import ContentDefinitionDTO from "./dto/content-definition";
 import ArrayContentFieldDefinitionDTO from "./dto/content-field-definition/array-content-field-definition";
 import { ContentFieldDefinitionDTO, ContentFieldType } from "./dto/content-field-definition/content-field-definition";
+import GroupContentFieldDefinitionDTO from "./dto/content-field-definition/group-content-field-definition";
  
 enum ErrorCode {
     InvalidFieldType = "invalid-field-type"
@@ -51,6 +53,20 @@ class ContentDefinitionManager {
 
             case ContentFieldType.Text:
                 contentFieldEntity = new TextContentFieldDefinition(contentFieldDefinitionDTO.getId(), contentFieldDefinitionDTO.getName());
+                break;
+
+            case ContentFieldType.Group:
+                let groupContentFieldDefinitionDTO: GroupContentFieldDefinitionDTO = contentFieldDefinitionDTO as GroupContentFieldDefinitionDTO;
+                
+                contentFieldEntity = new GroupContentFieldDefinition(contentFieldDefinitionDTO.getId(), contentFieldDefinitionDTO.getName());
+                
+                let groupContentFieldEntity: GroupContentFieldDefinition = contentFieldEntity as GroupContentFieldDefinition;
+                groupContentFieldDefinitionDTO.getContentFields().forEach(contentField => {
+                    groupContentFieldEntity.addContentField(
+                        contentField.name, 
+                        this.convertFieldDefinitionDtoToEntity(contentField.contentFieldDefinition),
+                        contentField.options);
+                });
                 break;
 
             default:

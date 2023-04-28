@@ -11,10 +11,11 @@ enum ContentFieldType {
     Numeric = "numeric",
     Text = "string",
     Date = "date",
-    Array = "array"
+    Array = "array",
+    Group = "group"
 }
 
-type ContentFieldValue = string | Date | number | string[] | Date[] | number[]; 
+type ContentFieldValue = string | Date | number | string[] | Date[] | number[] | any; // TODO: any could be used.
 type ContentFieldValidator = (contentFieldData: ContentFieldValue) => void;
 type ContentFieldDetermination = (contentFieldData: ContentFieldValue) => ContentFieldValue;
 

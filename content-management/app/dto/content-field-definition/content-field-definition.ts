@@ -2,7 +2,8 @@ enum ContentFieldType {
     Numeric = "numeric",
     Text = "string",
     Date = "date",
-    Array = "array"
+    Array = "array",
+    Group = "group"
 }
 
 type ContentFieldValue = string | Date | number | string[] | Date[] | number[]; 

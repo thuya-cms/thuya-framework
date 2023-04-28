@@ -1,0 +1,31 @@
+import logger from "./logger";
+
+class ContentHelper {
+    getFieldValue(fieldName: string, content: any) {
+        let propertyNameAsKey: keyof any = fieldName;
+
+        return content[propertyNameAsKey];
+    }
+
+    adjustContentFieldName(contentFieldName: string): string {
+        return contentFieldName
+            .toLowerCase()
+            .replace(/-/g, "");
+    }
+
+    getContentPropertyName(contentFieldName: string, content: any): keyof typeof content | undefined {
+        let fieldNameLowerCase = this.adjustContentFieldName(contentFieldName);
+        let propertyNameAsKey: keyof typeof content | undefined;
+
+        for (const contentProperty in content) {
+            if (contentProperty.toLowerCase() === fieldNameLowerCase) {
+                propertyNameAsKey = contentProperty;
+                break;
+            }
+        }  
+
+        return propertyNameAsKey;
+    }
+}
+
+export default new ContentHelper();

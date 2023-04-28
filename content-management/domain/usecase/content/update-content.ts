@@ -5,6 +5,7 @@ import { ContentDefinition } from "../../entity/content-definition";
 import factory from "../../factory";
 import contentManager from "../../../app/content-manager";
 import { ContentFieldDefinition } from "../../entity/content-field-definition/content-field-definition";
+import contentHelper from "../../../../common/utility/content-helper";
 
 enum ErrorCode {
     Required = "required",
@@ -15,10 +16,12 @@ class UpdateContent<T> {
     execute(contentDefinition: ContentDefinition<T>, content: T) {
         let finalContent: any = {};
 
-        expressHelper.deleteNotExistingProperties(content, contentDefinition);
+        expressHelper.deleteNotExistingProperties(
+            content, 
+            contentDefinition.getContentFields().map(contentField => contentField.name));
         
         contentDefinition.getContentFields().forEach(contentField => {
-            let fieldValue = expressHelper.getFieldValue(contentField.name, content);
+            let fieldValue = contentHelper.getFieldValue(contentField.name, content);
         
             if (contentField.options.isRequired && !fieldValue) {
                 logger.debug(`Value for field "%s" is required.`, contentField.name);

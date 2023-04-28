@@ -5,6 +5,7 @@ import logger from "../../../../common/utility/logger";
 import expressHelper from "../../../../common/utility/express-helper";
 import IdentifiableError from "../../../../common/identifiable-error";
 import contentManager from "../../../app/content-manager";
+import contentHelper from "../../../../common/utility/content-helper";
 
 enum ErrorCode {
     Required = "required",
@@ -15,25 +16,29 @@ class CreateContent<T> {
     execute(contentDefinition: ContentDefinition<T>, content: T): string {
         let finalContent: any = {};
 
-        expressHelper.deleteNotExistingProperties(content, contentDefinition);
+        expressHelper.deleteNotExistingProperties(
+            content, 
+            contentDefinition.getContentFields().map(contentField => contentField.name));
 
         contentDefinition.getContentFields().forEach(contentField => {
-            let fieldValue = expressHelper.getFieldValue(contentField.name, content);
+            let fieldValue = contentHelper.getFieldValue(contentField.name, content);
             
             if (contentField.options.isRequired && !fieldValue) {
                 logger.debug(`Value for field "%s" is required.`, contentField.name);
                 throw new IdentifiableError(ErrorCode.Required, `Value for field ${ contentField.name } is required.`);
             }
 
-            if (contentField.options.isUnique) 
-                this.validateUniqueness(contentDefinition, contentField, fieldValue);
-
-            contentField.contentFieldDefinition.validateValue(fieldValue);
-            fieldValue = contentField.contentFieldDefinition.executeDeterminations(fieldValue);
-
-            finalContent[contentField.name] = fieldValue;
-
-            logger.debug(`Value "%s" for field "%s" is valid.`, fieldValue, contentField.name);
+            if (fieldValue) {
+                if (contentField.options.isUnique) 
+                    this.validateUniqueness(contentDefinition, contentField, fieldValue);
+    
+                console.log(fieldValue);
+                contentField.contentFieldDefinition.validateValue(fieldValue);
+                fieldValue = contentField.contentFieldDefinition.executeDeterminations(fieldValue);
+    
+                finalContent[contentField.name] = fieldValue;
+                logger.debug(`Setting value "%s" for field "%s".`, fieldValue, contentField.name);
+            }
         });
 
         let id = factory.getPersistency().createContent(contentDefinition.getName(), finalContent);
