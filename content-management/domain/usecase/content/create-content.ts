@@ -37,6 +37,8 @@ class CreateContent<T> {
     
                 finalContent[contentField.name] = fieldValue;
                 logger.debug(`Setting value "%s" for field "%s".`, fieldValue, contentField.name);
+            } else {
+                logger.debug(`No value provided for field "%s".`, contentField.name);
             }
         });
 
