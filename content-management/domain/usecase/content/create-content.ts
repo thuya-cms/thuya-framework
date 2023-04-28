@@ -21,21 +21,26 @@ class CreateContent<T> {
             contentDefinition.getContentFields().map(contentField => contentField.name));
 
         contentDefinition.getContentFields().forEach(contentField => {
-            let fieldValue = contentHelper.getFieldValue(contentField.name, content);
-            
+            let fieldProperty = contentHelper.getContentPropertyName(contentField.name, content);
+            let fieldValue: any;
+
+            if (fieldProperty) {
+                fieldValue = contentHelper.getFieldValue(fieldProperty.toString(), content);
+            }
+
             if (contentField.options.isRequired && !fieldValue) {
                 logger.debug(`Value for field "%s" is required.`, contentField.name);
                 throw new IdentifiableError(ErrorCode.Required, `Value for field ${ contentField.name } is required.`);
             }
 
-            if (fieldValue) {
+            if (fieldValue && fieldProperty) {
                 if (contentField.options.isUnique) 
                     this.validateUniqueness(contentDefinition, contentField, fieldValue);
     
                 contentField.contentFieldDefinition.validateValue(fieldValue);
                 fieldValue = contentField.contentFieldDefinition.executeDeterminations(fieldValue);
     
-                finalContent[contentField.name] = fieldValue;
+                finalContent[fieldProperty] = fieldValue;
                 logger.debug(`Setting value "%s" for field "%s".`, fieldValue, contentField.name);
             } else {
                 logger.debug(`No value provided for field "%s".`, contentField.name);

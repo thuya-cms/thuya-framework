@@ -12,7 +12,7 @@ class ExpressContentManager {
         let contentName = expressHelper.getContentName(request);
         let content = listContent.execute(contentName);
 
-        response.json(content).status(200);
+        response.status(200).json(content);
 
         next();
     }
@@ -25,16 +25,18 @@ class ExpressContentManager {
             let contentDefinition = readContentDefinition.execute(contentName);
             let content = readContent.byId(contentDefinition, id);
 
-            response.json(content).status(200);
+            response.status(200).json(content);
 
             next();
         }
 
         catch (error: any) {
-            response.json({
-                code: error.code,
-                message: error.message
-            }).status(500);
+            response
+                .status(500)
+                .json({
+                    code: error.code,
+                    message: error.message
+                });
         }
     }
     
@@ -46,16 +48,18 @@ class ExpressContentManager {
             let contentDefinition = readContentDefinition.execute(contentName);
             let id = createContent.execute(contentDefinition, content);
     
-            response.json({id: id}).status(201);
+            response.status(201).json({id: id});
     
             next();
         }
 
         catch (error: any) {
-            response.json({
-                code: error.code,
-                message: error.message
-            }).status(500);
+            response
+                .status(500)
+                .json({
+                    code: error.code,
+                    message: error.message
+                });
         }
     }
 
@@ -73,10 +77,12 @@ class ExpressContentManager {
         }
 
         catch (error: any) {
-            response.json({
-                code: error.code,
-                message: error.message
-            }).status(500);
+            response
+                .status(500)
+                .json({
+                    code: error.code,
+                    message: error.message
+                });
         }
     }
 
@@ -94,10 +100,12 @@ class ExpressContentManager {
         }
 
         catch (error: any) {
-            response.json({
-                code: error.code,
-                message: error.message
-            }).status(500);
+            response
+                .status(500)
+                .json({
+                    code: error.code,
+                    message: error.message
+                });
         }
     }
 }

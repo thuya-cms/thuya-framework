@@ -1,5 +1,3 @@
-import logger from "./logger";
-
 class ContentHelper {
     getFieldValue(fieldName: string, content: any) {
         let propertyNameAsKey: keyof any = fieldName;
@@ -18,7 +16,7 @@ class ContentHelper {
         let propertyNameAsKey: keyof typeof content | undefined;
 
         for (const contentProperty in content) {
-            if (contentProperty.toLowerCase() === fieldNameLowerCase) {
+            if (this.adjustContentFieldName(contentProperty) === fieldNameLowerCase) {
                 propertyNameAsKey = contentProperty;
                 break;
             }
