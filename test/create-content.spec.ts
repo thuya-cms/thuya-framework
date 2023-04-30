@@ -12,12 +12,7 @@ import { ErrorCode } from "../content-management/domain/usecase/content/create-c
 describe("create content", () => {    
     let contentDefinition: ContentDefinitionDTO<any>;
     
-
-    afterEach(() => {
-        localContentManagementPersistency.clear();
-    });
-
-
+    
     beforeEach(() => {
         contentDefinition = new ContentDefinitionDTO<any>("", "test-definition")
         contentDefinition.addContentField(
@@ -28,8 +23,12 @@ describe("create content", () => {
         contentDefinition.addContentField("numeric-field", new NumericContentFieldDefinitionDTO("", "numeric-field-1"));
         contentDefinition.addContentField("date-field", new DateContentFieldDefinitionDTO("", "date-field-1"));
         contentDefinition.addContentField("array-field", new ArrayContentFieldDefinitionDTO("", "array-field-1", new TextContentFieldDefinitionDTO("", "array-content")));
-
+        
         contentDefinitionManager.createContentDefinition(contentDefinition);
+    });
+
+    afterEach(() => {
+        localContentManagementPersistency.clear();
     });
 
 

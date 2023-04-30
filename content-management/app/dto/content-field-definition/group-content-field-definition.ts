@@ -1,8 +1,7 @@
 import { ContentFieldDefinitionDTO, ContentFieldType } from "./content-field-definition";
 
 type ContentFieldOptions = {
-    isRequired?: boolean,
-    isUnique?: boolean
+    isRequired?: boolean
 }
 
 class GroupContentFieldDefinitionDTO extends ContentFieldDefinitionDTO {
