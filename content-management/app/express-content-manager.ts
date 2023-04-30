@@ -13,7 +13,7 @@ class ExpressContentManager {
         let content = listContent.execute(contentName);
 
         response.status(200).json(content);
-
+        
         next();
     }
 

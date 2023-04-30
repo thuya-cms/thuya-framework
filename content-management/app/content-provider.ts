@@ -17,6 +17,9 @@ abstract class ContentProvider {
         return [];
     }
 
+    createContent() {
+    }
+
 
     protected createContentFieldDefinitions() {}
     protected createContentDefinitions() {}
