@@ -1,10 +1,17 @@
-import { assert } from "chai";
+import { should } from "chai";
 import contentDefinitionManager from "../content-management/app/content-definition-manager";
 import ContentDefinitionDTO from "../content-management/app/dto/content-definition";
 import TextContentFieldDefinitionDTO from "../content-management/app/dto/content-field-definition/text-content-field-definition";
+import localContentManagementPersistency from "../content-management/persistency/local-content-management-persistency";
+import { ErrorCode } from "../content-management/domain/entity/content-definition";
 
-describe("Create content definition", () => {
-    it("valid empty definition should be created", () => {
+describe("create content definition", () => {
+    afterEach(() => {
+        localContentManagementPersistency.clear();
+    });
+
+
+    it("should be created wo fields", () => {
         let contentDefinition = new ContentDefinitionDTO("", "test-definition");
         contentDefinitionManager.createContentDefinition(contentDefinition);
     });
@@ -14,14 +21,15 @@ describe("Create content definition", () => {
             let contentDefinition = new ContentDefinitionDTO("", "");
             contentDefinitionManager.createContentDefinition(contentDefinition);
 
-            assert.fail();
+            should().fail();
         }
         
-        catch {
+        catch (error: any) {
+            should().equal(error.code, ErrorCode.InvalidName);
         }
     });
 
-    it("valid definition with one field should be created", () => {
+    it("should be created with one field", () => {
         let contentDefinition = new ContentDefinitionDTO("", "test-definition");
         contentDefinition.addContentField("test", new TextContentFieldDefinitionDTO("", "test-field"));
         contentDefinitionManager.createContentDefinition(contentDefinition);
@@ -31,13 +39,14 @@ describe("Create content definition", () => {
         try {
             let contentDefinition = new ContentDefinitionDTO("", "test-definition");
             contentDefinition.addContentField("test", new TextContentFieldDefinitionDTO("", "test-field"));
-            contentDefinitionManager.createContentDefinition(contentDefinition);
+            contentDefinition.addContentField("test", new TextContentFieldDefinitionDTO("", "test-field"));
             contentDefinitionManager.createContentDefinition(contentDefinition);
 
-            assert.fail();
+            should().fail();
         }
 
-        catch {
+        catch (error: any) {
+            should().equal(error.code, ErrorCode.DuplicateField);
         }
     });
 });

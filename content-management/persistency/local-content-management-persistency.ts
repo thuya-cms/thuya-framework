@@ -96,6 +96,11 @@ class LocalContentManagementPersistency implements IContentManagementPersistency
 
         return content;
     }
+
+    clear() {
+        this.content = [];
+        this.contentDefinitions = [];
+    }
 }
 
 export default new LocalContentManagementPersistency();

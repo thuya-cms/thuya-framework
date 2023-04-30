@@ -8,7 +8,7 @@
     "dist/**/*"
   ],
   "scripts": {
-    "test": "npm run build:dev && mocha dist/test/**/*.js",
+    "test": "mocha -r ts-node/register test/**/*.spec.ts",
     "prepublish": "npm run build",
     "build": "npx tsc",
     "build:dev": "npx tsc -p tsconfig-dev.json",
@@ -52,6 +52,7 @@
     "chai": "^4.3.7",
     "concurrently": "^7.6.0",
     "mocha": "^10.2.0",
-    "nodemon": "^2.0.20"
+    "nodemon": "^2.0.20",
+    "ts-node": "^10.9.1"
   }
 }

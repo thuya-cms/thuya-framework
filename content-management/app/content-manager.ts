@@ -13,9 +13,9 @@ class ContentManager {
         return readContent.byFieldValue(contentDefinition, fieldValue);
     }
 
-    createContent(contentDefinitionName: string, content: any) {
+    createContent(contentDefinitionName: string, content: any): string {
         let contentDefinition = readContentDefinition.execute(contentDefinitionName);
-        createContent.execute(contentDefinition, content);
+        return createContent.execute(contentDefinition, content);
     }
 }
 

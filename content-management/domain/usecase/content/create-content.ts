@@ -35,7 +35,7 @@ class CreateContent<T> {
 
             if (fieldValue && fieldProperty) {
                 if (contentField.options.isUnique) 
-                    this.validateUniqueness(contentDefinition, contentField, fieldValue);
+                    this.validateUniqueness(contentDefinition, fieldProperty.toString(), fieldValue);
     
                 contentField.contentFieldDefinition.validateValue(fieldValue);
                 fieldValue = contentField.contentFieldDefinition.executeDeterminations(fieldValue);
@@ -55,11 +55,11 @@ class CreateContent<T> {
     }
 
     
-    private validateUniqueness(contentDefinition: ContentDefinition<T>, contentField: { name: string; contentFieldDefinition: ContentFieldDefinition; options: { isRequired?: boolean | undefined; isUnique?: boolean | undefined; }; }, fieldValue: any) {
+    private validateUniqueness(contentDefinition: ContentDefinition<T>, fieldName: string, fieldValue: any) {
         let duplicate: any;
 
         try {
-            duplicate = contentManager.readContentByFieldValue(contentDefinition.getName(), { name: contentField.name, value: fieldValue });
+            duplicate = contentManager.readContentByFieldValue(contentDefinition.getName(), { name: fieldName, value: fieldValue });
         }
 
         catch (error) {
@@ -67,11 +67,11 @@ class CreateContent<T> {
         }
 
         if (duplicate) {
-            logger.debug(`Value of field "%s" is not unique.`, contentField.name);
-            throw new IdentifiableError(ErrorCode.NotUnique, `Value of field ${contentField.name} is not unique.`);
+            logger.debug(`Value of field "%s" is not unique.`, fieldName);
+            throw new IdentifiableError(ErrorCode.NotUnique, `Value of field ${fieldName} is not unique.`);
         }
 
-        logger.debug(`Value of field "%s" is unique.`, contentField.name);
+        logger.debug(`Value of field "%s" is unique.`, fieldName);
     }
 }
 
