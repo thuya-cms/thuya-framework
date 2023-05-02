@@ -1,4 +1,4 @@
-import { logger } from "../../../../common";
+import { Result, logger } from "../../../../common";
 import Entity from "../../../../common/entity";
 import IdentifiableError from "../../../../common/identifiable-error";
 
@@ -16,7 +16,7 @@ enum ContentFieldType {
 }
 
 type ContentFieldValue = string | Date | number | string[] | Date[] | number[] | any; // TODO: any could be used.
-type ContentFieldValidator = (contentFieldData: ContentFieldValue) => void;
+type ContentFieldValidator = (contentFieldData: ContentFieldValue) => Result;
 type ContentFieldDetermination = (contentFieldData: ContentFieldValue) => ContentFieldValue;
 
 abstract class ContentFieldDefinition extends Entity {
@@ -68,12 +68,17 @@ abstract class ContentFieldDefinition extends Entity {
         return this.determinations;
     }
 
-    validateValue(fieldValue: ContentFieldValue) {
+    validateValue(fieldValue: ContentFieldValue): Result {
         this.getValidators().forEach(validator => {
-            validator(fieldValue);
+            let result = validator(fieldValue);
+
+            if (result.getIsFailing()) 
+                return result;
         });
 
         logger.debug(`Content for "%s" field is valid.`, this.getName());
+
+        return Result.success();
     }
 
     executeDeterminations(fieldValue: ContentFieldValue): ContentFieldValue {

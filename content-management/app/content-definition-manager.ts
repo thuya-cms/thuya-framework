@@ -1,7 +1,6 @@
-import { logger } from "../../common";
+import { Result, logger } from "../../common";
 import IdentifiableError from "../../common/identifiable-error";
-import { ArrayContentFieldDefinition, ContentDefinition, ContentFieldDefinition, DateContentFieldDefinition, NumericContentFieldDefinition, TextContentFieldDefinition } from "../domain";
-import { GroupContentFieldDefinition } from "../domain/entity/content-field-definition/group-content-field-definition";
+import { GroupContentFieldDefinition, ArrayContentFieldDefinition, ContentDefinition, ContentFieldDefinition, DateContentFieldDefinition, NumericContentFieldDefinition, TextContentFieldDefinition } from "../domain";
 import createContentDefinition from "../domain/usecase/content-definition/create-content-definition";
 import ContentDefinitionDTO from "./dto/content-definition";
 import ArrayContentFieldDefinitionDTO from "./dto/content-field-definition/array-content-field-definition";
@@ -13,60 +12,119 @@ enum ErrorCode {
 }
 
 class ContentDefinitionManager {
-    createContentDefinition(contentDefinition: ContentDefinitionDTO<any>) {
-        let contentDefinitionEntity = this.convertDtoToEntity(contentDefinition);
-        createContentDefinition.execute(contentDefinitionEntity);
+    createContentDefinition(contentDefinition: ContentDefinitionDTO): Result {
+        let contentDefinitionEntityResult = this.convertDtoToEntity(contentDefinition);
+        if (contentDefinitionEntityResult.getIsFailing())
+            return Result.error(contentDefinitionEntityResult.getMessage());
+
+        let createContentDefinitionResult = createContentDefinition.execute(contentDefinitionEntityResult.getResult()!);
+        return createContentDefinitionResult;
     }
 
 
-    private convertDtoToEntity(contentDefinition: ContentDefinitionDTO<any>): ContentDefinition<any> {
-        let contentDefinitionEntity = new ContentDefinition(contentDefinition.getId(), contentDefinition.getName());
+    private convertDtoToEntity(contentDefinition: ContentDefinitionDTO<any>): Result<ContentDefinition> {
+        let contentDefinitionResult = ContentDefinition.create(contentDefinition.getId(), contentDefinition.getName());
+        if (contentDefinitionResult.getIsFailing())
+            return contentDefinitionResult;
+
+        let contentDefinitionEntity = contentDefinitionResult.getResult();
         
-        contentDefinition.getContentFields().forEach(contentField => {
-            let fieldDefinitionEntity = this.convertFieldDefinitionDtoToEntity(contentField.contentFieldDefinition);
-            contentDefinitionEntity.addContentField(contentField.name, fieldDefinitionEntity, contentField.options);
-        });
+        for (let contentField of contentDefinition.getContentFields()) {
+            let fieldDefinitionEntityResult = this.convertFieldDefinitionDtoToEntity(contentField.contentFieldDefinition);
 
-        return contentDefinitionEntity;
+            if (fieldDefinitionEntityResult.getIsFailing())
+                return Result.error(fieldDefinitionEntityResult.getMessage());
+
+            let addFieldResult = contentDefinitionEntity!.addContentField(contentField.name, fieldDefinitionEntityResult.getResult()!, contentField.options);
+
+            if (addFieldResult.getIsFailing())
+                return Result.error(addFieldResult.getMessage());
+        }
+
+        return Result.success(contentDefinitionEntity);
     }
 
-    private convertFieldDefinitionDtoToEntity(contentFieldDefinitionDTO: ContentFieldDefinitionDTO): ContentFieldDefinition {
-        let contentFieldEntity: ContentFieldDefinition;
+    private convertFieldDefinitionDtoToEntity(contentFieldDefinitionDTO: ContentFieldDefinitionDTO): Result<ContentFieldDefinition> {
+        let contentFieldEntity!: ContentFieldDefinition;
 
         switch (contentFieldDefinitionDTO.getType()) {
             case ContentFieldType.Array:
                 let arrayContentFieldDefinitionDTO: ArrayContentFieldDefinitionDTO = contentFieldDefinitionDTO as ArrayContentFieldDefinitionDTO;
 
-                contentFieldEntity = new ArrayContentFieldDefinition(
+                let arrayElementFieldResult = this.convertFieldDefinitionDtoToEntity(arrayContentFieldDefinitionDTO.getArrayElementType());
+                
+                if (arrayElementFieldResult.getIsFailing())
+                    return arrayElementFieldResult;
+                
+                let arrayFieldResult = ArrayContentFieldDefinition.create(
                     arrayContentFieldDefinitionDTO.getId(),
                     arrayContentFieldDefinitionDTO.getName(),
-                    this.convertFieldDefinitionDtoToEntity(arrayContentFieldDefinitionDTO.getArrayElementType()));
+                    arrayElementFieldResult.getResult()!);
+                
+                if (arrayFieldResult.getIsSuccessful()) 
+                    contentFieldEntity = arrayFieldResult.getResult()!;
+                else 
+                    return arrayFieldResult;
+
                 break;
 
             case ContentFieldType.Date:
-                contentFieldEntity = new DateContentFieldDefinition(contentFieldDefinitionDTO.getId(), contentFieldDefinitionDTO.getName());
+                let dateFieldResult = DateContentFieldDefinition.create(contentFieldDefinitionDTO.getId(), contentFieldDefinitionDTO.getName());
+
+                if (dateFieldResult.getIsSuccessful()) 
+                    contentFieldEntity = dateFieldResult.getResult()!;
+                else 
+                    return dateFieldResult;
+
                 break;
 
             case ContentFieldType.Numeric:
-                contentFieldEntity = new NumericContentFieldDefinition(contentFieldDefinitionDTO.getId(), contentFieldDefinitionDTO.getName());
+                let numericFieldResult = NumericContentFieldDefinition.create(contentFieldDefinitionDTO.getId(), contentFieldDefinitionDTO.getName());
+
+                if (numericFieldResult.getIsSuccessful()) 
+                    contentFieldEntity = numericFieldResult.getResult()!;
+                else 
+                    return numericFieldResult;
+
                 break;
 
             case ContentFieldType.Text:
-                contentFieldEntity = new TextContentFieldDefinition(contentFieldDefinitionDTO.getId(), contentFieldDefinitionDTO.getName());
+                let textFieldResult = TextContentFieldDefinition.create(contentFieldDefinitionDTO.getId(), contentFieldDefinitionDTO.getName());
+
+                if (textFieldResult.getIsSuccessful()) 
+                    contentFieldEntity = textFieldResult.getResult()!;
+                else 
+                    return textFieldResult;
+
                 break;
 
             case ContentFieldType.Group:
                 let groupContentFieldDefinitionDTO: GroupContentFieldDefinitionDTO = contentFieldDefinitionDTO as GroupContentFieldDefinitionDTO;
                 
-                contentFieldEntity = new GroupContentFieldDefinition(contentFieldDefinitionDTO.getId(), contentFieldDefinitionDTO.getName());
+                let groupFieldResult = GroupContentFieldDefinition.create(contentFieldDefinitionDTO.getId(), contentFieldDefinitionDTO.getName());
                 
+                if (groupFieldResult.getIsSuccessful()) 
+                    contentFieldEntity = groupFieldResult.getResult()!;
+                else 
+                    return groupFieldResult;
+
                 let groupContentFieldEntity: GroupContentFieldDefinition = contentFieldEntity as GroupContentFieldDefinition;
-                groupContentFieldDefinitionDTO.getContentFields().forEach(contentField => {
-                    groupContentFieldEntity.addContentField(
+                
+                for(let contentField of groupContentFieldDefinitionDTO.getContentFields()) {
+                    let groupElementFieldResult = this.convertFieldDefinitionDtoToEntity(contentField.contentFieldDefinition);
+
+                    if (groupElementFieldResult.getIsFailing())
+                        return groupElementFieldResult;
+
+                    let addFieldResult = groupContentFieldEntity.addContentField(
                         contentField.name, 
-                        this.convertFieldDefinitionDtoToEntity(contentField.contentFieldDefinition),
+                        groupElementFieldResult.getResult()!,
                         contentField.options);
-                });
+
+                    if (addFieldResult.getIsFailing())
+                        return Result.error(addFieldResult.getMessage());
+                }
+
                 break;
 
             default:
@@ -77,7 +135,7 @@ class ContentDefinitionManager {
         contentFieldDefinitionDTO.getValidators().forEach(validator => contentFieldEntity.addValidator(validator));
         contentFieldDefinitionDTO.getDeterminations().forEach(determination => contentFieldEntity.addDetermination(determination));
 
-        return contentFieldEntity;
+        return Result.success(contentFieldEntity);
     }
 }
 

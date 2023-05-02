@@ -2,11 +2,10 @@ import Entity from "../../../common/entity";
 import IdentifiableError from "../../../common/identifiable-error";
 import { ContentFieldDefinition } from "./content-field-definition/content-field-definition";
 import idContentFieldDefinition from "../../content/id-content-field-definition";
-import { logger } from "../../../common";
+import { Result, logger } from "../../../common";
 
 enum ErrorCode {
-    InvalidName = "invalid-name",
-    DuplicateField = "duplicate-field"
+    InvalidName = "invalid-name"
 }
 
 type ContentFieldOptions = {
@@ -14,14 +13,12 @@ type ContentFieldOptions = {
     isUnique?: boolean
 }
 
-class ContentDefinition<T> extends Entity {
+class ContentDefinition<T = any> extends Entity {
     private contentFields: { name: string, contentFieldDefinition: ContentFieldDefinition, options: ContentFieldOptions }[] = [];
 
 
 
-    constructor(
-            id: string, 
-            private name: string) {
+    protected constructor(id: string, private name: string) {
         super(id);
         
         if (!name) {
@@ -34,14 +31,25 @@ class ContentDefinition<T> extends Entity {
 
 
 
+    public static create<T>(id: string, name: string): Result<ContentDefinition<T>> {
+        try {
+            return Result.success(new ContentDefinition(id, name));
+        }
+
+        catch (error: any) {
+            return Result.error(error.message);
+        }
+    }
+
+
     getName(): string {
         return this.name;
     }
 
-    addContentField(name: string, contentField: ContentFieldDefinition, options?: ContentFieldOptions) {
+    addContentField(name: string, contentField: ContentFieldDefinition, options?: ContentFieldOptions): Result {
         if (this.contentFields.find(existingContentField => existingContentField.name === name)) {
             logger.error(`Field with name "%s" is already added.`, name);
-            throw new IdentifiableError(ErrorCode.DuplicateField, `Field with name "${ name }" is already added.`);
+            return Result.error(`Field with name "${ name }" is already added.`);
         }
 
         this.contentFields.push({
@@ -51,6 +59,8 @@ class ContentDefinition<T> extends Entity {
         });
 
         logger.debug(`Field "%s" is added to "%s".`, name, this.getName());
+
+        return Result.success();
     }
 
     getContentFields(): { name: string, contentFieldDefinition: ContentFieldDefinition, options: ContentFieldOptions }[] {

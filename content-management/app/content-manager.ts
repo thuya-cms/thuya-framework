@@ -1,21 +1,31 @@
+import { Result } from "../../common";
 import readContentDefinition from "../domain/usecase/content-definition/read-content-definition";
 import createContent from "../domain/usecase/content/create-content";
 import readContent from "../domain/usecase/content/read-content";
 
 class ContentManager {
-    readContent(contentDefinitionName: string, id: string,): any {
-        let contentDefinition = readContentDefinition.execute(contentDefinitionName);
-        return readContent.byId(contentDefinition, id);
+    readContent(contentDefinitionName: string, id: string,): Result<any> {
+        let readContentDefinitionResult = readContentDefinition.execute(contentDefinitionName);
+        if (readContentDefinitionResult.getIsFailing())
+            return readContentDefinitionResult;
+
+        return readContent.byId(readContentDefinitionResult.getResult()!, id);
     }
 
-    readContentByFieldValue(contentDefinitionName: string, fieldValue: { name: string, value: any }): any {
-        let contentDefinition = readContentDefinition.execute(contentDefinitionName);
-        return readContent.byFieldValue(contentDefinition, fieldValue);
+    readContentByFieldValue(contentDefinitionName: string, fieldValue: { name: string, value: any }): Result<any> {
+        let readContentDefinitionResult = readContentDefinition.execute(contentDefinitionName);
+        if (readContentDefinitionResult.getIsFailing())
+            return readContentDefinitionResult;
+
+        return readContent.byFieldValue(readContentDefinitionResult.getResult()!, fieldValue);
     }
 
-    createContent(contentDefinitionName: string, content: any): string {
-        let contentDefinition = readContentDefinition.execute(contentDefinitionName);
-        return createContent.execute(contentDefinition, content);
+    createContent(contentDefinitionName: string, content: any): Result<string> {
+        let createContentDefinitionResult = readContentDefinition.execute(contentDefinitionName);
+        if (createContentDefinitionResult.getIsFailing())
+            return Result.error(createContentDefinitionResult.getMessage());
+
+        return createContent.execute(createContentDefinitionResult.getResult()!, content);
     }
 }
 

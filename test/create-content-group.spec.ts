@@ -6,7 +6,6 @@ import GroupContentFieldDefinitionDTO from "../content-management/app/dto/conten
 import NumericContentFieldDefinitionDTO from "../content-management/app/dto/content-field-definition/numeric-content-field-definition";
 import TextContentFieldDefinitionDTO from "../content-management/app/dto/content-field-definition/text-content-field-definition";
 import localContentManagementPersistency from "../content-management/persistency/local-content-management-persistency";
-import { ErrorCode } from "../content-management/domain/entity/content-field-definition/group-content-field-definition";
 
 describe("create content with group", () => {
     let contentDefinition: ContentDefinitionDTO<any>;
@@ -27,49 +26,60 @@ describe("create content with group", () => {
         let numValue = 30;
 
         groupField = new GroupContentFieldDefinitionDTO("", "group-field-1");
-        groupField.addContentField("text-field", new TextContentFieldDefinitionDTO("", "text-field-1"));
-        groupField.addContentField("numeric-field", new NumericContentFieldDefinitionDTO("", "numeric-field-1"));
+        groupField.addContentField("textField", new TextContentFieldDefinitionDTO("", "text-field-1"));
+        groupField.addContentField("numericField", new NumericContentFieldDefinitionDTO("", "numeric-field-1"));
 
-        contentDefinition.addContentField("group-field", groupField);
-        contentDefinitionManager.createContentDefinition(contentDefinition);
+        contentDefinition.addContentField("groupField", groupField);
+        
+        let createResult = contentDefinitionManager.createContentDefinition(contentDefinition);
+        if (createResult.getIsFailing())
+            should().fail(createResult.getMessage());
 
-        let id = contentManager.createContent(contentDefinition.getName(), {
+        let createContentResult = contentManager.createContent(contentDefinition.getName(), {
             groupField: {
                 textField: textValue,
                 numericField: numValue 
             }
         });
-        let content = contentManager.readContent(contentDefinition.getName(), id);
+        if (createContentResult.getIsFailing())
+            should().fail(createContentResult.getMessage());
 
+        let readContentResult = contentManager.readContent(contentDefinition.getName(), createContentResult.getResult()!);
+        should().equal(readContentResult.getIsSuccessful(), true);
+
+        let content = readContentResult.getResult();
         should().exist(content);
-        should().equal(content.id, id);
+        should().equal(content.id, createContentResult.getResult());
         should().equal(content.groupField.textField, textValue);
         should().equal(content.groupField.numericField, numValue);
     });
 
     it("should fail with duplicate fields", () => {
-        try {
-            groupField = new GroupContentFieldDefinitionDTO("", "group-field-1");
-            groupField.addContentField("text-field", new TextContentFieldDefinitionDTO("", "text-field-1"));
-            groupField.addContentField("text-field", new TextContentFieldDefinitionDTO("", "text-field-1"));
-        }
+        groupField = new GroupContentFieldDefinitionDTO("", "group-field-1");
+        groupField.addContentField("textField", new TextContentFieldDefinitionDTO("", "text-field-1"));
+        groupField.addContentField("textField", new TextContentFieldDefinitionDTO("", "text-field-2"));
 
-        catch (error: any) {
-            should().equal(error.code, ErrorCode.DuplicateField);
-        }
+        contentDefinition.addContentField("groupField", groupField);
+        
+        let createDefinitionResult = contentDefinitionManager.createContentDefinition(contentDefinition);
+        if (createDefinitionResult.getIsSuccessful())
+            should().fail(createDefinitionResult.getMessage());
+
+        should().equal(createDefinitionResult.getMessage(), `Field with name "textField" is already added to group "group-field-1".`);
     });
 
     it("should fail with missing required value", () => {
-        try {
-            groupField = new GroupContentFieldDefinitionDTO("", "group-field-1");
-            groupField.addContentField("text-field", new TextContentFieldDefinitionDTO("", "text-field-1"), { isRequired: true });
-            contentDefinitionManager.createContentDefinition(contentDefinition);
+        groupField = new GroupContentFieldDefinitionDTO("", "group-field-1");
+        groupField.addContentField("textField", new TextContentFieldDefinitionDTO("", "text-field-1"), { isRequired: true });
+        
+        contentDefinition.addContentField("groupField", groupField);
+        
+        let createDefinitionResult = contentDefinitionManager.createContentDefinition(contentDefinition);
+        if (createDefinitionResult.getIsFailing())
+            should().fail(createDefinitionResult.getMessage());
 
-            contentManager.createContent(contentDefinition.getName(), {});
-        }
+        let createContentResult = contentManager.createContent(contentDefinition.getName(), {});
 
-        catch (error: any) {
-            should().equal(error.code, ErrorCode.Required);
-        }
+        should().equal(createContentResult.getIsFailing(), true);
     });
 });

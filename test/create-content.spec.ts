@@ -1,4 +1,4 @@
-import { assert, should } from "chai";
+import { should } from "chai";
 import contentDefinitionManager from "../content-management/app/content-definition-manager";
 import contentManager from "../content-management/app/content-manager";
 import ContentDefinitionDTO from "../content-management/app/dto/content-definition";
@@ -7,7 +7,6 @@ import NumericContentFieldDefinitionDTO from "../content-management/app/dto/cont
 import DateContentFieldDefinitionDTO from "../content-management/app/dto/content-field-definition/date-content-field-definition";
 import ArrayContentFieldDefinitionDTO from "../content-management/app/dto/content-field-definition/array-content-field-definition";
 import localContentManagementPersistency from "../content-management/persistency/local-content-management-persistency";
-import { ErrorCode } from "../content-management/domain/usecase/content/create-content";
 
 describe("create content", () => {    
     let contentDefinition: ContentDefinitionDTO<any>;
@@ -16,15 +15,16 @@ describe("create content", () => {
     beforeEach(() => {
         contentDefinition = new ContentDefinitionDTO<any>("", "test-definition")
         contentDefinition.addContentField(
-            "text-field", 
+            "textField", 
             new TextContentFieldDefinitionDTO("", "text-field-1"), 
             { isRequired: true, isUnique: true });
 
-        contentDefinition.addContentField("numeric-field", new NumericContentFieldDefinitionDTO("", "numeric-field-1"));
-        contentDefinition.addContentField("date-field", new DateContentFieldDefinitionDTO("", "date-field-1"));
-        contentDefinition.addContentField("array-field", new ArrayContentFieldDefinitionDTO("", "array-field-1", new TextContentFieldDefinitionDTO("", "array-content")));
+        contentDefinition.addContentField("numericField", new NumericContentFieldDefinitionDTO("", "numeric-field-1"));
+        contentDefinition.addContentField("dateField", new DateContentFieldDefinitionDTO("", "date-field-1"));
+        contentDefinition.addContentField("arrayField", new ArrayContentFieldDefinitionDTO("", "array-field-1", new TextContentFieldDefinitionDTO("", "array-content")));
         
-        contentDefinitionManager.createContentDefinition(contentDefinition);
+        let createContentDefinitionResult = contentDefinitionManager.createContentDefinition(contentDefinition);
+        should().equal(createContentDefinitionResult.getIsSuccessful(), true);
     });
 
     afterEach(() => {
@@ -38,16 +38,20 @@ describe("create content", () => {
         let dateValue = new Date().toISOString();
         let arrayValue = ["string1", "string2"];
 
-        let id = contentManager.createContent(contentDefinition.getName(), {
+        let createContentResult = contentManager.createContent(contentDefinition.getName(), {
             textField: textValue,
             numericField: numValue,
             dateField: dateValue,
             arrayField: arrayValue
         });
-        let content = contentManager.readContent(contentDefinition.getName(), id);
+        should().equal(createContentResult.getIsSuccessful(), true, createContentResult.getMessage());
 
+        let readContentResult = contentManager.readContent(contentDefinition.getName(), createContentResult.getResult()!);
+        should().equal(readContentResult.getIsSuccessful(), true, readContentResult.getMessage());
+
+        let content = readContentResult.getResult();
         should().exist(content);
-        should().equal(content.id, id);
+        should().equal(content.id, createContentResult.getResult());
         should().equal(content.textField, textValue);
         should().equal(content.numericField, numValue);
         should().equal(content.dateField, dateValue);
@@ -57,13 +61,18 @@ describe("create content", () => {
     it("should be created with missing not required fields", () => {
         let textValue = "text-value";
 
-        let id = contentManager.createContent(contentDefinition.getName(), {
+        let createContentResult = contentManager.createContent(contentDefinition.getName(), {
             textField: textValue
         });
-        let content = contentManager.readContent(contentDefinition.getName(), id);
+        if (createContentResult.getIsFailing())
+            should().fail();
 
+        let readContentResult = contentManager.readContent(contentDefinition.getName(), createContentResult.getResult()!);
+        should().equal(readContentResult.getIsSuccessful(), true);
+
+        let content = readContentResult.getResult();
         should().exist(content);
-        should().equal(content.id, id);
+        should().equal(content.id, createContentResult.getResult());
         should().equal(content.textField, textValue);
         should().not.exist(content.numericField);
         should().not.exist(content.dateField);
@@ -71,28 +80,17 @@ describe("create content", () => {
     });
 
     it("should fail with missing required field", () => {
-        try {
-            contentManager.createContent(contentDefinition.getName(), {});
-            should().fail();
-        }
-
-        catch (error: any) {
-            should().equal(error.code, ErrorCode.Required);
-        }
+        let createContentResult = contentManager.createContent(contentDefinition.getName(), {});
+        should().equal(createContentResult.getIsFailing(), true);
     });
 
     it("should fail with duplicate unique value", () => {
-        try {
-            let textValue = "text-value";
-    
-            contentManager.createContent(contentDefinition.getName(), { textField: textValue });
-            contentManager.createContent(contentDefinition.getName(), { textField: textValue });
+        let textValue = "text-value";
 
-            should().fail();
-        }
+        let createContentResult = contentManager.createContent(contentDefinition.getName(), { textField: textValue });
+        should().equal(createContentResult.getIsSuccessful(), true);
 
-        catch (error: any) {
-            should().equal(error.code, ErrorCode.NotUnique);
-        }
+        createContentResult = contentManager.createContent(contentDefinition.getName(), { textField: textValue });
+        should().equal(createContentResult.getIsFailing(), true);
     });
 });

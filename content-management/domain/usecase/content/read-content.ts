@@ -1,30 +1,25 @@
-import IdentifiableError from "../../../../common/identifiable-error";
-import logger from "../../../../common/utility/logger";
+import { Result } from "../../../../common";
 import { ContentDefinition } from "../../entity/content-definition";
 import factory from "../../factory";
 
-enum ErrorCode {
-    NotFound = "not-found",
-}
-
 class ReadContent<T> {
-    byId(contentDefinition: ContentDefinition<T>, id: string): T {
+    byId(contentDefinition: ContentDefinition<T>, id: string): Result<T> {
         try {
-            return factory.getPersistency().readContent(contentDefinition.getName(), id);
+            return Result.success(factory.getPersistency().readContent(contentDefinition.getName(), id));
         }
 
         catch (error: any) {
-            throw new IdentifiableError(ErrorCode.NotFound, "Failed to read content.");
+            return Result.error("Failed to read content.");
         }
     }
 
-    byFieldValue(contentDefinition: ContentDefinition<T>, fieldValue: { name: string, value: any }): T {
+    byFieldValue(contentDefinition: ContentDefinition<T>, fieldValue: { name: string, value: any }): Result<T> {
         try {
-            return factory.getPersistency().readContentByFieldValue(fieldValue, contentDefinition.getName());
+            return Result.success(factory.getPersistency().readContentByFieldValue(fieldValue, contentDefinition.getName()));
         }
 
         catch (error: any) {
-            throw new IdentifiableError(ErrorCode.NotFound, "Failed to read content.");
+            return Result.error("Failed to read content.");
         }
     }
 }

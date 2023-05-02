@@ -1,12 +1,7 @@
-import { IdentifiableError, logger } from "../../../../common";
+import { Result, logger } from "../../../../common";
 import contentHelper from "../../../../common/utility/content-helper";
 import expressHelper from "../../../../common/utility/express-helper";
 import { ContentFieldDefinition, ContentFieldType, ContentFieldValue } from "./content-field-definition";
-
-enum ErrorCode {
-    DuplicateField = "duplicate-field",
-    Required = "required"
-}
 
 type ContentFieldOptions = {
     isRequired?: boolean
@@ -17,16 +12,28 @@ class GroupContentFieldDefinition extends ContentFieldDefinition {
 
     
     
-    constructor(id: string, name: string) {
+    protected constructor(id: string, name: string) {
         super(id, name, ContentFieldType.Group);
     }
 
 
 
-    addContentField(name: string, contentField: ContentFieldDefinition, options?: ContentFieldOptions) {
+    static create(id: string, name: string): Result<GroupContentFieldDefinition> {
+        try {
+            let contentFieldDefinition = new GroupContentFieldDefinition(id, name);
+            return Result.success(contentFieldDefinition);
+        }
+
+        catch (error: any) {
+            return Result.error(error.message);
+        }
+    }
+
+
+    addContentField(name: string, contentField: ContentFieldDefinition, options?: ContentFieldOptions): Result {
         if (this.contentFields.find(existingContentField => existingContentField.name === name)) {
             logger.error(`Field with name "%s" is already added to group "%s".`, name, this.getName());
-            throw new IdentifiableError(ErrorCode.DuplicateField, `Field with name "${ name }" is already added to group "${ this.getName() }".`);
+            return Result.error(`Field with name "${ name }" is already added to group "${ this.getName() }".`);
         }
 
         this.contentFields.push({
@@ -36,14 +43,16 @@ class GroupContentFieldDefinition extends ContentFieldDefinition {
         });
 
         logger.debug(`Field "%s" is added to group "%s".`, name, this.getName());
+
+        return Result.success();
     }
 
     getContentFields(): { name: string, contentFieldDefinition: ContentFieldDefinition, options: ContentFieldOptions }[] {
         return this.contentFields;
     }
 
-    override validateValue(fieldValue: ContentFieldValue): void {
-        this.getContentFields().forEach(contentField => {
+    override validateValue(fieldValue: ContentFieldValue): Result {
+        for (let contentField of this.getContentFields()) {
             let propertyName = contentHelper.getContentPropertyName(contentField.name, fieldValue);
             let singleFieldValue;
 
@@ -52,13 +61,15 @@ class GroupContentFieldDefinition extends ContentFieldDefinition {
 
             if (contentField.options.isRequired && !singleFieldValue) {
                 logger.debug(`Value for field "%s" is required.`, contentField.name);
-                throw new IdentifiableError(ErrorCode.Required, `Value for field ${ contentField.name } is required.`);
+                return Result.error(`Value for field "${ contentField.name }" is required.`);
             }
 
-            contentField.contentFieldDefinition.validateValue(singleFieldValue);
-        });
+            let result = contentField.contentFieldDefinition.validateValue(singleFieldValue);
+
+            if (result.getIsFailing()) return result;
+        }
         
-        super.validateValue(fieldValue);
+        return super.validateValue(fieldValue);
     }
     
     override executeDeterminations(fieldValue: any): ContentFieldValue {
@@ -68,4 +79,4 @@ class GroupContentFieldDefinition extends ContentFieldDefinition {
     }
 }
 
-export { GroupContentFieldDefinition, ErrorCode };
+export default GroupContentFieldDefinition;

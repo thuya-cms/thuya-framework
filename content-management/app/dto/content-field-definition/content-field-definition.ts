@@ -1,3 +1,5 @@
+import { Result } from "../../../../common";
+
 enum ContentFieldType {
     Numeric = "numeric",
     Text = "string",
@@ -7,7 +9,7 @@ enum ContentFieldType {
 }
 
 type ContentFieldValue = string | Date | number | string[] | Date[] | number[]; 
-type ContentFieldValidator = (contentFieldData: ContentFieldValue) => void;
+type ContentFieldValidator = (contentFieldData: ContentFieldValue) => Result;
 type ContentFieldDetermination = (contentFieldData: ContentFieldValue) => ContentFieldValue;
 
 abstract class ContentFieldDefinitionDTO {

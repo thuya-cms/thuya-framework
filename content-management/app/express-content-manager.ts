@@ -9,23 +9,41 @@ import expressHelper from "../../common/utility/express-helper";
 
 class ExpressContentManager {
     listContent(request: Request, response: Response, next: NextFunction) {
-        let contentName = expressHelper.getContentName(request);
-        let content = listContent.execute(contentName);
+        try {
+            let contentName = expressHelper.getContentName(request);
 
-        response.status(200).json(content);
-        
-        next();
+            let listContentResult = listContent.execute(contentName);
+            if (listContentResult.getIsFailing())
+                throw new Error(listContentResult.getMessage());
+    
+            response.status(200).json(listContentResult);
+            
+            next();
+        }
+
+        catch (error: any) {
+            response
+                .status(500)
+                .json({
+                    message: error.message
+                });
+        }
     }
 
     readContent(request: Request, response: Response, next: NextFunction) {
-        let contentName = expressHelper.getContentName(request);
-        let id = request.params.id;
-
         try {
-            let contentDefinition = readContentDefinition.execute(contentName);
-            let content = readContent.byId(contentDefinition, id);
+            let contentName = expressHelper.getContentName(request);
+            let id = request.params.id;
 
-            response.status(200).json(content);
+            let readContentDefinitionResult = readContentDefinition.execute(contentName);
+            if (readContentDefinitionResult.getIsFailing())
+                throw new Error(readContentDefinitionResult.getMessage());
+
+            let readContentResult = readContent.byId(readContentDefinitionResult.getResult()!, id);
+            if (readContentResult.getIsFailing())
+                throw new Error(readContentResult.getMessage());
+
+            response.status(200).json(readContentResult.getResult());
 
             next();
         }
@@ -34,21 +52,25 @@ class ExpressContentManager {
             response
                 .status(500)
                 .json({
-                    code: error.code,
                     message: error.message
                 });
         }
     }
     
     createContent(request: Request, response: Response, next: NextFunction) {
-        let contentName = expressHelper.getContentName(request);
-        let content = request.body;
-
         try {
-            let contentDefinition = readContentDefinition.execute(contentName);
-            let id = createContent.execute(contentDefinition, content);
+            let contentName = expressHelper.getContentName(request);
+            let content = request.body;
+            
+            let readContentDefinitionResult = readContentDefinition.execute(contentName);
+            if (readContentDefinitionResult.getIsFailing())
+                throw new Error(readContentDefinitionResult.getMessage());
+            
+            let createContentResult = createContent.execute(readContentDefinitionResult.getResult()!, content);
+            if (createContentResult.getIsFailing())
+                throw new Error(createContentResult.getMessage());
     
-            response.status(201).json({id: id});
+            response.status(201).json({ id: createContentResult.getResult() });
     
             next();
         }
@@ -57,7 +79,6 @@ class ExpressContentManager {
             response
                 .status(500)
                 .json({
-                    code: error.code,
                     message: error.message
                 });
         }
@@ -68,8 +89,13 @@ class ExpressContentManager {
         let id = request.params.id;
 
         try {
-            let contentDefinition = readContentDefinition.execute(contentName);
-            deleteContent.execute(contentDefinition, id);
+            let readContentDefinitionResult = readContentDefinition.execute(contentName);
+            if (readContentDefinitionResult.getIsFailing())
+                throw new Error(readContentDefinitionResult.getMessage());
+
+            let deleteContentResult = deleteContent.execute(readContentDefinitionResult.getResult()!, id);
+            if (deleteContentResult.getIsFailing())
+                throw new Error(deleteContentResult.getMessage());
 
             response.sendStatus(200);
 
@@ -80,7 +106,6 @@ class ExpressContentManager {
             response
                 .status(500)
                 .json({
-                    code: error.code,
                     message: error.message
                 });
         }
@@ -91,8 +116,13 @@ class ExpressContentManager {
         let content = request.body;
 
         try {
-            let contentDefinition = readContentDefinition.execute(contentName);
-            updateContent.execute(contentDefinition, content);
+            let readContentDefinitionResult = readContentDefinition.execute(contentName);
+            if (readContentDefinitionResult.getIsFailing())
+                throw new Error(readContentDefinitionResult.getMessage());
+
+            let updateContentResult = updateContent.execute(readContentDefinitionResult.getResult()!, content);
+            if (updateContentResult.getIsFailing())
+                throw new Error(updateContentResult.getMessage());
 
             response.sendStatus(200);
 
@@ -103,7 +133,6 @@ class ExpressContentManager {
             response
                 .status(500)
                 .json({
-                    code: error.code,
                     message: error.message
                 });
         }

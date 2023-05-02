@@ -1,26 +1,34 @@
-import IdentifiableError from "../../../../common/identifiable-error";
+import { Result } from "../../../../common";
 import logger from "../../../../common/utility/logger";
 import { ContentFieldDefinition, ContentFieldType, ContentFieldValue } from "./content-field-definition";
 
-enum ErrorCode {
-    InvalidNumber = "invalid-number"
-}
-
 class NumericContentFieldDefinition extends ContentFieldDefinition {
-    constructor(id: string, name: string) {
+    protected constructor(id: string, name: string) {
         super(id, name, ContentFieldType.Numeric);
     }
 
-    
 
-    override validateValue(fieldValue: ContentFieldValue): void {
+
+    static create(id: string, name: string): Result<NumericContentFieldDefinition> {
+        try {
+            let contentFieldDefinition = new NumericContentFieldDefinition(id, name);
+            return Result.success(contentFieldDefinition);
+        }
+
+        catch (error: any) {
+            return Result.error(error.message);
+        }
+    }
+
+
+    override validateValue(fieldValue: ContentFieldValue): Result {
         if (Number.isNaN(Number(fieldValue))) {
             logger.debug(`Invalid numeric value "%s" for field "%s".`, fieldValue, this.getName());
-            throw new IdentifiableError(ErrorCode.InvalidNumber, "Provided value is not a number.");
+            return Result.error(`Invalid numeric value "${ fieldValue }" for field "${ this.getName() }".`);
         }
         
-        super.validateValue(fieldValue);
+        return super.validateValue(fieldValue);
     }
 }
 
-export { NumericContentFieldDefinition, ErrorCode };
+export default NumericContentFieldDefinition;

@@ -1,36 +1,46 @@
-import IdentifiableError from "../../../../common/identifiable-error";
+import { Result } from "../../../../common";
 import logger from "../../../../common/utility/logger";
 import { ContentFieldDefinition, ContentFieldType, ContentFieldValue } from "./content-field-definition";
 
-enum ErrorCode {
-    InvalidArray = "invalid-array"
-}
-
 class ArrayContentFieldDefinition extends ContentFieldDefinition {    
-    constructor(id: string, name: string, private arrayElementType: ContentFieldDefinition) {
+    protected constructor(id: string, name: string, private arrayElementType: ContentFieldDefinition) {
         super(id, name, ContentFieldType.Array);
     }
 
+
+
+    static create(id: string, name: string, arrayElementType: ContentFieldDefinition): Result<ArrayContentFieldDefinition> {
+        try {
+            let contentFieldDefinition = new ArrayContentFieldDefinition(id, name, arrayElementType);
+            return Result.success(contentFieldDefinition);
+        }
+
+        catch (error: any) {
+            return Result.error(error.message);
+        }
+    }
 
 
     getArrayElementType(): ContentFieldDefinition {
         return this.arrayElementType;
     }
 
-    override validateValue(fieldValue: ContentFieldValue): void {
+    override validateValue(fieldValue: ContentFieldValue): Result<void> {
         if (!Array.isArray(fieldValue)) {
             logger.debug(`Invalid array value "%s" for "%s".`, fieldValue, this.getName());
-            throw new IdentifiableError(ErrorCode.InvalidArray, "Provided value is not an array.");
+            return Result.error(`Invalid array value "${ fieldValue }" for "${ this.getName() }".`);
         }
 
         let array: any[] = fieldValue;
 
         array.forEach(arrayElementValue => {
-            this.arrayElementType.validateValue(arrayElementValue);
+            let result = this.arrayElementType.validateValue(arrayElementValue);
+
+            if (result.getIsFailing()) return result;
         });
         
-        super.validateValue(fieldValue);
+        return super.validateValue(fieldValue);
     }
 }
 
-export { ArrayContentFieldDefinition, ErrorCode };
+export default ArrayContentFieldDefinition;

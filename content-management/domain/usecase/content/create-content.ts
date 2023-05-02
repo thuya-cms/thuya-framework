@@ -1,11 +1,12 @@
 import { ContentDefinition } from "../../entity/content-definition";
-import { ContentFieldDefinition } from "../../entity/content-field-definition/content-field-definition";
+import { ContentFieldDefinition, ContentFieldType } from "../../entity/content-field-definition/content-field-definition";
 import factory from "../../factory";
 import logger from "../../../../common/utility/logger";
 import expressHelper from "../../../../common/utility/express-helper";
 import IdentifiableError from "../../../../common/identifiable-error";
 import contentManager from "../../../app/content-manager";
 import contentHelper from "../../../../common/utility/content-helper";
+import { Result } from "../../../../common";
 
 enum ErrorCode {
     Required = "required",
@@ -13,65 +14,64 @@ enum ErrorCode {
 }
 
 class CreateContent<T> {
-    execute(contentDefinition: ContentDefinition<T>, content: T): string {
+    execute(contentDefinition: ContentDefinition<T>, content: T): Result<string> {
         let finalContent: any = {};
 
         expressHelper.deleteNotExistingProperties(
             content, 
             contentDefinition.getContentFields().map(contentField => contentField.name));
 
-        contentDefinition.getContentFields().forEach(contentField => {
-            let fieldProperty = contentHelper.getContentPropertyName(contentField.name, content);
-            let fieldValue: any;
-
-            if (fieldProperty) {
-                fieldValue = contentHelper.getFieldValue(fieldProperty.toString(), content);
-            }
+        for (let contentField of contentDefinition.getContentFields()) {
+            let fieldValue = contentHelper.getFieldValue(contentField.name, content);
 
             if (contentField.options.isRequired && !fieldValue) {
                 logger.debug(`Value for field "%s" is required.`, contentField.name);
-                throw new IdentifiableError(ErrorCode.Required, `Value for field ${ contentField.name } is required.`);
+                return Result.error(`Value for field ${ contentField.name } is required.`);
             }
 
-            if (fieldValue && fieldProperty) {
-                if (contentField.options.isUnique) 
-                    this.validateUniqueness(contentDefinition, fieldProperty.toString(), fieldValue);
+            if (fieldValue) {
+                if (contentField.options.isUnique) {
+                    let uniquenessResult = this.validateUniqueness(contentDefinition, contentField.name, fieldValue);
+                    if (uniquenessResult.getIsFailing()) 
+                        return Result.error(uniquenessResult.getMessage());
+                }
     
-                contentField.contentFieldDefinition.validateValue(fieldValue);
+                let validationResult = contentField.contentFieldDefinition.validateValue(fieldValue);
+                if (validationResult.getIsFailing())
+                    return Result.error(validationResult.getMessage());
+
                 fieldValue = contentField.contentFieldDefinition.executeDeterminations(fieldValue);
-    
-                finalContent[fieldProperty] = fieldValue;
+
+                finalContent[contentField.name] = fieldValue;
                 logger.debug(`Setting value "%s" for field "%s".`, fieldValue, contentField.name);
             } else {
+                if (contentField.contentFieldDefinition.getType() === ContentFieldType.Group) {
+                    let validationResult = contentField.contentFieldDefinition.validateValue({});
+                    if (validationResult.getIsFailing())
+                        return Result.error(validationResult.getMessage());
+                }
+
                 logger.debug(`No value provided for field "%s".`, contentField.name);
             }
-        });
+        }
 
         let id = factory.getPersistency().createContent(contentDefinition.getName(), finalContent);
-
         logger.info(`Content of type "%s" is created successfully.`, contentDefinition.getName());
 
-        return id;
+        return Result.success(id);
     }
 
     
-    private validateUniqueness(contentDefinition: ContentDefinition<T>, fieldName: string, fieldValue: any) {
-        let duplicate: any;
+    private validateUniqueness(contentDefinition: ContentDefinition<T>, fieldName: string, fieldValue: any): Result {
+        let readContentResult = contentManager.readContentByFieldValue(contentDefinition.getName(), { name: fieldName, value: fieldValue });
 
-        try {
-            duplicate = contentManager.readContentByFieldValue(contentDefinition.getName(), { name: fieldName, value: fieldValue });
-        }
-
-        catch (error) {
-            duplicate = undefined; // No duplicate.
-        }
-
-        if (duplicate) {
+        if (readContentResult.getIsSuccessful()) {
             logger.debug(`Value of field "%s" is not unique.`, fieldName);
-            throw new IdentifiableError(ErrorCode.NotUnique, `Value of field ${fieldName} is not unique.`);
+            return Result.error(`Value of field ${fieldName} is not unique.`);
+        } else {
+            logger.debug(`Value of field "%s" is unique.`, fieldName);
+            return Result.success();
         }
-
-        logger.debug(`Value of field "%s" is unique.`, fieldName);
     }
 }
 

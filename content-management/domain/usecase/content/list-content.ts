@@ -1,8 +1,9 @@
+import { Result } from "../../../../common";
 import factory from "../../factory";
 
 class ListContent {
-    execute(contentName: string): any[] {
-        return factory.getPersistency().listContent(contentName);
+    execute(contentName: string): Result<any[]> {
+        return Result.success(factory.getPersistency().listContent(contentName));
     }
 }
 

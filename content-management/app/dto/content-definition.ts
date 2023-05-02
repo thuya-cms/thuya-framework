@@ -6,7 +6,7 @@ type ContentFieldOptions = {
     isUnique?: boolean
 }
 
-class ContentDefinitionDTO<T> {
+class ContentDefinitionDTO<T = any> {
     private contentFields: { name: string, contentFieldDefinition: ContentFieldDefinitionDTO, options: ContentFieldOptions }[] = [];
 
 

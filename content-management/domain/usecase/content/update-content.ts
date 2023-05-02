@@ -4,8 +4,9 @@ import logger from "../../../../common/utility/logger";
 import { ContentDefinition } from "../../entity/content-definition";
 import factory from "../../factory";
 import contentManager from "../../../app/content-manager";
-import { ContentFieldDefinition } from "../../entity/content-field-definition/content-field-definition";
+import { ContentFieldDefinition, ContentFieldType } from "../../entity/content-field-definition/content-field-definition";
 import contentHelper from "../../../../common/utility/content-helper";
+import { Result } from "../../../../common";
 
 enum ErrorCode {
     Required = "required",
@@ -13,55 +14,64 @@ enum ErrorCode {
 }
 
 class UpdateContent<T> {
-    execute(contentDefinition: ContentDefinition<T>, content: T) {
+    execute(contentDefinition: ContentDefinition<T>, content: T): Result {
         let finalContent: any = {};
 
         expressHelper.deleteNotExistingProperties(
             content, 
             contentDefinition.getContentFields().map(contentField => contentField.name));
-        
-        contentDefinition.getContentFields().forEach(contentField => {
+
+        for (let contentField of contentDefinition.getContentFields()) {
             let fieldValue = contentHelper.getFieldValue(contentField.name, content);
-        
+
             if (contentField.options.isRequired && !fieldValue) {
                 logger.debug(`Value for field "%s" is required.`, contentField.name);
-                throw new IdentifiableError(ErrorCode.Required, `Value for field ${ contentField.name } is required.`);
+                return Result.error(`Value for field ${ contentField.name } is required.`);
             }
 
-            if (contentField.options.isUnique) 
-                this.validateUniqueness(contentDefinition, contentField, fieldValue);
+            if (fieldValue) {
+                if (contentField.options.isUnique) {
+                    let uniquenessResult = this.validateUniqueness(contentDefinition, contentField.name, fieldValue);
+                    if (uniquenessResult.getIsFailing()) 
+                        return Result.error(uniquenessResult.getMessage());
+                }
+    
+                let validationResult = contentField.contentFieldDefinition.validateValue(fieldValue);
+                if (validationResult.getIsFailing())
+                    return Result.error(validationResult.getMessage());
 
-            contentField.contentFieldDefinition.validateValue(fieldValue);
-            fieldValue = contentField.contentFieldDefinition.executeDeterminations(fieldValue);
+                fieldValue = contentField.contentFieldDefinition.executeDeterminations(fieldValue);
 
-            finalContent[contentField.name] = fieldValue;
+                finalContent[contentField.name] = fieldValue;
+                logger.debug(`Setting value "%s" for field "%s".`, fieldValue, contentField.name);
+            } else {
+                if (contentField.contentFieldDefinition.getType() === ContentFieldType.Group) {
+                    let validationResult = contentField.contentFieldDefinition.validateValue({});
+                    if (validationResult.getIsFailing())
+                        return Result.error(validationResult.getMessage());
+                }
 
-            logger.debug(`Value "%s" for field "%s" is valid.`, fieldValue, contentField.name);
-        });
+                logger.debug(`No value provided for field "%s".`, contentField.name);
+            }
+        }
 
-        factory.getPersistency().updateContent(contentDefinition.getName(), content);
+        factory.getPersistency().updateContent(contentDefinition.getName(), finalContent);
+        logger.info(`Content of type "%s" is created successfully.`, contentDefinition.getName());
 
-        logger.info(`Content of type "%s" is updated successfully.`, contentDefinition.getName());
+        return Result.success();
     }
 
 
-    private validateUniqueness(contentDefinition: ContentDefinition<T>, contentField: { name: string; contentFieldDefinition: ContentFieldDefinition; options: { isRequired?: boolean | undefined; isUnique?: boolean | undefined; }; }, fieldValue: any) {
-        let duplicate: any;
+    private validateUniqueness(contentDefinition: ContentDefinition<T>, fieldName: string, fieldValue: any): Result {
+        let readContentResult = contentManager.readContentByFieldValue(contentDefinition.getName(), { name: fieldName, value: fieldValue });
 
-        try {
-            duplicate = contentManager.readContentByFieldValue(contentDefinition.getName(), { name: contentField.name, value: fieldValue });
+        if (readContentResult.getIsSuccessful()) {
+            logger.debug(`Value of field "%s" is unique.`, fieldName);
+            return Result.success();
+        } else {
+            logger.debug(`Value of field "%s" is not unique.`, fieldName);
+            return Result.error(`Value of field ${fieldName} is not unique.`);
         }
-
-        catch (error) {
-            duplicate = undefined; // No duplicate.
-        }
-
-        if (duplicate) {
-            logger.debug(`Value of field "%s" is not unique.`, contentField.name);
-            throw new IdentifiableError(ErrorCode.NotUnique, `Value of field ${contentField.name} is not unique.`);
-        }
-
-        logger.debug(`Value of field "%s" is unique.`, contentField.name);
     }
 }
 
