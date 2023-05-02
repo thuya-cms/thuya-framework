@@ -11,7 +11,7 @@ class ArrayContentFieldDefinition extends ContentFieldDefinition {
 
     static create(id: string, name: string, arrayElementType: ContentFieldDefinition): Result<ArrayContentFieldDefinition> {
         try {
-            let contentFieldDefinition = new ArrayContentFieldDefinition(id, name, arrayElementType);
+            const contentFieldDefinition = new ArrayContentFieldDefinition(id, name, arrayElementType);
             return Result.success(contentFieldDefinition);
         }
 
@@ -31,10 +31,10 @@ class ArrayContentFieldDefinition extends ContentFieldDefinition {
             return Result.error(`Invalid array value "${ fieldValue }" for "${ this.getName() }".`);
         }
 
-        let array: any[] = fieldValue;
+        const array: any[] = fieldValue;
 
         array.forEach(arrayElementValue => {
-            let result = this.arrayElementType.validateValue(arrayElementValue);
+            const result = this.arrayElementType.validateValue(arrayElementValue);
 
             if (result.getIsFailing()) return result;
         });

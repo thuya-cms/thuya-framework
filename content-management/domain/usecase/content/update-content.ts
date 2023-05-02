@@ -14,13 +14,13 @@ enum ErrorCode {
 
 class UpdateContent<T> {
     execute(contentDefinition: ContentDefinition<T>, content: T): Result {
-        let finalContent: any = {};
+        const finalContent: any = {};
 
         expressHelper.deleteNotExistingProperties(
             content, 
             contentDefinition.getContentFields().map(contentField => contentField.name));
 
-        for (let contentField of contentDefinition.getContentFields()) {
+        for (const contentField of contentDefinition.getContentFields()) {
             let fieldValue = contentHelper.getFieldValue(contentField.name, content);
 
             if (contentField.options.isRequired && !fieldValue) {
@@ -30,12 +30,12 @@ class UpdateContent<T> {
 
             if (fieldValue) {
                 if (contentField.options.isUnique) {
-                    let uniquenessResult = this.validateUniqueness(contentDefinition, contentField.name, fieldValue);
+                    const uniquenessResult = this.validateUniqueness(contentDefinition, contentField.name, fieldValue);
                     if (uniquenessResult.getIsFailing()) 
                         return Result.error(uniquenessResult.getMessage());
                 }
     
-                let validationResult = contentField.contentFieldDefinition.validateValue(fieldValue);
+                const validationResult = contentField.contentFieldDefinition.validateValue(fieldValue);
                 if (validationResult.getIsFailing())
                     return Result.error(validationResult.getMessage());
 
@@ -45,7 +45,7 @@ class UpdateContent<T> {
                 logger.debug(`Setting value "%s" for field "%s".`, fieldValue, contentField.name);
             } else {
                 if (contentField.contentFieldDefinition.getType() === ContentFieldType.Group) {
-                    let validationResult = contentField.contentFieldDefinition.validateValue({});
+                    const validationResult = contentField.contentFieldDefinition.validateValue({});
                     if (validationResult.getIsFailing())
                         return Result.error(validationResult.getMessage());
                 }
@@ -62,7 +62,7 @@ class UpdateContent<T> {
 
 
     private validateUniqueness(contentDefinition: ContentDefinition<T>, fieldName: string, fieldValue: any): Result {
-        let readContentResult = contentManager.readContentByFieldValue(contentDefinition.getName(), { name: fieldName, value: fieldValue });
+        const readContentResult = contentManager.readContentByFieldValue(contentDefinition.getName(), { name: fieldName, value: fieldValue });
 
         if (readContentResult.getIsSuccessful()) {
             logger.debug(`Value of field "%s" is unique.`, fieldName);

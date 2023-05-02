@@ -3,6 +3,6 @@ enum HandlerAction {
     Update,
     Delete,
     Read
-};
+}
 
 export default HandlerAction;

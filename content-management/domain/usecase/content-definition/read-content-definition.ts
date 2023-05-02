@@ -4,7 +4,7 @@ import factory from "../../factory";
 
 class ReadContentDefinition {
     execute(contentName: string): Result<ContentDefinition> {
-        let contentDefinition = factory.getContentDefinitionPersistency().readContentDefinition(contentName);
+        const contentDefinition = factory.getContentDefinitionPersistency().readContentDefinition(contentName);
 
         if (!contentDefinition) {
             logger.debug(`Content definition "%s" not found.`, contentName);

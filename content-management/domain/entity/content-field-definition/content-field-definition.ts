@@ -64,7 +64,7 @@ abstract class ContentFieldDefinition extends Entity {
 
     validateValue(fieldValue: ContentFieldValue): Result {
         this.getValidators().forEach(validator => {
-            let result = validator(fieldValue);
+            const result = validator(fieldValue);
 
             if (result.getIsFailing()) 
                 return result;

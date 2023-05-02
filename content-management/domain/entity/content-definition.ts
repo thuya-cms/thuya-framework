@@ -8,6 +8,7 @@ type ContentFieldOptions = {
     isUnique?: boolean
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 class ContentDefinition<T = any> extends Entity {
     private contentFields: { name: string, contentFieldDefinition: ContentFieldDefinition, options: ContentFieldOptions }[] = [];
 

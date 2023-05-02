@@ -8,29 +8,29 @@ import GroupContentFieldDefinitionDTO from "./dto/content-field-definition/group
 
 class ContentDefinitionManager {
     createContentDefinition(contentDefinition: ContentDefinitionDTO): Result {
-        let contentDefinitionEntityResult = this.convertDtoToEntity(contentDefinition);
+        const contentDefinitionEntityResult = this.convertDtoToEntity(contentDefinition);
         if (contentDefinitionEntityResult.getIsFailing())
             return Result.error(contentDefinitionEntityResult.getMessage());
 
-        let createContentDefinitionResult = createContentDefinition.execute(contentDefinitionEntityResult.getResult()!);
+        const createContentDefinitionResult = createContentDefinition.execute(contentDefinitionEntityResult.getResult()!);
         return createContentDefinitionResult;
     }
 
 
     private convertDtoToEntity(contentDefinition: ContentDefinitionDTO<any>): Result<ContentDefinition> {
-        let contentDefinitionResult = ContentDefinition.create(contentDefinition.getId(), contentDefinition.getName());
+        const contentDefinitionResult = ContentDefinition.create(contentDefinition.getId(), contentDefinition.getName());
         if (contentDefinitionResult.getIsFailing())
             return contentDefinitionResult;
 
-        let contentDefinitionEntity = contentDefinitionResult.getResult();
+        const contentDefinitionEntity = contentDefinitionResult.getResult();
         
-        for (let contentField of contentDefinition.getContentFields()) {
-            let fieldDefinitionEntityResult = this.convertFieldDefinitionDtoToEntity(contentField.contentFieldDefinition);
+        for (const contentField of contentDefinition.getContentFields()) {
+            const fieldDefinitionEntityResult = this.convertFieldDefinitionDtoToEntity(contentField.contentFieldDefinition);
 
             if (fieldDefinitionEntityResult.getIsFailing())
                 return Result.error(fieldDefinitionEntityResult.getMessage());
 
-            let addFieldResult = contentDefinitionEntity!.addContentField(contentField.name, fieldDefinitionEntityResult.getResult()!, contentField.options);
+            const addFieldResult = contentDefinitionEntity!.addContentField(contentField.name, fieldDefinitionEntityResult.getResult()!, contentField.options);
 
             if (addFieldResult.getIsFailing())
                 return Result.error(addFieldResult.getMessage());
@@ -43,15 +43,15 @@ class ContentDefinitionManager {
         let contentFieldEntity!: ContentFieldDefinition;
 
         switch (contentFieldDefinitionDTO.getType()) {
-            case ContentFieldType.Array:
-                let arrayContentFieldDefinitionDTO: ArrayContentFieldDefinitionDTO = contentFieldDefinitionDTO as ArrayContentFieldDefinitionDTO;
+            case ContentFieldType.Array: {
+                const arrayContentFieldDefinitionDTO: ArrayContentFieldDefinitionDTO = contentFieldDefinitionDTO as ArrayContentFieldDefinitionDTO;
 
-                let arrayElementFieldResult = this.convertFieldDefinitionDtoToEntity(arrayContentFieldDefinitionDTO.getArrayElementType());
+                const arrayElementFieldResult = this.convertFieldDefinitionDtoToEntity(arrayContentFieldDefinitionDTO.getArrayElementType());
                 
                 if (arrayElementFieldResult.getIsFailing())
                     return arrayElementFieldResult;
                 
-                let arrayFieldResult = ArrayContentFieldDefinition.create(
+                const arrayFieldResult = ArrayContentFieldDefinition.create(
                     arrayContentFieldDefinitionDTO.getId(),
                     arrayContentFieldDefinitionDTO.getName(),
                     arrayElementFieldResult.getResult()!);
@@ -62,9 +62,10 @@ class ContentDefinitionManager {
                     return arrayFieldResult;
 
                 break;
+            }
 
-            case ContentFieldType.Date:
-                let dateFieldResult = DateContentFieldDefinition.create(contentFieldDefinitionDTO.getId(), contentFieldDefinitionDTO.getName());
+            case ContentFieldType.Date: {
+                const dateFieldResult = DateContentFieldDefinition.create(contentFieldDefinitionDTO.getId(), contentFieldDefinitionDTO.getName());
 
                 if (dateFieldResult.getIsSuccessful()) 
                     contentFieldEntity = dateFieldResult.getResult()!;
@@ -72,9 +73,10 @@ class ContentDefinitionManager {
                     return dateFieldResult;
 
                 break;
+            }
 
-            case ContentFieldType.Numeric:
-                let numericFieldResult = NumericContentFieldDefinition.create(contentFieldDefinitionDTO.getId(), contentFieldDefinitionDTO.getName());
+            case ContentFieldType.Numeric: {
+                const numericFieldResult = NumericContentFieldDefinition.create(contentFieldDefinitionDTO.getId(), contentFieldDefinitionDTO.getName());
 
                 if (numericFieldResult.getIsSuccessful()) 
                     contentFieldEntity = numericFieldResult.getResult()!;
@@ -82,9 +84,10 @@ class ContentDefinitionManager {
                     return numericFieldResult;
 
                 break;
+            }
 
-            case ContentFieldType.Text:
-                let textFieldResult = TextContentFieldDefinition.create(contentFieldDefinitionDTO.getId(), contentFieldDefinitionDTO.getName());
+            case ContentFieldType.Text: {
+                const textFieldResult = TextContentFieldDefinition.create(contentFieldDefinitionDTO.getId(), contentFieldDefinitionDTO.getName());
 
                 if (textFieldResult.getIsSuccessful()) 
                     contentFieldEntity = textFieldResult.getResult()!;
@@ -92,26 +95,27 @@ class ContentDefinitionManager {
                     return textFieldResult;
 
                 break;
+            }
 
-            case ContentFieldType.Group:
-                let groupContentFieldDefinitionDTO: GroupContentFieldDefinitionDTO = contentFieldDefinitionDTO as GroupContentFieldDefinitionDTO;
+            case ContentFieldType.Group: {
+                const groupContentFieldDefinitionDTO: GroupContentFieldDefinitionDTO = contentFieldDefinitionDTO as GroupContentFieldDefinitionDTO;
                 
-                let groupFieldResult = GroupContentFieldDefinition.create(contentFieldDefinitionDTO.getId(), contentFieldDefinitionDTO.getName());
+                const groupFieldResult = GroupContentFieldDefinition.create(contentFieldDefinitionDTO.getId(), contentFieldDefinitionDTO.getName());
                 
                 if (groupFieldResult.getIsSuccessful()) 
                     contentFieldEntity = groupFieldResult.getResult()!;
                 else 
                     return groupFieldResult;
 
-                let groupContentFieldEntity: GroupContentFieldDefinition = contentFieldEntity as GroupContentFieldDefinition;
+                const groupContentFieldEntity: GroupContentFieldDefinition = contentFieldEntity as GroupContentFieldDefinition;
                 
-                for(let contentField of groupContentFieldDefinitionDTO.getContentFields()) {
-                    let groupElementFieldResult = this.convertFieldDefinitionDtoToEntity(contentField.contentFieldDefinition);
+                for(const contentField of groupContentFieldDefinitionDTO.getContentFields()) {
+                    const groupElementFieldResult = this.convertFieldDefinitionDtoToEntity(contentField.contentFieldDefinition);
 
                     if (groupElementFieldResult.getIsFailing())
                         return groupElementFieldResult;
 
-                    let addFieldResult = groupContentFieldEntity.addContentField(
+                    const addFieldResult = groupContentFieldEntity.addContentField(
                         contentField.name, 
                         groupElementFieldResult.getResult()!,
                         contentField.options);
@@ -121,6 +125,7 @@ class ContentDefinitionManager {
                 }
 
                 break;
+            }
 
             default:
                 logger.error(`Field type "%s" is not valid.`, contentFieldDefinitionDTO.getType())

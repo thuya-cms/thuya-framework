@@ -77,7 +77,7 @@ class ThuyaApp {
     }
 
 
-    private registerContentDefinition(contentDefinition: ContentDefinitionDTO<any>) {
+    private registerContentDefinition(contentDefinition: ContentDefinitionDTO) {
         contentDefinitionManager.createContentDefinition(contentDefinition);
 
         this._expressApp.get("/" + contentDefinition.getName(), expressContentManager.listContent.bind(expressContentManager));

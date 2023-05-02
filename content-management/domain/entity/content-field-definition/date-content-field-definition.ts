@@ -12,7 +12,7 @@ class DateContentFieldDefinition extends ContentFieldDefinition {
 
     static create(id: string, name: string): Result<DateContentFieldDefinition> {
         try {
-            let contentFieldDefinition = new DateContentFieldDefinition(id, name);
+            const contentFieldDefinition = new DateContentFieldDefinition(id, name);
             return Result.success(contentFieldDefinition);
         }
 

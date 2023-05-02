@@ -10,9 +10,9 @@ import expressHelper from "../../common/utility/express-helper";
 class ExpressContentManager {
     listContent(request: Request, response: Response, next: NextFunction) {
         try {
-            let contentName = expressHelper.getContentName(request);
+            const contentName = expressHelper.getContentName(request);
 
-            let listContentResult = listContent.execute(contentName);
+            const listContentResult = listContent.execute(contentName);
             if (listContentResult.getIsFailing())
                 throw new Error(listContentResult.getMessage());
     
@@ -32,14 +32,14 @@ class ExpressContentManager {
 
     readContent(request: Request, response: Response, next: NextFunction) {
         try {
-            let contentName = expressHelper.getContentName(request);
-            let id = request.params.id;
+            const contentName = expressHelper.getContentName(request);
+            const id = request.params.id;
 
-            let readContentDefinitionResult = readContentDefinition.execute(contentName);
+            const readContentDefinitionResult = readContentDefinition.execute(contentName);
             if (readContentDefinitionResult.getIsFailing())
                 throw new Error(readContentDefinitionResult.getMessage());
 
-            let readContentResult = readContent.byId(readContentDefinitionResult.getResult()!, id);
+            const readContentResult = readContent.byId(readContentDefinitionResult.getResult()!, id);
             if (readContentResult.getIsFailing())
                 throw new Error(readContentResult.getMessage());
 
@@ -59,14 +59,14 @@ class ExpressContentManager {
     
     createContent(request: Request, response: Response, next: NextFunction) {
         try {
-            let contentName = expressHelper.getContentName(request);
-            let content = request.body;
+            const contentName = expressHelper.getContentName(request);
+            const content = request.body;
             
-            let readContentDefinitionResult = readContentDefinition.execute(contentName);
+            const readContentDefinitionResult = readContentDefinition.execute(contentName);
             if (readContentDefinitionResult.getIsFailing())
                 throw new Error(readContentDefinitionResult.getMessage());
             
-            let createContentResult = createContent.execute(readContentDefinitionResult.getResult()!, content);
+            const createContentResult = createContent.execute(readContentDefinitionResult.getResult()!, content);
             if (createContentResult.getIsFailing())
                 throw new Error(createContentResult.getMessage());
     
@@ -85,15 +85,15 @@ class ExpressContentManager {
     }
 
     deleteContent(request: Request, response: Response, next: NextFunction) {
-        let contentName = expressHelper.getContentName(request);
-        let id = request.params.id;
+        const contentName = expressHelper.getContentName(request);
+        const id = request.params.id;
 
         try {
-            let readContentDefinitionResult = readContentDefinition.execute(contentName);
+            const readContentDefinitionResult = readContentDefinition.execute(contentName);
             if (readContentDefinitionResult.getIsFailing())
                 throw new Error(readContentDefinitionResult.getMessage());
 
-            let deleteContentResult = deleteContent.execute(readContentDefinitionResult.getResult()!, id);
+            const deleteContentResult = deleteContent.execute(readContentDefinitionResult.getResult()!, id);
             if (deleteContentResult.getIsFailing())
                 throw new Error(deleteContentResult.getMessage());
 
@@ -112,15 +112,15 @@ class ExpressContentManager {
     }
 
     updateContent(request: Request, response: Response, next: NextFunction) {
-        let contentName = expressHelper.getContentName(request);
-        let content = request.body;
+        const contentName = expressHelper.getContentName(request);
+        const content = request.body;
 
         try {
-            let readContentDefinitionResult = readContentDefinition.execute(contentName);
+            const readContentDefinitionResult = readContentDefinition.execute(contentName);
             if (readContentDefinitionResult.getIsFailing())
                 throw new Error(readContentDefinitionResult.getMessage());
 
-            let updateContentResult = updateContent.execute(readContentDefinitionResult.getResult()!, content);
+            const updateContentResult = updateContent.execute(readContentDefinitionResult.getResult()!, content);
             if (updateContentResult.getIsFailing())
                 throw new Error(updateContentResult.getMessage());
 

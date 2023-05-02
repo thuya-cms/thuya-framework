@@ -20,7 +20,7 @@ class GroupContentFieldDefinition extends ContentFieldDefinition {
 
     static create(id: string, name: string): Result<GroupContentFieldDefinition> {
         try {
-            let contentFieldDefinition = new GroupContentFieldDefinition(id, name);
+            const contentFieldDefinition = new GroupContentFieldDefinition(id, name);
             return Result.success(contentFieldDefinition);
         }
 
@@ -52,8 +52,8 @@ class GroupContentFieldDefinition extends ContentFieldDefinition {
     }
 
     override validateValue(fieldValue: ContentFieldValue): Result {
-        for (let contentField of this.getContentFields()) {
-            let propertyName = contentHelper.getContentPropertyName(contentField.name, fieldValue);
+        for (const contentField of this.getContentFields()) {
+            const propertyName = contentHelper.getContentPropertyName(contentField.name, fieldValue);
             let singleFieldValue;
 
             if (propertyName)
@@ -64,7 +64,7 @@ class GroupContentFieldDefinition extends ContentFieldDefinition {
                 return Result.error(`Value for field "${ contentField.name }" is required.`);
             }
 
-            let result = contentField.contentFieldDefinition.validateValue(singleFieldValue);
+            const result = contentField.contentFieldDefinition.validateValue(singleFieldValue);
 
             if (result.getIsFailing()) return result;
         }

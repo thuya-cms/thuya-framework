@@ -1,6 +1,6 @@
 class ContentHelper {
     getFieldValue(fieldName: string, content: any) {
-        let propertyNameAsKey: keyof any = fieldName;
+        const propertyNameAsKey: keyof any = fieldName;
 
         return content[propertyNameAsKey];
     }
@@ -12,7 +12,7 @@ class ContentHelper {
     }
 
     getContentPropertyName(contentFieldName: string, content: any): keyof typeof content | undefined {
-        let fieldNameLowerCase = this.adjustContentFieldName(contentFieldName);
+        const fieldNameLowerCase = this.adjustContentFieldName(contentFieldName);
         let propertyNameAsKey: keyof typeof content | undefined;
 
         for (const contentProperty in content) {

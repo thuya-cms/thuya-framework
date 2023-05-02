@@ -12,7 +12,7 @@ class Logger {
     
     
     initializeLogLevel() {
-        let logLevel: string | undefined = process.env.LOG_LEVEL;
+        const logLevel: string | undefined = process.env.LOG_LEVEL;
 
         if (logLevel) 
             this.logLevel = logLevel as LogLevel;

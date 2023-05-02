@@ -11,7 +11,7 @@ class NumericContentFieldDefinition extends ContentFieldDefinition {
 
     static create(id: string, name: string): Result<NumericContentFieldDefinition> {
         try {
-            let contentFieldDefinition = new NumericContentFieldDefinition(id, name);
+            const contentFieldDefinition = new NumericContentFieldDefinition(id, name);
             return Result.success(contentFieldDefinition);
         }
 

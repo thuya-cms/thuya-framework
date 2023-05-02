@@ -32,12 +32,12 @@ class LocalContentManagementPersistency implements IContentDefinitionPersistency
     }
 
     deleteContent(contentName: string, id: string): void {
-        let contentList = this.content.find(content => content.contentName === contentName);
+        const contentList = this.content.find(content => content.contentName === contentName);
         
         if (!contentList)
             throw new Error("Content not found.");
 
-        let contentIndex = contentList.content.findIndex(content => content["id"] === id);
+        const contentIndex = contentList.content.findIndex(content => content["id"] === id);
 
         if (contentIndex === -1)
             throw new Error("Content not found.");
@@ -46,12 +46,12 @@ class LocalContentManagementPersistency implements IContentDefinitionPersistency
     }
 
     updateContent(contentName: string, content: any): void {
-        let contentList = this.content.find(content => content.contentName === contentName);
+        const contentList = this.content.find(content => content.contentName === contentName);
         
         if (!contentList)
             throw new Error("Content not found.");
 
-        let oldContentIndex = contentList.content.findIndex(content => content["id"] === content.id);
+        const oldContentIndex = contentList.content.findIndex(content => content["id"] === content.id);
 
         if (oldContentIndex === -1)
             throw new Error("Content not found.");
@@ -65,18 +65,18 @@ class LocalContentManagementPersistency implements IContentDefinitionPersistency
     }
 
     listContent(contentName: string): any[] {
-        let list = this.content.find(content => content.contentName === contentName);
+        const list = this.content.find(content => content.contentName === contentName);
 
         return list ? list.content : [];
     }
 
     readContent(contentName: string, id: string) {
-        let contentList = this.content.find(content => content.contentName === contentName);
+        const contentList = this.content.find(content => content.contentName === contentName);
         
         if (!contentList)
             throw new Error("Content not found.");
 
-        let content = contentList.content.find(content => content["id"] === id);
+        const content = contentList.content.find(content => content["id"] === id);
 
         if (!content)
             throw new Error("Content not found.");
@@ -85,12 +85,12 @@ class LocalContentManagementPersistency implements IContentDefinitionPersistency
     }
 
     readContentByFieldValue(fieldValue: { name: string; value: any; }, contentName: string) {
-        let contentList = this.content.find(content => content.contentName === contentName);
+        const contentList = this.content.find(content => content.contentName === contentName);
         
         if (!contentList)
             throw new Error("Content not found.");
 
-        let content = contentList.content.find(content => content[fieldValue.name] === fieldValue.value);
+        const content = contentList.content.find(content => content[fieldValue.name] === fieldValue.value);
 
         if (!content)
             throw new Error("Content not found.");

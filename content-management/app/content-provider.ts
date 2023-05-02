@@ -13,15 +13,18 @@ abstract class ContentProvider {
         return [];
     }
 
-    getContentDefinitions(): ContentDefinitionDTO<any>[] {
+    getContentDefinitions(): ContentDefinitionDTO[] {
         return [];
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
     createContent() {
     }
 
 
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
     protected createContentFieldDefinitions() {}
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
     protected createContentDefinitions() {}
 }
 

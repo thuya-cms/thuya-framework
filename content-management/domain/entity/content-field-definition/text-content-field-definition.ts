@@ -10,7 +10,7 @@ class TextContentFieldDefinition extends ContentFieldDefinition {
 
     static create(id: string, name: string): Result<TextContentFieldDefinition> {
         try {
-            let contentFieldDefinition = new TextContentFieldDefinition(id, name);
+            const contentFieldDefinition = new TextContentFieldDefinition(id, name);
             return Result.success(contentFieldDefinition);
         }
 

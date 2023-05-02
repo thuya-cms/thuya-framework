@@ -8,12 +8,12 @@ import TextContentFieldDefinitionDTO from "../content-management/app/dto/content
 import localContentManagementPersistency from "../content-management/persistency/local-content-management-persistency";
 
 describe("create content with group", () => {
-    let contentDefinition: ContentDefinitionDTO<any>;
+    let contentDefinition: ContentDefinitionDTO;
     let groupField: GroupContentFieldDefinitionDTO;
 
     
     beforeEach(() => {
-        contentDefinition = new ContentDefinitionDTO<any>("", "test-definition");
+        contentDefinition = new ContentDefinitionDTO("", "test-definition");
     });
 
     afterEach(() => {
@@ -22,8 +22,8 @@ describe("create content with group", () => {
 
 
     it("should create valid content", () => {
-        let textValue = "text-value";
-        let numValue = 30;
+        const textValue = "text-value";
+        const numValue = 30;
 
         groupField = new GroupContentFieldDefinitionDTO("", "group-field-1");
         groupField.addContentField("textField", new TextContentFieldDefinitionDTO("", "text-field-1"));
@@ -31,11 +31,11 @@ describe("create content with group", () => {
 
         contentDefinition.addContentField("groupField", groupField);
         
-        let createResult = contentDefinitionManager.createContentDefinition(contentDefinition);
+        const createResult = contentDefinitionManager.createContentDefinition(contentDefinition);
         if (createResult.getIsFailing())
             should().fail(createResult.getMessage());
 
-        let createContentResult = contentManager.createContent(contentDefinition.getName(), {
+        const createContentResult = contentManager.createContent(contentDefinition.getName(), {
             groupField: {
                 textField: textValue,
                 numericField: numValue 
@@ -44,10 +44,10 @@ describe("create content with group", () => {
         if (createContentResult.getIsFailing())
             should().fail(createContentResult.getMessage());
 
-        let readContentResult = contentManager.readContent(contentDefinition.getName(), createContentResult.getResult()!);
+        const readContentResult = contentManager.readContent(contentDefinition.getName(), createContentResult.getResult()!);
         should().equal(readContentResult.getIsSuccessful(), true);
 
-        let content = readContentResult.getResult();
+        const content = readContentResult.getResult();
         should().exist(content);
         should().equal(content.id, createContentResult.getResult());
         should().equal(content.groupField.textField, textValue);
@@ -61,7 +61,7 @@ describe("create content with group", () => {
 
         contentDefinition.addContentField("groupField", groupField);
         
-        let createDefinitionResult = contentDefinitionManager.createContentDefinition(contentDefinition);
+        const createDefinitionResult = contentDefinitionManager.createContentDefinition(contentDefinition);
         if (createDefinitionResult.getIsSuccessful())
             should().fail(createDefinitionResult.getMessage());
 
@@ -74,11 +74,11 @@ describe("create content with group", () => {
         
         contentDefinition.addContentField("groupField", groupField);
         
-        let createDefinitionResult = contentDefinitionManager.createContentDefinition(contentDefinition);
+        const createDefinitionResult = contentDefinitionManager.createContentDefinition(contentDefinition);
         if (createDefinitionResult.getIsFailing())
             should().fail(createDefinitionResult.getMessage());
 
-        let createContentResult = contentManager.createContent(contentDefinition.getName(), {});
+        const createContentResult = contentManager.createContent(contentDefinition.getName(), {});
 
         should().equal(createContentResult.getIsFailing(), true);
     });

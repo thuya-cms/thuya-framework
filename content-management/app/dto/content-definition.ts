@@ -1,4 +1,3 @@
-import idContentFieldDefinition from "../../content/id-content-field-definition";
 import { ContentFieldDefinitionDTO } from "./content-field-definition/content-field-definition";
 
 type ContentFieldOptions = {
@@ -6,6 +5,7 @@ type ContentFieldOptions = {
     isUnique?: boolean
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 class ContentDefinitionDTO<T = any> {
     private contentFields: { name: string, contentFieldDefinition: ContentFieldDefinitionDTO, options: ContentFieldOptions }[] = [];
 

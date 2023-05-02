@@ -5,7 +5,7 @@ import readContent from "../domain/usecase/content/read-content";
 
 class ContentManager {
     readContent(contentDefinitionName: string, id: string,): Result<any> {
-        let readContentDefinitionResult = readContentDefinition.execute(contentDefinitionName);
+        const readContentDefinitionResult = readContentDefinition.execute(contentDefinitionName);
         if (readContentDefinitionResult.getIsFailing())
             return readContentDefinitionResult;
 
@@ -13,7 +13,7 @@ class ContentManager {
     }
 
     readContentByFieldValue(contentDefinitionName: string, fieldValue: { name: string, value: any }): Result<any> {
-        let readContentDefinitionResult = readContentDefinition.execute(contentDefinitionName);
+        const readContentDefinitionResult = readContentDefinition.execute(contentDefinitionName);
         if (readContentDefinitionResult.getIsFailing())
             return readContentDefinitionResult;
 
@@ -21,7 +21,7 @@ class ContentManager {
     }
 
     createContent(contentDefinitionName: string, content: any): Result<string> {
-        let createContentDefinitionResult = readContentDefinition.execute(contentDefinitionName);
+        const createContentDefinitionResult = readContentDefinition.execute(contentDefinitionName);
         if (createContentDefinitionResult.getIsFailing())
             return Result.error(createContentDefinitionResult.getMessage());
 
