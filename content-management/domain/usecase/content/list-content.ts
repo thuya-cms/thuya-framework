@@ -3,7 +3,7 @@ import factory from "../../factory";
 
 class ListContent {
     execute(contentName: string): Result<any[]> {
-        return Result.success(factory.getPersistency().listContent(contentName));
+        return Result.success(factory.getContentPersistency().listContent(contentName));
     }
 }
 

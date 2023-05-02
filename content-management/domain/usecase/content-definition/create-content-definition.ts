@@ -4,8 +4,8 @@ import { ContentDefinition } from '../../entity/content-definition';
 import factory from '../../factory';
 
 class CreateContentDefinition {
-    execute(contentDefinition: ContentDefinition<any>): Result {
-        factory.getPersistency().createContentDefinition(contentDefinition);
+    execute(contentDefinition: ContentDefinition): Result {
+        factory.getContentDefinitionPersistency().createContentDefinition(contentDefinition);
 
         logger.info(`Content definition "%s" created successfully.`, contentDefinition.getName());
 

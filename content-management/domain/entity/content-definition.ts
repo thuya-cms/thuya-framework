@@ -1,12 +1,7 @@
 import Entity from "../../../common/entity";
-import IdentifiableError from "../../../common/identifiable-error";
 import { ContentFieldDefinition } from "./content-field-definition/content-field-definition";
 import idContentFieldDefinition from "../../content/id-content-field-definition";
 import { Result, logger } from "../../../common";
-
-enum ErrorCode {
-    InvalidName = "invalid-name"
-}
 
 type ContentFieldOptions = {
     isRequired?: boolean,
@@ -23,7 +18,7 @@ class ContentDefinition<T = any> extends Entity {
         
         if (!name) {
             logger.error(`Content definition name is required.`);
-            throw new IdentifiableError(ErrorCode.InvalidName, "Content definition name is required.");
+            throw new Error("Content definition name is required.");
         }
 
         this.addContentField("id", idContentFieldDefinition);
@@ -68,4 +63,4 @@ class ContentDefinition<T = any> extends Entity {
     }
 }
 
-export { ContentDefinition, ErrorCode };
+export { ContentDefinition };

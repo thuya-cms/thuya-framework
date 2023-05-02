@@ -1,11 +1,5 @@
 import { Result, logger } from "../../../../common";
 import Entity from "../../../../common/entity";
-import IdentifiableError from "../../../../common/identifiable-error";
-
-enum ErrorCode {
-    InvalidName = "invalid-name",
-    InvalidType = "invalid-type"
-}
 
 enum ContentFieldType {
     Numeric = "numeric",
@@ -33,12 +27,12 @@ abstract class ContentFieldDefinition extends Entity {
         
         if (!name) {
             logger.error(`Content field definition name is required.`);
-            throw new IdentifiableError(ErrorCode.InvalidName, "Content field definition name is required.");
+            throw new Error("Content field definition name is required.");
         }
 
         if (!Object.values(ContentFieldType).includes(type)) {
             logger.error(`Content field definition type is invalid.`);
-            throw new IdentifiableError(ErrorCode.InvalidType, "Content field definition type is invalid.");
+            throw new Error("Content field definition type is invalid.");
         }
     }
 
@@ -92,4 +86,4 @@ abstract class ContentFieldDefinition extends Entity {
     }
 }
 
-export { ContentFieldDefinition, ErrorCode, ContentFieldType, ContentFieldValue };
+export { ContentFieldDefinition, ContentFieldType, ContentFieldValue };

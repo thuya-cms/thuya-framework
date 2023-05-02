@@ -1,9 +1,8 @@
 import { ContentDefinition } from "../../entity/content-definition";
-import { ContentFieldDefinition, ContentFieldType } from "../../entity/content-field-definition/content-field-definition";
+import { ContentFieldType } from "../../entity/content-field-definition/content-field-definition";
 import factory from "../../factory";
 import logger from "../../../../common/utility/logger";
 import expressHelper from "../../../../common/utility/express-helper";
-import IdentifiableError from "../../../../common/identifiable-error";
 import contentManager from "../../../app/content-manager";
 import contentHelper from "../../../../common/utility/content-helper";
 import { Result } from "../../../../common";
@@ -55,7 +54,7 @@ class CreateContent<T> {
             }
         }
 
-        let id = factory.getPersistency().createContent(contentDefinition.getName(), finalContent);
+        let id = factory.getContentPersistency().createContent(contentDefinition.getName(), finalContent);
         logger.info(`Content of type "%s" is created successfully.`, contentDefinition.getName());
 
         return Result.success(id);

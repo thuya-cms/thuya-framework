@@ -1,10 +1,9 @@
 import expressHelper from "../../../../common/utility/express-helper";
-import IdentifiableError from "../../../../common/identifiable-error";
 import logger from "../../../../common/utility/logger";
 import { ContentDefinition } from "../../entity/content-definition";
 import factory from "../../factory";
 import contentManager from "../../../app/content-manager";
-import { ContentFieldDefinition, ContentFieldType } from "../../entity/content-field-definition/content-field-definition";
+import { ContentFieldType } from "../../entity/content-field-definition/content-field-definition";
 import contentHelper from "../../../../common/utility/content-helper";
 import { Result } from "../../../../common";
 
@@ -55,7 +54,7 @@ class UpdateContent<T> {
             }
         }
 
-        factory.getPersistency().updateContent(contentDefinition.getName(), finalContent);
+        factory.getContentPersistency().updateContent(contentDefinition.getName(), finalContent);
         logger.info(`Content of type "%s" is created successfully.`, contentDefinition.getName());
 
         return Result.success();

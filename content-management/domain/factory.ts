@@ -1,23 +1,34 @@
 import localContentManagementPersistency from "../persistency/local-content-management-persistency";
-import IContentManagementPersistency from "./usecase/persistency.interface";
+import IContentDefinitionPersistency from "./usecase/content-definition-persistency.interface";
+import IContentPersistency from "./usecase/content-persistency.interface";
 
 class Factory {
-    private persistency: IContentManagementPersistency;
+    private contentDefinitionPersistency: IContentDefinitionPersistency;
+    private contentPersistency: IContentPersistency;
     
 
 
     constructor() {
-        this.persistency = localContentManagementPersistency;
+        this.contentDefinitionPersistency = localContentManagementPersistency;
+        this.contentPersistency = localContentManagementPersistency;
     }
 
 
 
-    setPersistency(persistency: IContentManagementPersistency) {
-        this.persistency = persistency;
+    setContentDefinitionPersistency(persistency: IContentDefinitionPersistency) {
+        this.contentDefinitionPersistency = persistency;
     }
 
-    getPersistency(): IContentManagementPersistency {
-        return this.persistency;
+    getContentDefinitionPersistency(): IContentDefinitionPersistency {
+        return this.contentDefinitionPersistency;
+    }
+    
+    setContentPersistency(persistency: IContentPersistency) {
+        this.contentPersistency = persistency;
+    }
+
+    getContentPersistency(): IContentPersistency {
+        return this.contentPersistency;
     }
 }
 

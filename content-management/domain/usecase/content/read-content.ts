@@ -5,7 +5,7 @@ import factory from "../../factory";
 class ReadContent<T> {
     byId(contentDefinition: ContentDefinition<T>, id: string): Result<T> {
         try {
-            return Result.success(factory.getPersistency().readContent(contentDefinition.getName(), id));
+            return Result.success(factory.getContentPersistency().readContent(contentDefinition.getName(), id));
         }
 
         catch (error: any) {
@@ -15,7 +15,7 @@ class ReadContent<T> {
 
     byFieldValue(contentDefinition: ContentDefinition<T>, fieldValue: { name: string, value: any }): Result<T> {
         try {
-            return Result.success(factory.getPersistency().readContentByFieldValue(fieldValue, contentDefinition.getName()));
+            return Result.success(factory.getContentPersistency().readContentByFieldValue(fieldValue, contentDefinition.getName()));
         }
 
         catch (error: any) {

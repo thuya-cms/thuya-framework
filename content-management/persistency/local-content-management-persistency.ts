@@ -1,14 +1,15 @@
 import { ContentDefinition } from "../domain/entity/content-definition";
-import IContentManagementPersistency from "../domain/usecase/persistency.interface";
+import IContentDefinitionPersistency from "../domain/usecase/content-definition-persistency.interface";
 import {v4 as uuidv4} from 'uuid';
+import IContentPersistency from "../domain/usecase/content-persistency.interface";
 
-class LocalContentManagementPersistency implements IContentManagementPersistency {
-    private contentDefinitions: ContentDefinition<any>[] = [];
+class LocalContentManagementPersistency implements IContentDefinitionPersistency, IContentPersistency {
+    private contentDefinitions: ContentDefinition[] = [];
     private content: { contentName: string, content: any[] }[] = [];
     
     
     
-    createContentDefinition(contentDefinition: ContentDefinition<any>): void {
+    createContentDefinition(contentDefinition: ContentDefinition): void {
         this.contentDefinitions.push(contentDefinition);
     }
     
@@ -59,7 +60,7 @@ class LocalContentManagementPersistency implements IContentManagementPersistency
         contentList.content.push(content);
     }
 
-    readContentDefinition(contentName: string): ContentDefinition<any> | undefined {
+    readContentDefinition(contentName: string): ContentDefinition | undefined {
         return this.contentDefinitions.find(contentDefinition => contentDefinition.getName() === contentName);
     }
 
