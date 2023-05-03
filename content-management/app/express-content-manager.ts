@@ -16,7 +16,7 @@ class ExpressContentManager {
             if (listContentResult.getIsFailing())
                 throw new Error(listContentResult.getMessage());
     
-            response.status(200).json(listContentResult);
+            response.status(200).json(listContentResult.getResult());
             
             next();
         }
