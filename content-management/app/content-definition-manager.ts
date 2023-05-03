@@ -1,6 +1,7 @@
 import { Result, logger } from "../../common";
 import { GroupContentFieldDefinition, ArrayContentFieldDefinition, ContentDefinition, ContentFieldDefinition, DateContentFieldDefinition, NumericContentFieldDefinition, TextContentFieldDefinition } from "../domain";
 import createContentDefinition from "../domain/usecase/content-definition/create-content-definition";
+import createContentFieldDefinition from "../domain/usecase/content-definition/create-content-field-definition";
 import ContentDefinitionDTO from "./dto/content-definition";
 import ArrayContentFieldDefinitionDTO from "./dto/content-field-definition/array-content-field-definition";
 import { ContentFieldDefinitionDTO, ContentFieldType } from "./dto/content-field-definition/content-field-definition";
@@ -12,8 +13,15 @@ class ContentDefinitionManager {
         if (contentDefinitionEntityResult.getIsFailing())
             return Result.error(contentDefinitionEntityResult.getMessage());
 
-        const createContentDefinitionResult = createContentDefinition.execute(contentDefinitionEntityResult.getResult()!);
-        return createContentDefinitionResult;
+        return createContentDefinition.execute(contentDefinitionEntityResult.getResult()!);
+    }
+
+    createContentFieldDefinition(contentFieldDefinition: ContentFieldDefinitionDTO): Result {
+        const contentFieldDefinitionEntityResult = this.convertFieldDefinitionDtoToEntity(contentFieldDefinition);
+        if (contentFieldDefinitionEntityResult.getIsFailing())
+            return Result.error(contentFieldDefinitionEntityResult.getMessage());
+
+        return createContentFieldDefinition.execute(contentFieldDefinitionEntityResult.getResult()!);
     }
 
 

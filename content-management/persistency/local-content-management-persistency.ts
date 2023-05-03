@@ -2,16 +2,92 @@ import { ContentDefinition } from "../domain/entity/content-definition";
 import IContentDefinitionPersistency from "../domain/usecase/content-definition-persistency.interface";
 import {v4 as uuidv4} from 'uuid';
 import IContentPersistency from "../domain/usecase/content-persistency.interface";
+import { ContentFieldDefinition } from "../domain";
+
+type ContentDefinitionData = {
+    id: string,
+    name: string,
+    fields: {
+        name: string,
+        id: string,
+        options: {
+            isRequired: boolean,
+            isUnique: boolean
+        }
+    }[]
+};
 
 class LocalContentManagementPersistency implements IContentDefinitionPersistency, IContentPersistency {
-    private contentDefinitions: ContentDefinition[] = [];
+    private contentDefinitions: ContentDefinitionData[] = [];
+    private contentFieldDefinitions: {
+        id: string,
+        field: ContentFieldDefinition
+    }[] = [];
     private content: { contentName: string, content: any[] }[] = [];
     
     
     
     createContentDefinition(contentDefinition: ContentDefinition): void {
-        this.contentDefinitions.push(contentDefinition);
+        const contentDefinitionData: ContentDefinitionData = {
+            id: uuidv4(),
+            name: contentDefinition.getName(),
+            fields: []
+        };
+
+        for (const contentField of contentDefinition.getContentFields()) {
+            const field = this.contentFieldDefinitions.find(existingContentFieldDefinition => existingContentFieldDefinition.field.getName() === contentField.contentFieldDefinition.getName());
+
+            if (!field)
+                throw new Error("Not existing field.");
+
+            const fieldData = {
+                id: field.id,
+                name: contentField.name,
+                options: {
+                    isRequired: false,
+                    isUnique: false
+                }
+            };
+
+            if (contentField.options) {
+                fieldData.options.isRequired = contentField.options.isRequired || false;
+                fieldData.options.isUnique = contentField.options.isUnique || false;
+            }
+
+            contentDefinitionData.fields.push(fieldData);
+        }
+
+        this.contentDefinitions.push(contentDefinitionData);
     }
+
+    createContentFieldDefinition(contentFieldDefinition: ContentFieldDefinition): void {
+        this.contentFieldDefinitions.push({
+            id: uuidv4(),
+            field: contentFieldDefinition
+        });
+    }
+
+    readContentDefinition(contentName: string): ContentDefinition | undefined {
+        const contentDefinitionData = this.contentDefinitions.find(contentDefinition => contentDefinition.name === contentName);
+
+        if (!contentDefinitionData) return undefined;
+
+        const contentDefinitionResult = ContentDefinition.create(contentDefinitionData.id, contentDefinitionData.name);
+        const contentDefinition = contentDefinitionResult.getResult()!;
+
+        for (const contentFieldDefinitionAssignment of contentDefinitionData.fields) {
+            const contentFieldDefinition = this.contentFieldDefinitions.find(existingContentFieldDefinition => existingContentFieldDefinition.id === contentFieldDefinitionAssignment.id);
+
+            if (!contentFieldDefinition)
+                throw new Error("Field not found.");
+
+            contentDefinition.addContentField(contentFieldDefinitionAssignment.name, contentFieldDefinition.field, contentFieldDefinitionAssignment.options);
+        }
+
+        return contentDefinition;
+    }
+
+
     
     createContent(contentName: string, content: any): string {
         let existingContent = this.content.find(existingContent => existingContent.contentName === contentName);
@@ -58,10 +134,6 @@ class LocalContentManagementPersistency implements IContentDefinitionPersistency
 
         contentList.content.splice(oldContentIndex, 1);
         contentList.content.push(content);
-    }
-
-    readContentDefinition(contentName: string): ContentDefinition | undefined {
-        return this.contentDefinitions.find(contentDefinition => contentDefinition.getName() === contentName);
     }
 
     listContent(contentName: string): any[] {

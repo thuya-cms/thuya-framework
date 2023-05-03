@@ -7,24 +7,32 @@ import NumericContentFieldDefinitionDTO from "../content-management/app/dto/cont
 import DateContentFieldDefinitionDTO from "../content-management/app/dto/content-field-definition/date-content-field-definition";
 import ArrayContentFieldDefinitionDTO from "../content-management/app/dto/content-field-definition/array-content-field-definition";
 import localContentManagementPersistency from "../content-management/persistency/local-content-management-persistency";
+import contentDefinitionUtil from "./util/content-definition-util";
 
 describe("create content", () => {    
     let contentDefinition: ContentDefinitionDTO;
     
     
     beforeEach(() => {
+        contentDefinitionUtil.defineContentField(new TextContentFieldDefinitionDTO("", "id"));
+
+        const textField = contentDefinitionUtil.defineContentField(new TextContentFieldDefinitionDTO("", "text-field"));
+        const numField = contentDefinitionUtil.defineContentField(new NumericContentFieldDefinitionDTO("", "numeric-field-1"));
+        const dateField = contentDefinitionUtil.defineContentField(new DateContentFieldDefinitionDTO("", "date-field-1"));
+        const arrayElementField = contentDefinitionUtil.defineContentField(new TextContentFieldDefinitionDTO("", "array-content"));
+        const arrayField = contentDefinitionUtil.defineContentField(new ArrayContentFieldDefinitionDTO("", "array-field-1", arrayElementField));
+
         contentDefinition = new ContentDefinitionDTO("", "test-definition")
         contentDefinition.addContentField(
             "textField", 
-            new TextContentFieldDefinitionDTO("", "text-field-1"), 
+            textField, 
             { isRequired: true, isUnique: true });
 
-        contentDefinition.addContentField("numericField", new NumericContentFieldDefinitionDTO("", "numeric-field-1"));
-        contentDefinition.addContentField("dateField", new DateContentFieldDefinitionDTO("", "date-field-1"));
-        contentDefinition.addContentField("arrayField", new ArrayContentFieldDefinitionDTO("", "array-field-1", new TextContentFieldDefinitionDTO("", "array-content")));
+        contentDefinition.addContentField("numericField", numField);
+        contentDefinition.addContentField("dateField", dateField);
+        contentDefinition.addContentField("arrayField", arrayField);
         
-        const createContentDefinitionResult = contentDefinitionManager.createContentDefinition(contentDefinition);
-        should().equal(createContentDefinitionResult.getIsSuccessful(), true);
+        contentDefinitionUtil.defineContent(contentDefinition);
     });
 
     afterEach(() => {
@@ -64,8 +72,7 @@ describe("create content", () => {
         const createContentResult = contentManager.createContent(contentDefinition.getName(), {
             textField: textValue
         });
-        if (createContentResult.getIsFailing())
-            should().fail();
+        should().equal(createContentResult.getIsSuccessful(), true, createContentResult.getMessage());
 
         const readContentResult = contentManager.readContent(contentDefinition.getName(), createContentResult.getResult()!);
         should().equal(readContentResult.getIsSuccessful(), true);
