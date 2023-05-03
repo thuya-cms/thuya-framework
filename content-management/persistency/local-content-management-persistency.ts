@@ -38,7 +38,7 @@ class LocalContentManagementPersistency implements IContentDefinitionPersistency
             const field = this.contentFieldDefinitions.find(existingContentFieldDefinition => existingContentFieldDefinition.field.getName() === contentField.contentFieldDefinition.getName());
 
             if (!field)
-                throw new Error("Not existing field.");
+                throw new Error(`Not existing field "${ contentField.contentFieldDefinition.getName() }".`);
 
             const fieldData = {
                 id: field.id,

@@ -8,6 +8,7 @@ import contentDefinitionManager from './content-management/app/content-definitio
 import Module from './module';
 import ContentDefinitionDTO from './content-management/app/dto/content-definition';
 import dotenv from "dotenv";
+import TextContentFieldDefinitionDTO from './content-management/app/dto/content-field-definition/text-content-field-definition';
 
 class ThuyaApp {
     private _expressApp: express.Application;
@@ -26,6 +27,8 @@ class ThuyaApp {
 		this._expressApp.use(bodyParser.urlencoded({ extended: false }));
 
         this._expressServer = undefined;
+        
+        contentDefinitionManager.createContentFieldDefinition(new TextContentFieldDefinitionDTO("", "id"));
     }
 
 

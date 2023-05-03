@@ -1,5 +1,4 @@
 import { should } from "chai";
-import contentDefinitionManager from "../content-management/app/content-definition-manager";
 import contentManager from "../content-management/app/content-manager";
 import ContentDefinitionDTO from "../content-management/app/dto/content-definition";
 import TextContentFieldDefinitionDTO from "../content-management/app/dto/content-field-definition/text-content-field-definition";
