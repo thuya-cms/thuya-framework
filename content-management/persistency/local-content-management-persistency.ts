@@ -3,6 +3,7 @@ import IContentDefinitionPersistency from "../domain/usecase/content-definition-
 import {v4 as uuidv4} from 'uuid';
 import IContentPersistency from "../domain/usecase/content-persistency.interface";
 import { ArrayContentFieldDefinition, ContentFieldDefinition, ContentFieldType, DateContentFieldDefinition, GroupContentFieldDefinition, NumericContentFieldDefinition, TextContentFieldDefinition } from "../domain";
+import handlerAccessor from "./handler-accessor";
 
 type ContentDefinitionData = {
     id: string,
@@ -88,6 +89,13 @@ class LocalContentManagementPersistency implements IContentDefinitionPersistency
                 throw new Error("Field not found.");
 
             const contentFieldDefinition = this.convertFieldDataToEntity(contentFieldDefinitionData);
+
+            for (const validator of handlerAccessor.getValidatorsForContentFieldDefinition(contentFieldDefinitionData.id)) 
+                contentFieldDefinition.addValidator(validator);
+            
+            for (const determination of handlerAccessor.getDeterminationsForContentFieldDefinition(contentFieldDefinitionData.id)) 
+                contentFieldDefinition.addDetermination(determination);
+
             contentDefinition.addContentField(contentFieldDefinitionAssignment.name, contentFieldDefinition, contentFieldDefinitionAssignment.options);
         }
 
@@ -124,15 +132,23 @@ class LocalContentManagementPersistency implements IContentDefinitionPersistency
                 if (!groupElementDefinitionData)
                     throw new Error("Group element not found.");
 
-                contentFieldDefinitionData.groupElements.push({
+                const groupElementData = {
                     id: groupElementDefinitionData.id,
                     name: groupElement.name,
                     options: {
                         isRequired: false
                     }
-                });
+                };
+
+                if (groupElement.options.isRequired)
+                    groupElementData.options.isRequired = true;
+
+                contentFieldDefinitionData.groupElements.push(groupElementData);
             }
         }
+
+        handlerAccessor.addValidatorsForContentFieldDefinition(contentFieldDefinitionData.id, contentFieldDefinition.getValidators());
+        handlerAccessor.addDeterminationsForContentFieldDefinition(contentFieldDefinitionData.id, contentFieldDefinition.getDeterminations());
         
         this.contentFieldDefinitions.push(contentFieldDefinitionData);
     }
@@ -222,6 +238,7 @@ class LocalContentManagementPersistency implements IContentDefinitionPersistency
     clear() {
         this.content = [];
         this.contentDefinitions = [];
+        this.contentFieldDefinitions = [];
     }
 
 

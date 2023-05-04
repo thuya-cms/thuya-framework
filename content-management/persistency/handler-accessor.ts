@@ -35,7 +35,8 @@ class InMemoryHandlerAccessor implements IHandlerAccessor {
             this.contentFieldHandlers.push(contentFieldDefinitionData);
         }
 
-        contentFieldDefinitionData.validators.push(...contentFieldValidators);
+        for (const validator of contentFieldValidators)
+            contentFieldDefinitionData.validators.push(validator);
     }
 
     addDeterminationsForContentFieldDefinition(id: string, contentFieldDeterminations: ContentFieldDetermination[]): void {
@@ -51,7 +52,8 @@ class InMemoryHandlerAccessor implements IHandlerAccessor {
             this.contentFieldHandlers.push(contentFieldDefinitionData);
         }
 
-        contentFieldDefinitionData.determinations.push(...contentFieldDeterminations);
+        for (const determination of contentFieldDeterminations)
+            contentFieldDefinitionData.determinations.push(determination);
     }
     
     getValidatorsForContentFieldDefinition(id: string): ContentFieldValidator[] {
@@ -66,6 +68,10 @@ class InMemoryHandlerAccessor implements IHandlerAccessor {
         if (!contentFieldDefinitionData) return [];
 
         return contentFieldDefinitionData.determinations;
+    }
+
+    clear() {
+        this.contentFieldHandlers = [];
     }
 }
 

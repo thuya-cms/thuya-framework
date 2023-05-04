@@ -63,12 +63,12 @@ abstract class ContentFieldDefinition extends Entity {
     }
 
     validateValue(fieldValue: ContentFieldValue): Result {
-        this.getValidators().forEach(validator => {
+        for (const validator of this.getValidators()) {
             const result = validator(fieldValue);
 
             if (result.getIsFailing()) 
                 return result;
-        });
+        }
 
         logger.debug(`Content for "%s" field is valid.`, this.getName());
 
@@ -78,9 +78,9 @@ abstract class ContentFieldDefinition extends Entity {
     executeDeterminations(fieldValue: ContentFieldValue): ContentFieldValue {
         let updatedValue = fieldValue;
 
-        this.getDeterminations().forEach(determination => {
+        for (const determination of this.getDeterminations()) { 
             updatedValue = determination(updatedValue);
-        });
+        }
 
         return updatedValue;
     }

@@ -7,6 +7,7 @@ import DateContentFieldDefinitionDTO from "../content-management/app/dto/content
 import ArrayContentFieldDefinitionDTO from "../content-management/app/dto/content-field-definition/array-content-field-definition";
 import localContentManagementPersistency from "../content-management/persistency/local-content-management-persistency";
 import contentDefinitionUtil from "./util/content-definition-util";
+import handlerAccessor from "../content-management/persistency/handler-accessor";
 
 describe("create content", () => {    
     let contentDefinition: ContentDefinitionDTO;
@@ -36,6 +37,7 @@ describe("create content", () => {
 
     afterEach(() => {
         localContentManagementPersistency.clear();
+        handlerAccessor.clear();
     });
 
 
