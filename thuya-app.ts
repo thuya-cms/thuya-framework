@@ -66,12 +66,8 @@ class ThuyaApp {
         module.getContentProviders().forEach(contentProvider => this.useContentProvider(contentProvider));
     }
 
-    /**
-     * Add a new content provider to the application.
-     * 
-     * @param contentProvider the content provider to add
-     */
-    public useContentProvider(contentProvider: ContentProvider) {
+
+    private useContentProvider(contentProvider: ContentProvider) {
         for (const contentFieldDefinition of contentProvider.getContentFieldDefinitions()) {
             contentDefinitionManager.createContentFieldDefinition(contentFieldDefinition);
         }
@@ -82,7 +78,6 @@ class ThuyaApp {
 
         contentProvider.createContent();
     }
-
 
     private registerContentDefinition(contentDefinition: ContentDefinitionDTO) {
         contentDefinitionManager.createContentDefinition(contentDefinition);
