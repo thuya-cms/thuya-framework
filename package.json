@@ -8,6 +8,7 @@
     "dist/**/*"
   ],
   "scripts": {
+    "eslint": "eslint .",
     "test": "mocha -r ts-node/register test/**/*.spec.ts",
     "prepublish": "npm run build",
     "build": "npx tsc",
