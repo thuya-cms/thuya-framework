@@ -2,7 +2,7 @@ import { ContentDefinition } from "../domain/entity/content-definition";
 import IContentDefinitionPersistency from "../domain/usecase/content-definition-persistency.interface";
 import {v4 as uuidv4} from 'uuid';
 import IContentPersistency from "../domain/usecase/content-persistency.interface";
-import { ContentFieldDefinition } from "../domain";
+import { ArrayContentFieldDefinition, ContentFieldDefinition, ContentFieldType, DateContentFieldDefinition, GroupContentFieldDefinition, NumericContentFieldDefinition, TextContentFieldDefinition } from "../domain";
 
 type ContentDefinitionData = {
     id: string,
@@ -17,12 +17,23 @@ type ContentDefinitionData = {
     }[]
 };
 
+type ContentFieldDefinitionData = {
+    id: string,
+    name: string,
+    type: string,
+    arrayElementDefinitionId?: string,
+    groupElements?: {
+        id: string,
+        name: string,
+        options: {
+            isRequired: boolean
+        }
+    }[]
+};
+
 class LocalContentManagementPersistency implements IContentDefinitionPersistency, IContentPersistency {
     private contentDefinitions: ContentDefinitionData[] = [];
-    private contentFieldDefinitions: {
-        id: string,
-        field: ContentFieldDefinition
-    }[] = [];
+    private contentFieldDefinitions: ContentFieldDefinitionData[] = [];
     private content: { contentName: string, content: any[] }[] = [];
     
     
@@ -35,7 +46,8 @@ class LocalContentManagementPersistency implements IContentDefinitionPersistency
         };
 
         for (const contentField of contentDefinition.getContentFields()) {
-            const field = this.contentFieldDefinitions.find(existingContentFieldDefinition => existingContentFieldDefinition.field.getName() === contentField.contentFieldDefinition.getName());
+            const field = this.contentFieldDefinitions.find(existingContentFieldDefinition => 
+                existingContentFieldDefinition.name === contentField.contentFieldDefinition.getName());
 
             if (!field)
                 throw new Error(`Not existing field "${ contentField.contentFieldDefinition.getName() }".`);
@@ -60,13 +72,6 @@ class LocalContentManagementPersistency implements IContentDefinitionPersistency
         this.contentDefinitions.push(contentDefinitionData);
     }
 
-    createContentFieldDefinition(contentFieldDefinition: ContentFieldDefinition): void {
-        this.contentFieldDefinitions.push({
-            id: uuidv4(),
-            field: contentFieldDefinition
-        });
-    }
-
     readContentDefinition(contentName: string): ContentDefinition | undefined {
         const contentDefinitionData = this.contentDefinitions.find(contentDefinition => contentDefinition.name === contentName);
 
@@ -76,17 +81,61 @@ class LocalContentManagementPersistency implements IContentDefinitionPersistency
         const contentDefinition = contentDefinitionResult.getResult()!;
 
         for (const contentFieldDefinitionAssignment of contentDefinitionData.fields) {
-            const contentFieldDefinition = this.contentFieldDefinitions.find(existingContentFieldDefinition => existingContentFieldDefinition.id === contentFieldDefinitionAssignment.id);
+            const contentFieldDefinitionData = this.contentFieldDefinitions.find(existingContentFieldDefinition => 
+                existingContentFieldDefinition.id === contentFieldDefinitionAssignment.id);
 
-            if (!contentFieldDefinition)
+            if (!contentFieldDefinitionData)
                 throw new Error("Field not found.");
 
-            contentDefinition.addContentField(contentFieldDefinitionAssignment.name, contentFieldDefinition.field, contentFieldDefinitionAssignment.options);
+            const contentFieldDefinition = this.convertFieldDataToEntity(contentFieldDefinitionData);
+            contentDefinition.addContentField(contentFieldDefinitionAssignment.name, contentFieldDefinition, contentFieldDefinitionAssignment.options);
         }
 
         return contentDefinition;
     }
 
+    createContentFieldDefinition(contentFieldDefinition: ContentFieldDefinition): void {
+        const contentFieldDefinitionData: ContentFieldDefinitionData = {
+            id: uuidv4(),
+            name: contentFieldDefinition.getName(),
+            type: contentFieldDefinition.getType()
+        };
+
+        if (contentFieldDefinition.getType() === ContentFieldType.Array) {
+            const arrayFieldDefinition = contentFieldDefinition as ArrayContentFieldDefinition;
+
+            const arrayElementDefinitionData = this.contentFieldDefinitions.find(existingContentFieldDefinition =>
+                existingContentFieldDefinition.name === arrayFieldDefinition.getArrayElementType().getName());
+
+            if (!arrayElementDefinitionData)
+                throw new Error("Array element type not found.")
+
+            contentFieldDefinitionData.arrayElementDefinitionId = arrayElementDefinitionData.id;
+        }
+
+        if (contentFieldDefinition.getType() === ContentFieldType.Group) {
+            contentFieldDefinitionData.groupElements = [];
+
+            const groupFieldDefinition = contentFieldDefinition as GroupContentFieldDefinition;
+            for (const groupElement of groupFieldDefinition.getContentFields()) {
+                const groupElementDefinitionData = this.contentFieldDefinitions.find(existingContentFieldDefinition =>
+                    existingContentFieldDefinition.name === groupElement.contentFieldDefinition.getName());
+
+                if (!groupElementDefinitionData)
+                    throw new Error("Group element not found.");
+
+                contentFieldDefinitionData.groupElements.push({
+                    id: groupElementDefinitionData.id,
+                    name: groupElement.name,
+                    options: {
+                        isRequired: false
+                    }
+                });
+            }
+        }
+        
+        this.contentFieldDefinitions.push(contentFieldDefinitionData);
+    }
 
     
     createContent(contentName: string, content: any): string {
@@ -173,6 +222,74 @@ class LocalContentManagementPersistency implements IContentDefinitionPersistency
     clear() {
         this.content = [];
         this.contentDefinitions = [];
+    }
+
+
+    private convertFieldDataToEntity(contentFieldDefinitionData: ContentFieldDefinitionData) {
+        let contentFieldDefinition: ContentFieldDefinition;
+
+        switch (contentFieldDefinitionData.type) {
+            case ContentFieldType.Array: {
+                const arrayElementDefinitionData = this.contentFieldDefinitions.find(existingContentFieldDefinition =>
+                    existingContentFieldDefinition.id === contentFieldDefinitionData.arrayElementDefinitionId);
+
+                if (!arrayElementDefinitionData) 
+                    throw new Error("Array field element type is not defined.");
+
+                const arrayElementDefinition = this.convertFieldDataToEntity(arrayElementDefinitionData);
+                const createArrayFieldDefinitionResult = ArrayContentFieldDefinition.create(contentFieldDefinitionData.id, contentFieldDefinitionData.name, arrayElementDefinition);
+                contentFieldDefinition = createArrayFieldDefinitionResult.getResult()!;
+
+                break;
+            }
+
+            case ContentFieldType.Date: {
+                const createDateFieldDefinitionResult = DateContentFieldDefinition.create(contentFieldDefinitionData.id, contentFieldDefinitionData.name);
+                contentFieldDefinition = createDateFieldDefinitionResult.getResult()!;
+
+                break;
+            }
+
+            case ContentFieldType.Group: {
+                const createGroupFieldDefinitionResult = GroupContentFieldDefinition.create(contentFieldDefinitionData.id, contentFieldDefinitionData.name);
+                const groupContentField = createGroupFieldDefinitionResult.getResult()!;
+                
+                if (contentFieldDefinitionData.groupElements) {
+                    for (const groupElement of contentFieldDefinitionData.groupElements) {
+                        const groupElementDefinitionData = this.contentFieldDefinitions.find(existingContentFieldDefinition =>
+                            existingContentFieldDefinition.id === groupElement.id);
+    
+                        if (!groupElementDefinitionData) 
+                            throw new Error("Unknown group element type.");
+    
+                        groupContentField.addContentField(groupElement.name, this.convertFieldDataToEntity(groupElementDefinitionData), groupElement.options);
+                    }
+                }
+
+                contentFieldDefinition = groupContentField;
+
+                break;
+            }
+
+            case ContentFieldType.Numeric: {
+                const createNumericFieldDefinitionResult = NumericContentFieldDefinition.create(contentFieldDefinitionData.id, contentFieldDefinitionData.name);
+                contentFieldDefinition = createNumericFieldDefinitionResult.getResult()!;
+
+                break;
+            }
+
+            case ContentFieldType.Text: {
+                const createTextFieldDefinitionResult = TextContentFieldDefinition.create(contentFieldDefinitionData.id, contentFieldDefinitionData.name);
+                contentFieldDefinition = createTextFieldDefinitionResult.getResult()!;
+
+                break;
+            }
+
+            default: 
+                throw new Error("Invalid field type.");
+        }
+
+        return contentFieldDefinition!;
     }
 }
 

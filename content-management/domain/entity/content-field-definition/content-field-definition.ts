@@ -86,4 +86,4 @@ abstract class ContentFieldDefinition extends Entity {
     }
 }
 
-export { ContentFieldDefinition, ContentFieldType, ContentFieldValue };
+export { ContentFieldDefinition, ContentFieldType, ContentFieldValue, ContentFieldValidator, ContentFieldDetermination };
