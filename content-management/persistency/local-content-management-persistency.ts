@@ -1,41 +1,12 @@
-import { ContentDefinition } from "../domain/entity/content-definition";
-import IContentDefinitionPersistency from "../domain/usecase/content-definition-persistency.interface";
+import IContentDefinitionPersistency, { ContentDefinitionData, ContentFieldDefinitionData } from "./content-definition-persistency.interface";
 import {v4 as uuid} from 'uuid';
 import IContentPersistency from "../domain/usecase/content-persistency.interface";
-import handlerAccessor from "./handler-accessor";
 import { ContentFieldDefinition, ContentFieldType } from "../domain/entity/content-field-definition/content-field-definition";
 import ArrayContentFieldDefinition from "../domain/entity/content-field-definition/array-content-field-definition";
 import GroupContentFieldDefinition from "../domain/entity/content-field-definition/group-content-field-definition";
 import DateContentFieldDefinition from "../domain/entity/content-field-definition/date-content-field-definition";
 import NumericContentFieldDefinition from "../domain/entity/content-field-definition/numeric-content-field-definition";
 import TextContentFieldDefinition from "../domain/entity/content-field-definition/text-content-field-definition";
-
-type ContentDefinitionData = {
-    id: string,
-    name: string,
-    fields: {
-        name: string,
-        id: string,
-        options: {
-            isRequired: boolean,
-            isUnique: boolean
-        }
-    }[]
-};
-
-type ContentFieldDefinitionData = {
-    id: string,
-    name: string,
-    type: string,
-    arrayElementDefinitionId?: string,
-    groupElements?: {
-        id: string,
-        name: string,
-        options: {
-            isRequired: boolean
-        }
-    }[]
-};
 
 class LocalContentManagementPersistency implements IContentDefinitionPersistency, IContentPersistency {
     private contentDefinitions: ContentDefinitionData[] = [];
@@ -44,118 +15,45 @@ class LocalContentManagementPersistency implements IContentDefinitionPersistency
     
     
     
-    createContentDefinition(contentDefinition: ContentDefinition) {
-        const contentDefinitionData: ContentDefinitionData = {
-            id: uuid(),
-            name: contentDefinition.getName(),
-            fields: []
-        };
-
-        for (const contentField of contentDefinition.getContentFields()) {
-            const field = this.contentFieldDefinitions.find(existingContentFieldDefinition => 
-                existingContentFieldDefinition.name === contentField.contentFieldDefinition.getName());
-
-            if (!field)
-                throw new Error(`Not existing field "${ contentField.contentFieldDefinition.getName() }".`);
-
-            const fieldData = {
-                id: field.id,
-                name: contentField.name,
-                options: {
-                    isRequired: false,
-                    isUnique: false
-                }
-            };
-
-            if (contentField.options) {
-                fieldData.options.isRequired = contentField.options.isRequired || false;
-                fieldData.options.isUnique = contentField.options.isUnique || false;
-            }
-
-            contentDefinitionData.fields.push(fieldData);
-        }
-
+    createContentDefinition(contentDefinitionData: ContentDefinitionData): string {
+        contentDefinitionData.id = uuid();
         this.contentDefinitions.push(contentDefinitionData);
+
+        return contentDefinitionData.id;
     }
 
-    readContentDefinition(contentName: string) {
+    readContentDefinition(contentName: string): ContentDefinitionData {
         const contentDefinitionData = this.contentDefinitions.find(contentDefinition => contentDefinition.name === contentName);
 
-        if (!contentDefinitionData) return undefined;
+        if (!contentDefinitionData)
+            throw new Error("Content definition not found.");
 
-        const contentDefinitionResult = ContentDefinition.create(contentDefinitionData.id, contentDefinitionData.name);
-        const contentDefinition = contentDefinitionResult.getResult()!;
+        return contentDefinitionData;
+    }
+    
+    readContentFieldDefinitionById(id: string): ContentFieldDefinitionData {
+        const contentDefinitionData = this.contentFieldDefinitions.find(contentFieldDefinition => contentFieldDefinition.id === id);
 
-        for (const contentFieldDefinitionAssignment of contentDefinitionData.fields) {
-            const contentFieldDefinitionData = this.contentFieldDefinitions.find(existingContentFieldDefinition => 
-                existingContentFieldDefinition.id === contentFieldDefinitionAssignment.id);
+        if (!contentDefinitionData)
+            throw new Error("Content definition not found.");
 
-            if (!contentFieldDefinitionData)
-                throw new Error("Field not found.");
+        return contentDefinitionData;
+    }
+    
+    readContentFieldDefinitionByName(name: string): ContentFieldDefinitionData {
+        const contentDefinitionData = this.contentFieldDefinitions.find(contentFieldDefinition => contentFieldDefinition.name === name);
 
-            const contentFieldDefinition = this.convertFieldDataToEntity(contentFieldDefinitionData);
+        if (!contentDefinitionData)
+            throw new Error("Content definition not found.");
 
-            for (const validator of handlerAccessor.getValidatorsForContentFieldDefinition(contentFieldDefinitionData.id)) 
-                contentFieldDefinition.addValidator(validator);
-            
-            for (const determination of handlerAccessor.getDeterminationsForContentFieldDefinition(contentFieldDefinitionData.id)) 
-                contentFieldDefinition.addDetermination(determination);
-
-            contentDefinition.addContentField(contentFieldDefinitionAssignment.name, contentFieldDefinition, contentFieldDefinitionAssignment.options);
-        }
-
-        return contentDefinition;
+        return contentDefinitionData;
     }
 
-    createContentFieldDefinition(contentFieldDefinition: ContentFieldDefinition) {
-        const contentFieldDefinitionData: ContentFieldDefinitionData = {
-            id: uuid(),
-            name: contentFieldDefinition.getName(),
-            type: contentFieldDefinition.getType()
-        };
-
-        if (contentFieldDefinition.getType() === ContentFieldType.Array) {
-            const arrayFieldDefinition = contentFieldDefinition as ArrayContentFieldDefinition;
-
-            const arrayElementDefinitionData = this.contentFieldDefinitions.find(existingContentFieldDefinition =>
-                existingContentFieldDefinition.name === arrayFieldDefinition.getArrayElementType().getName());
-
-            if (!arrayElementDefinitionData)
-                throw new Error("Array element type not found.")
-
-            contentFieldDefinitionData.arrayElementDefinitionId = arrayElementDefinitionData.id;
-        }
-
-        if (contentFieldDefinition.getType() === ContentFieldType.Group) {
-            contentFieldDefinitionData.groupElements = [];
-
-            const groupFieldDefinition = contentFieldDefinition as GroupContentFieldDefinition;
-            for (const groupElement of groupFieldDefinition.getContentFields()) {
-                const groupElementDefinitionData = this.contentFieldDefinitions.find(existingContentFieldDefinition =>
-                    existingContentFieldDefinition.name === groupElement.contentFieldDefinition.getName());
-
-                if (!groupElementDefinitionData)
-                    throw new Error("Group element not found.");
-
-                const groupElementData = {
-                    id: groupElementDefinitionData.id,
-                    name: groupElement.name,
-                    options: {
-                        isRequired: false
-                    }
-                };
-
-                if (groupElement.options.isRequired)
-                    groupElementData.options.isRequired = true;
-
-                contentFieldDefinitionData.groupElements.push(groupElementData);
-            }
-        }
-
-        handlerAccessor.addValidatorsForContentFieldDefinition(contentFieldDefinitionData.id, contentFieldDefinition.getValidators());
-        handlerAccessor.addDeterminationsForContentFieldDefinition(contentFieldDefinitionData.id, contentFieldDefinition.getDeterminations());
-        
+    createContentFieldDefinition(contentFieldDefinitionData: ContentFieldDefinitionData): string {
+        contentFieldDefinitionData.id = uuid();
         this.contentFieldDefinitions.push(contentFieldDefinitionData);
+
+        return contentFieldDefinitionData.id;
     }
 
     

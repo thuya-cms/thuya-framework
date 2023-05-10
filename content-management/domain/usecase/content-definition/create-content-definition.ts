@@ -1,11 +1,11 @@
 import { Result } from '../../../../common';
 import logger from '../../../../common/utility/logger';
+import contentDefinitionRepository from '../../../repository/content-definition-repository';
 import { ContentDefinition } from '../../entity/content-definition';
-import factory from '../../factory';
 
 class CreateContentDefinition {
     execute(contentDefinition: ContentDefinition): Result {
-        factory.getContentDefinitionPersistency().createContentDefinition(contentDefinition);
+        contentDefinitionRepository.createContentDefinition(contentDefinition);
 
         logger.info(`Content definition "%s" created successfully.`, contentDefinition.getName());
 

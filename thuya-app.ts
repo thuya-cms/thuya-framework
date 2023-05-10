@@ -9,7 +9,7 @@ import Module from './module';
 import ContentDefinitionDTO from './content-management/app/dto/content-definition';
 import dotenv from "dotenv";
 import TextContentFieldDefinitionDTO from './content-management/app/dto/content-field-definition/text-content-field-definition';
-import IContentDefinitionPersistency from './content-management/domain/usecase/content-definition-persistency.interface';
+import IContentDefinitionPersistency from './content-management/persistency/content-definition-persistency.interface';
 import factory from './content-management/domain/factory';
 import { IContentPersistency } from './content-management/domain';
 import correlator from 'express-correlation-id';

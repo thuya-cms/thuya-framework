@@ -1,10 +1,10 @@
 import { Result, logger } from "../../../../common";
+import contentDefinitionRepository from "../../../repository/content-definition-repository";
 import { ContentDefinition } from "../../entity/content-definition";
-import factory from "../../factory";
 
 class ReadContentDefinition {
     execute(contentName: string): Result<ContentDefinition> {
-        const contentDefinition = factory.getContentDefinitionPersistency().readContentDefinition(contentName);
+        const contentDefinition = contentDefinitionRepository.readContentDefinition(contentName);
 
         if (!contentDefinition) {
             logger.error(`Content definition "%s" not found.`, contentName);
