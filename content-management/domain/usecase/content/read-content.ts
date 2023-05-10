@@ -2,10 +2,10 @@ import { Result } from "../../../../common";
 import { ContentDefinition } from "../../entity/content-definition";
 import factory from "../../factory";
 
-class ReadContent<T> {
-    byId(contentDefinition: ContentDefinition<T>, id: string): Result<T> {
+class ReadContent<T extends { id: string }> {
+    async byId(contentDefinition: ContentDefinition<T>, id: string): Promise<Result<T>> {
         try {
-            return Result.success(factory.getContentPersistency().readContent(contentDefinition.getName(), id));
+            return Result.success(await factory.getContentPersistency().readContent(contentDefinition.getName(), id));
         }
 
         catch (error: any) {
@@ -13,9 +13,9 @@ class ReadContent<T> {
         }
     }
 
-    byFieldValue(contentDefinition: ContentDefinition<T>, fieldValue: { name: string, value: any }): Result<T> {
+    async byFieldValue(contentDefinition: ContentDefinition<T>, fieldValue: { name: string, value: any }): Promise<Result<T[]>> {
         try {
-            return Result.success(factory.getContentPersistency().readContentByFieldValue(fieldValue, contentDefinition.getName()));
+            return Result.success(await factory.getContentPersistency().readContentByFieldValue(fieldValue, contentDefinition.getName()));
         }
 
         catch (error: any) {

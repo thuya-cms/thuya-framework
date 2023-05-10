@@ -1,5 +1,11 @@
 import { Result, logger } from "../../common";
-import { GroupContentFieldDefinition, ArrayContentFieldDefinition, ContentDefinition, ContentFieldDefinition, DateContentFieldDefinition, NumericContentFieldDefinition, TextContentFieldDefinition } from "../domain";
+import { ContentDefinition } from "../domain/entity/content-definition";
+import ArrayContentFieldDefinition from "../domain/entity/content-field-definition/array-content-field-definition";
+import { ContentFieldDefinition } from "../domain/entity/content-field-definition/content-field-definition";
+import DateContentFieldDefinition from "../domain/entity/content-field-definition/date-content-field-definition";
+import GroupContentFieldDefinition from "../domain/entity/content-field-definition/group-content-field-definition";
+import NumericContentFieldDefinition from "../domain/entity/content-field-definition/numeric-content-field-definition";
+import TextContentFieldDefinition from "../domain/entity/content-field-definition/text-content-field-definition";
 import createContentDefinition from "../domain/usecase/content-definition/create-content-definition";
 import createContentFieldDefinition from "../domain/usecase/content-definition/create-content-field-definition";
 import ContentDefinitionDTO from "./dto/content-definition";

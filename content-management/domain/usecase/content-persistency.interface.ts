@@ -1,10 +1,12 @@
+import UnknownContent from "./content/unknown-content.type";
+
 interface IContentPersistency {
-    createContent(contentName: string, content: any): string;
-    updateContent(contentName: string, content: any): void;
-    deleteContent(contentName: string, id: string): void;
-    readContent(contentName: string, id: string): any;
-    readContentByFieldValue(fieldValue: { name: string; value: any; }, contentName: string): any;
-    listContent(contentName: string): any[];
+    createContent(contentName: string, content: UnknownContent): Promise<string>;
+    updateContent(contentName: string, content: UnknownContent): Promise<void>;
+    deleteContent(contentName: string, id: string): Promise<void>;
+    readContent(contentName: string, id: string): Promise<UnknownContent>;
+    readContentByFieldValue(fieldValue: { name: string; value: any; }, contentName: string): Promise<UnknownContent>;
+    listContent(contentName: string): Promise<UnknownContent[]>;
 }
 
 export default IContentPersistency;

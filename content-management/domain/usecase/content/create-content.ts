@@ -13,7 +13,7 @@ enum ErrorCode {
 }
 
 class CreateContent<T> {
-    execute(contentDefinition: ContentDefinition<T>, content: T): Result<string> {
+    async execute(contentDefinition: ContentDefinition<T>, content: T): Promise<Result<string>> {
         const finalContent: any = {};
 
         expressHelper.deleteNotExistingProperties(
@@ -30,7 +30,7 @@ class CreateContent<T> {
 
             if (fieldValue) {
                 if (contentField.options.isUnique) {
-                    const uniquenessResult = this.validateUniqueness(contentDefinition, contentField.name, fieldValue);
+                    const uniquenessResult = await this.validateUniqueness(contentDefinition, contentField.name, fieldValue);
                     if (uniquenessResult.getIsFailing()) 
                         return Result.error(uniquenessResult.getMessage());
                 }
@@ -54,19 +54,20 @@ class CreateContent<T> {
             }
         }
 
-        const id = factory.getContentPersistency().createContent(contentDefinition.getName(), finalContent);
+        const id = await factory.getContentPersistency().createContent(contentDefinition.getName(), finalContent);
         logger.info(`Content of type "%s" is created successfully.`, contentDefinition.getName());
 
         return Result.success(id);
     }
 
     
-    private validateUniqueness(contentDefinition: ContentDefinition<T>, fieldName: string, fieldValue: any): Result {
-        const readContentResult = contentManager.readContentByFieldValue(contentDefinition.getName(), { name: fieldName, value: fieldValue });
+    private async validateUniqueness(contentDefinition: ContentDefinition<T>, fieldName: string, fieldValue: any): Promise<Result> {
+        logger.debug(`Validating uniqueness of field "%s" with value "%s".`, fieldName, fieldValue);
+        const readContentResult = await contentManager.readContentByFieldValue(contentDefinition.getName(), { name: fieldName, value: fieldValue });
 
         if (readContentResult.getIsSuccessful()) {
-            logger.debug(`Value of field "%s" is not unique.`, fieldName);
-            return Result.error(`Value of field ${fieldName} is not unique.`);
+            logger.debug(`Value "%s" of field "%s" is not unique.`, fieldValue, fieldName);
+            return Result.error(`Value "${ fieldValue }" of field ${fieldName} is not unique.`);
         } else {
             logger.debug(`Value of field "%s" is unique.`, fieldName);
             return Result.success();

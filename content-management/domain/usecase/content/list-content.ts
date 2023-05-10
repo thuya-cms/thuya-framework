@@ -1,9 +1,10 @@
 import { Result } from "../../../../common";
 import factory from "../../factory";
+import UnknownContent from "./unknown-content.type";
 
 class ListContent {
-    execute(contentName: string): Result<any[]> {
-        return Result.success(factory.getContentPersistency().listContent(contentName));
+    async execute(contentName: string): Promise<Result<UnknownContent[]>> {
+        return Result.success(await factory.getContentPersistency().listContent(contentName));
     }
 }
 

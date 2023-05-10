@@ -41,13 +41,13 @@ describe("create content", () => {
     });
 
 
-    it("should be created with valid fields", () => {
+    it("should be created with valid fields", async () => {
         const textValue = "text-value";
         const numValue = 20;
         const dateValue = new Date().toISOString();
         const arrayValue = ["string1", "string2"];
 
-        const createContentResult = contentManager.createContent(contentDefinition.getName(), {
+        const createContentResult = await contentManager.createContent(contentDefinition.getName(), {
             textField: textValue,
             numericField: numValue,
             dateField: dateValue,
@@ -55,7 +55,7 @@ describe("create content", () => {
         });
         should().equal(createContentResult.getIsSuccessful(), true, createContentResult.getMessage());
 
-        const readContentResult = contentManager.readContent(contentDefinition.getName(), createContentResult.getResult()!);
+        const readContentResult = await contentManager.readContent(contentDefinition.getName(), createContentResult.getResult()!);
         should().equal(readContentResult.getIsSuccessful(), true, readContentResult.getMessage());
 
         const content = readContentResult.getResult();
@@ -67,15 +67,15 @@ describe("create content", () => {
         should().equal(content.arrayField, arrayValue);
     });
 
-    it("should be created with missing not required fields", () => {
+    it("should be created with missing not required fields", async () => {
         const textValue = "text-value";
 
-        const createContentResult = contentManager.createContent(contentDefinition.getName(), {
+        const createContentResult = await contentManager.createContent(contentDefinition.getName(), {
             textField: textValue
         });
         should().equal(createContentResult.getIsSuccessful(), true, createContentResult.getMessage());
 
-        const readContentResult = contentManager.readContent(contentDefinition.getName(), createContentResult.getResult()!);
+        const readContentResult = await contentManager.readContent(contentDefinition.getName(), createContentResult.getResult()!);
         should().equal(readContentResult.getIsSuccessful(), true);
 
         const content = readContentResult.getResult();
@@ -87,18 +87,18 @@ describe("create content", () => {
         should().not.exist(content.arrayField);
     });
 
-    it("should fail with missing required field", () => {
-        const createContentResult = contentManager.createContent(contentDefinition.getName(), {});
+    it("should fail with missing required field", async () => {
+        const createContentResult = await contentManager.createContent(contentDefinition.getName(), {});
         should().equal(createContentResult.getIsFailing(), true);
     });
 
-    it("should fail with duplicate unique value", () => {
+    it("should fail with duplicate unique value", async () => {
         const textValue = "text-value";
 
-        let createContentResult = contentManager.createContent(contentDefinition.getName(), { textField: textValue });
+        let createContentResult = await contentManager.createContent(contentDefinition.getName(), { textField: textValue });
         should().equal(createContentResult.getIsSuccessful(), true);
 
-        createContentResult = contentManager.createContent(contentDefinition.getName(), { textField: textValue });
+        createContentResult = await contentManager.createContent(contentDefinition.getName(), { textField: textValue });
         should().equal(createContentResult.getIsFailing(), true);
     });
 });

@@ -25,7 +25,7 @@ describe("create content with group", () => {
     });
 
 
-    it("should create valid content", () => {
+    it("should create valid content", async () => {
         const textValue = "text-value";
         const numValue = 30;
 
@@ -40,7 +40,7 @@ describe("create content with group", () => {
         contentDefinition.addContentField("groupField", groupField);
         contentDefinitionUtil.defineContent(contentDefinition);
 
-        const createContentResult = contentManager.createContent(contentDefinition.getName(), {
+        const createContentResult = await contentManager.createContent(contentDefinition.getName(), {
             groupField: {
                 textField: textValue,
                 numericField: numValue 
@@ -48,7 +48,7 @@ describe("create content with group", () => {
         });
         should().equal(createContentResult.getIsSuccessful(), true, createContentResult.getMessage());
 
-        const readContentResult = contentManager.readContent(contentDefinition.getName(), createContentResult.getResult()!);
+        const readContentResult = await contentManager.readContent(contentDefinition.getName(), createContentResult.getResult()!);
         should().equal(readContentResult.getIsSuccessful(), true, readContentResult.getMessage());
 
         const content = readContentResult.getResult();
@@ -73,7 +73,7 @@ describe("create content with group", () => {
         should().equal(createDefinitionResult.getMessage(), `Field with name "textField" is already added to group "group-field-1".`);
     });
 
-    it("should fail with missing required value", () => {
+    it("should fail with missing required value", async () => {
         const textField = contentDefinitionUtil.defineContentField(new TextContentFieldDefinitionDTO("", "text-field"));
 
         groupField = new GroupContentFieldDefinitionDTO("", "group-field-1");
@@ -83,7 +83,7 @@ describe("create content with group", () => {
         contentDefinition.addContentField("groupField", groupField);
         contentDefinitionUtil.defineContent(contentDefinition);
 
-        const createContentResult = contentManager.createContent(contentDefinition.getName(), {});
+        const createContentResult = await contentManager.createContent(contentDefinition.getName(), {});
         should().equal(createContentResult.getIsFailing(), true);
     });
 });

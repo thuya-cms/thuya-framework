@@ -7,7 +7,7 @@ class ReadContentDefinition {
         const contentDefinition = factory.getContentDefinitionPersistency().readContentDefinition(contentName);
 
         if (!contentDefinition) {
-            logger.debug(`Content definition "%s" not found.`, contentName);
+            logger.error(`Content definition "%s" not found.`, contentName);
             return Result.error(`Content definition "${ contentName }" not found.`);
         }
 

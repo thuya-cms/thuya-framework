@@ -17,7 +17,7 @@ describe("determinations when creating content", () => {
     });
 
     
-    it("should update the value with determination", () => {
+    it("should update the value with determination", async () => {
         const contentField = new TextContentFieldDefinitionDTO("", "field");
         contentField.addDetermination((data) => {
             return "Updated " + data;
@@ -28,12 +28,12 @@ describe("determinations when creating content", () => {
         contentDefinition.addContentField("fieldOne", contentField);
         contentDefinitionUtil.defineContent(contentDefinition);
 
-        const createContentResult = contentManager.createContent("definition", {
+        const createContentResult = await contentManager.createContent("definition", {
             fieldOne: "data1"
         });
         should().equal(createContentResult.getIsSuccessful(), true, createContentResult.getMessage());
         
-        const readContentResult = contentManager.readContent(contentDefinition.getName(), createContentResult.getResult()!);
+        const readContentResult = await contentManager.readContent(contentDefinition.getName(), createContentResult.getResult()!);
         should().equal(readContentResult.getIsSuccessful(), true, readContentResult.getMessage());
 
         const content = readContentResult.getResult();

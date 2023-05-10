@@ -1,9 +1,14 @@
 import { ContentDefinition } from "../domain/entity/content-definition";
 import IContentDefinitionPersistency from "../domain/usecase/content-definition-persistency.interface";
-import {v4 as uuidv4} from 'uuid';
+import {v4 as uuid} from 'uuid';
 import IContentPersistency from "../domain/usecase/content-persistency.interface";
-import { ArrayContentFieldDefinition, ContentFieldDefinition, ContentFieldType, DateContentFieldDefinition, GroupContentFieldDefinition, NumericContentFieldDefinition, TextContentFieldDefinition } from "../domain";
 import handlerAccessor from "./handler-accessor";
+import { ContentFieldDefinition, ContentFieldType } from "../domain/entity/content-field-definition/content-field-definition";
+import ArrayContentFieldDefinition from "../domain/entity/content-field-definition/array-content-field-definition";
+import GroupContentFieldDefinition from "../domain/entity/content-field-definition/group-content-field-definition";
+import DateContentFieldDefinition from "../domain/entity/content-field-definition/date-content-field-definition";
+import NumericContentFieldDefinition from "../domain/entity/content-field-definition/numeric-content-field-definition";
+import TextContentFieldDefinition from "../domain/entity/content-field-definition/text-content-field-definition";
 
 type ContentDefinitionData = {
     id: string,
@@ -39,9 +44,9 @@ class LocalContentManagementPersistency implements IContentDefinitionPersistency
     
     
     
-    createContentDefinition(contentDefinition: ContentDefinition): void {
+    createContentDefinition(contentDefinition: ContentDefinition) {
         const contentDefinitionData: ContentDefinitionData = {
-            id: uuidv4(),
+            id: uuid(),
             name: contentDefinition.getName(),
             fields: []
         };
@@ -73,7 +78,7 @@ class LocalContentManagementPersistency implements IContentDefinitionPersistency
         this.contentDefinitions.push(contentDefinitionData);
     }
 
-    readContentDefinition(contentName: string): ContentDefinition | undefined {
+    readContentDefinition(contentName: string) {
         const contentDefinitionData = this.contentDefinitions.find(contentDefinition => contentDefinition.name === contentName);
 
         if (!contentDefinitionData) return undefined;
@@ -102,9 +107,9 @@ class LocalContentManagementPersistency implements IContentDefinitionPersistency
         return contentDefinition;
     }
 
-    createContentFieldDefinition(contentFieldDefinition: ContentFieldDefinition): void {
+    createContentFieldDefinition(contentFieldDefinition: ContentFieldDefinition) {
         const contentFieldDefinitionData: ContentFieldDefinitionData = {
-            id: uuidv4(),
+            id: uuid(),
             name: contentFieldDefinition.getName(),
             type: contentFieldDefinition.getType()
         };
@@ -154,7 +159,7 @@ class LocalContentManagementPersistency implements IContentDefinitionPersistency
     }
 
     
-    createContent(contentName: string, content: any): string {
+    createContent(contentName: string, content: any) {
         let existingContent = this.content.find(existingContent => existingContent.contentName === contentName);
 
         if (!existingContent) {
@@ -166,13 +171,13 @@ class LocalContentManagementPersistency implements IContentDefinitionPersistency
             this.content.push(existingContent);
         }
 
-        content.id = uuidv4();
+        content.id = uuid();
         existingContent.content.push(content);
 
-        return content.id;
+        return Promise.resolve(content.id);
     }
 
-    deleteContent(contentName: string, id: string): void {
+    async deleteContent(contentName: string, id: string) {
         const contentList = this.content.find(content => content.contentName === contentName);
         
         if (!contentList)
@@ -186,7 +191,7 @@ class LocalContentManagementPersistency implements IContentDefinitionPersistency
         contentList.content.splice(contentIndex, 1);
     }
 
-    updateContent(contentName: string, content: any): void {
+    async updateContent(contentName: string, content: any) {
         const contentList = this.content.find(content => content.contentName === contentName);
         
         if (!contentList)
@@ -201,13 +206,13 @@ class LocalContentManagementPersistency implements IContentDefinitionPersistency
         contentList.content.push(content);
     }
 
-    listContent(contentName: string): any[] {
+    async listContent(contentName: string) {
         const list = this.content.find(content => content.contentName === contentName);
 
         return list ? list.content : [];
     }
 
-    readContent(contentName: string, id: string) {
+    async readContent(contentName: string, id: string) {
         const contentList = this.content.find(content => content.contentName === contentName);
         
         if (!contentList)
@@ -221,7 +226,7 @@ class LocalContentManagementPersistency implements IContentDefinitionPersistency
         return content;
     }
 
-    readContentByFieldValue(fieldValue: { name: string; value: any; }, contentName: string) {
+    async readContentByFieldValue(fieldValue: { name: string; value: any; }, contentName: string) {
         const contentList = this.content.find(content => content.contentName === contentName);
         
         if (!contentList)

@@ -18,7 +18,8 @@ abstract class ContentProvider {
     }
 
     // eslint-disable-next-line @typescript-eslint/no-empty-function
-    createContent() {
+    createContent(): Promise<void> {
+        return Promise.resolve();
     }
 
 

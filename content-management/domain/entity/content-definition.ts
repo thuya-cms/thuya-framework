@@ -22,7 +22,8 @@ class ContentDefinition<T = any> extends Entity {
             throw new Error("Content definition name is required.");
         }
 
-        this.addContentField("id", idContentFieldDefinition);
+        if (!this.getContentFields().find(contentField => contentField.contentFieldDefinition.getName() === "id"))
+            this.addContentField("id", idContentFieldDefinition);
     }
 
 
@@ -43,6 +44,11 @@ class ContentDefinition<T = any> extends Entity {
     }
 
     addContentField(name: string, contentField: ContentFieldDefinition, options?: ContentFieldOptions): Result {
+        if (name === "id") {
+            logger.debug(`Adding "id" field manually is not possible.`);
+            return Result.success();
+        }
+
         if (this.contentFields.find(existingContentField => existingContentField.name === name)) {
             logger.error(`Field with name "%s" is already added.`, name);
             return Result.error(`Field with name "${ name }" is already added.`);

@@ -18,7 +18,7 @@ describe("validations when creating content", () => {
     });
 
     
-    it("should fail with failing validation", () => {
+    it("should fail with failing validation", async () => {
         const contentField = new TextContentFieldDefinitionDTO("", "field");
         contentField.addValidator((data) => {
             return Result.error(`Validation failed with data ${ data }.`);
@@ -29,7 +29,7 @@ describe("validations when creating content", () => {
         contentDefinition.addContentField("fieldOne", contentField);
         contentDefinitionUtil.defineContent(contentDefinition);
 
-        const createContentResult = contentManager.createContent("definition", {
+        const createContentResult = await contentManager.createContent("definition", {
             fieldOne: "data1"
         });
         should().equal(createContentResult.getIsFailing(), true);

@@ -9,6 +9,10 @@ import Module from './module';
 import ContentDefinitionDTO from './content-management/app/dto/content-definition';
 import dotenv from "dotenv";
 import TextContentFieldDefinitionDTO from './content-management/app/dto/content-field-definition/text-content-field-definition';
+import IContentDefinitionPersistency from './content-management/domain/usecase/content-definition-persistency.interface';
+import factory from './content-management/domain/factory';
+import { IContentPersistency } from './content-management/domain';
+import correlator from 'express-correlation-id';
 
 class ThuyaApp {
     private _expressApp: express.Application;
@@ -23,6 +27,7 @@ class ThuyaApp {
         logger.initializeLogLevel();
 
         this._expressApp = express();
+        this._expressApp.use(correlator());
         this._expressApp.use(bodyParser.json());	
 		this._expressApp.use(bodyParser.urlencoded({ extended: false }));
 
@@ -40,6 +45,8 @@ class ThuyaApp {
      * @throws will throw an exception if there is no persistency implementation set
      */
     public start(): void {
+        logger.debug(`Starting Thuya application.`);
+
         if (this._expressServer)
             throw new Error("App is already running.");
 
@@ -54,29 +61,50 @@ class ThuyaApp {
      * @throws will throw an exception if the app is not running
      */
     public stop(): void {
+        logger.debug(`Stopping Thuya application.`);
+
         if (!this._expressServer) 
             throw new Error("App is not running.");
 
         this._expressServer.close();
     }
 
-    public useModule(module: Module) {
+    public async useModule(module: Module): Promise<void> {
+        logger.debug(`Using module "%s".`, module.getMetadata().name);
+
         module.setupMiddlewares(this._expressApp);
-        module.getControllers().forEach(controller => this._expressApp.use(controller.getRouter()));
-        module.getContentProviders().forEach(contentProvider => this.useContentProvider(contentProvider));
+        
+        logger.debug(`Using controllers of module "%s".`, module.getMetadata().name);
+        for (const controller of module.getControllers()) 
+            this._expressApp.use(controller.getRouter())
+
+        logger.debug(`Using content providers of module "%s".`, module.getMetadata().name);
+        for (const contentProvider of module.getContentProviders()) 
+            await this.useContentProvider(contentProvider);
+    }
+
+    public useContentDefinitionPersistency(persistency: IContentDefinitionPersistency) {
+        factory.setContentDefinitionPersistency(persistency);
+    }
+    
+    public useContentPersistency(persistency: IContentPersistency) {
+        factory.setContentPersistency(persistency);
     }
 
 
-    private useContentProvider(contentProvider: ContentProvider) {
+    private async useContentProvider(contentProvider: ContentProvider) {
+        logger.debug(`Creating content field definitions.`);
         for (const contentFieldDefinition of contentProvider.getContentFieldDefinitions()) {
             contentDefinitionManager.createContentFieldDefinition(contentFieldDefinition);
         }
 
+        logger.debug(`Creating content definitions.`);
         for (const contentDefinition of contentProvider.getContentDefinitions()) {
             this.registerContentDefinition(contentDefinition);
         }
 
-        contentProvider.createContent();
+        logger.debug(`Creating content.`);
+        await contentProvider.createContent();
     }
 
     private registerContentDefinition(contentDefinition: ContentDefinitionDTO) {

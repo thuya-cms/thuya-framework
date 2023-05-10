@@ -12,8 +12,8 @@ enum ErrorCode {
     NotUnique = "not-unique"
 }
 
-class UpdateContent<T> {
-    execute(contentDefinition: ContentDefinition<T>, content: T): Result {
+class UpdateContent<T extends { id: string }> {
+    async execute(contentDefinition: ContentDefinition<T>, content: T): Promise<Result> {
         const finalContent: any = {};
 
         expressHelper.deleteNotExistingProperties(
@@ -30,7 +30,7 @@ class UpdateContent<T> {
 
             if (fieldValue) {
                 if (contentField.options.isUnique) {
-                    const uniquenessResult = this.validateUniqueness(contentDefinition, contentField.name, fieldValue);
+                    const uniquenessResult = await this.validateUniqueness(contentDefinition, contentField.name, fieldValue);
                     if (uniquenessResult.getIsFailing()) 
                         return Result.error(uniquenessResult.getMessage());
                 }
@@ -54,15 +54,15 @@ class UpdateContent<T> {
             }
         }
 
-        factory.getContentPersistency().updateContent(contentDefinition.getName(), finalContent);
+        await factory.getContentPersistency().updateContent(contentDefinition.getName(), finalContent);
         logger.info(`Content of type "%s" is created successfully.`, contentDefinition.getName());
 
         return Result.success();
     }
 
 
-    private validateUniqueness(contentDefinition: ContentDefinition<T>, fieldName: string, fieldValue: any): Result {
-        const readContentResult = contentManager.readContentByFieldValue(contentDefinition.getName(), { name: fieldName, value: fieldValue });
+    private async validateUniqueness(contentDefinition: ContentDefinition<T>, fieldName: string, fieldValue: any): Promise<Result> {
+        const readContentResult = await contentManager.readContentByFieldValue(contentDefinition.getName(), { name: fieldName, value: fieldValue });
 
         if (readContentResult.getIsSuccessful()) {
             logger.debug(`Value of field "%s" is unique.`, fieldName);

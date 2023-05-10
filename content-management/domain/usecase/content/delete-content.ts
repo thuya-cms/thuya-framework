@@ -3,8 +3,8 @@ import { ContentDefinition } from "../../entity/content-definition";
 import factory from "../../factory";
 
 class DeleteContent<T> {
-    execute(contentDefinition: ContentDefinition<T>, id: string): Result {
-        factory.getContentPersistency().deleteContent(contentDefinition.getName(), id);
+    async execute(contentDefinition: ContentDefinition<T>, id: string): Promise<Result> {
+        await factory.getContentPersistency().deleteContent(contentDefinition.getName(), id);
         logger.info(`Content of type "%s" deleted successfully.`, contentDefinition.getName());
 
         return Result.success();

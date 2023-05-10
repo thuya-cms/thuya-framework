@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from "express";
+import { Request, Response } from "express";
 import listContent from "../domain/usecase/content/list-content";
 import createContent from "../domain/usecase/content/create-content";
 import readContentDefinition from "../domain/usecase/content-definition/read-content-definition";
@@ -8,17 +8,15 @@ import updateContent from "../domain/usecase/content/update-content";
 import expressHelper from "../../common/utility/express-helper";
 
 class ExpressContentManager {
-    listContent(request: Request, response: Response, next: NextFunction) {
+    async listContent(request: Request, response: Response) {
         try {
             const contentName = expressHelper.getContentName(request);
 
-            const listContentResult = listContent.execute(contentName);
+            const listContentResult = await listContent.execute(contentName);
             if (listContentResult.getIsFailing())
                 throw new Error(listContentResult.getMessage());
     
             response.status(200).json(listContentResult.getResult());
-            
-            next();
         }
 
         catch (error: any) {
@@ -30,7 +28,7 @@ class ExpressContentManager {
         }
     }
 
-    readContent(request: Request, response: Response, next: NextFunction) {
+    async readContent(request: Request, response: Response) {
         try {
             const contentName = expressHelper.getContentName(request);
             const id = request.params.id;
@@ -39,13 +37,11 @@ class ExpressContentManager {
             if (readContentDefinitionResult.getIsFailing())
                 throw new Error(readContentDefinitionResult.getMessage());
 
-            const readContentResult = readContent.byId(readContentDefinitionResult.getResult()!, id);
+            const readContentResult = await readContent.byId(readContentDefinitionResult.getResult()!, id);
             if (readContentResult.getIsFailing())
                 throw new Error(readContentResult.getMessage());
 
             response.status(200).json(readContentResult.getResult());
-
-            next();
         }
 
         catch (error: any) {
@@ -57,7 +53,7 @@ class ExpressContentManager {
         }
     }
     
-    createContent(request: Request, response: Response, next: NextFunction) {
+    async createContent(request: Request, response: Response) {
         try {
             const contentName = expressHelper.getContentName(request);
             const content = request.body;
@@ -66,13 +62,11 @@ class ExpressContentManager {
             if (readContentDefinitionResult.getIsFailing())
                 throw new Error(readContentDefinitionResult.getMessage());
             
-            const createContentResult = createContent.execute(readContentDefinitionResult.getResult()!, content);
+            const createContentResult = await createContent.execute(readContentDefinitionResult.getResult()!, content);
             if (createContentResult.getIsFailing())
                 throw new Error(createContentResult.getMessage());
     
             response.status(201).json({ id: createContentResult.getResult() });
-    
-            next();
         }
 
         catch (error: any) {
@@ -84,7 +78,7 @@ class ExpressContentManager {
         }
     }
 
-    deleteContent(request: Request, response: Response, next: NextFunction) {
+    async deleteContent(request: Request, response: Response) {
         const contentName = expressHelper.getContentName(request);
         const id = request.params.id;
 
@@ -93,13 +87,11 @@ class ExpressContentManager {
             if (readContentDefinitionResult.getIsFailing())
                 throw new Error(readContentDefinitionResult.getMessage());
 
-            const deleteContentResult = deleteContent.execute(readContentDefinitionResult.getResult()!, id);
+            const deleteContentResult = await deleteContent.execute(readContentDefinitionResult.getResult()!, id);
             if (deleteContentResult.getIsFailing())
                 throw new Error(deleteContentResult.getMessage());
 
             response.sendStatus(200);
-
-            next();
         }
 
         catch (error: any) {
@@ -111,7 +103,7 @@ class ExpressContentManager {
         }
     }
 
-    updateContent(request: Request, response: Response, next: NextFunction) {
+    async updateContent(request: Request, response: Response) {
         const contentName = expressHelper.getContentName(request);
         const content = request.body;
 
@@ -120,13 +112,11 @@ class ExpressContentManager {
             if (readContentDefinitionResult.getIsFailing())
                 throw new Error(readContentDefinitionResult.getMessage());
 
-            const updateContentResult = updateContent.execute(readContentDefinitionResult.getResult()!, content);
+            const updateContentResult = await updateContent.execute(readContentDefinitionResult.getResult()!, content);
             if (updateContentResult.getIsFailing())
                 throw new Error(updateContentResult.getMessage());
 
             response.sendStatus(200);
-
-            next();
         }
 
         catch (error: any) {
