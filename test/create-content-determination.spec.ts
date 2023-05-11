@@ -7,8 +7,8 @@ import contentDefinitionUtil from "./util/content-definition-util";
 import handlerAccessor from "../content-management/persistency/handler-accessor";
 
 describe("determinations when creating content", () => {
-    beforeEach(() => {
-        contentDefinitionUtil.defineContentField(new TextContentFieldDefinitionDTO("", "id"));
+    beforeEach(async () => {
+        await contentDefinitionUtil.defineContentField(new TextContentFieldDefinitionDTO("", "id"));
     });
     
     afterEach(() => {
@@ -22,11 +22,11 @@ describe("determinations when creating content", () => {
         contentField.addDetermination((data) => {
             return "Updated " + data;
         });
-        contentDefinitionUtil.defineContentField(contentField);
+        await contentDefinitionUtil.defineContentField(contentField);
 
         const contentDefinition = new ContentDefinitionDTO("", "definition");
         contentDefinition.addContentField("fieldOne", contentField);
-        contentDefinitionUtil.defineContent(contentDefinition);
+        await contentDefinitionUtil.defineContent(contentDefinition);
 
         const createContentResult = await contentManager.createContent("definition", {
             fieldOne: "data1"

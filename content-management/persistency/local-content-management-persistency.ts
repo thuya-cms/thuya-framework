@@ -15,45 +15,45 @@ class LocalContentManagementPersistency implements IContentDefinitionPersistency
     
     
     
-    createContentDefinition(contentDefinitionData: ContentDefinitionData): string {
+    createContentDefinition(contentDefinitionData: ContentDefinitionData): Promise<string> {
         contentDefinitionData.id = uuid();
         this.contentDefinitions.push(contentDefinitionData);
 
-        return contentDefinitionData.id;
+        return Promise.resolve(contentDefinitionData.id);
     }
 
-    readContentDefinition(contentName: string): ContentDefinitionData {
+    readContentDefinition(contentName: string): Promise<ContentDefinitionData> {
         const contentDefinitionData = this.contentDefinitions.find(contentDefinition => contentDefinition.name === contentName);
 
         if (!contentDefinitionData)
             throw new Error("Content definition not found.");
 
-        return contentDefinitionData;
+        return Promise.resolve(contentDefinitionData);
     }
     
-    readContentFieldDefinitionById(id: string): ContentFieldDefinitionData {
+    readContentFieldDefinitionById(id: string): Promise<ContentFieldDefinitionData> {
         const contentDefinitionData = this.contentFieldDefinitions.find(contentFieldDefinition => contentFieldDefinition.id === id);
 
         if (!contentDefinitionData)
             throw new Error("Content definition not found.");
 
-        return contentDefinitionData;
+        return Promise.resolve(contentDefinitionData);
     }
     
-    readContentFieldDefinitionByName(name: string): ContentFieldDefinitionData {
+    readContentFieldDefinitionByName(name: string): Promise<ContentFieldDefinitionData> {
         const contentDefinitionData = this.contentFieldDefinitions.find(contentFieldDefinition => contentFieldDefinition.name === name);
 
         if (!contentDefinitionData)
             throw new Error("Content definition not found.");
 
-        return contentDefinitionData;
+        return Promise.resolve(contentDefinitionData);
     }
 
-    createContentFieldDefinition(contentFieldDefinitionData: ContentFieldDefinitionData): string {
+    createContentFieldDefinition(contentFieldDefinitionData: ContentFieldDefinitionData): Promise<string> {
         contentFieldDefinitionData.id = uuid();
         this.contentFieldDefinitions.push(contentFieldDefinitionData);
 
-        return contentFieldDefinitionData.id;
+        return Promise.resolve(contentFieldDefinitionData.id);
     }
 
     
@@ -75,7 +75,7 @@ class LocalContentManagementPersistency implements IContentDefinitionPersistency
         return Promise.resolve(content.id);
     }
 
-    async deleteContent(contentName: string, id: string) {
+    deleteContent(contentName: string, id: string): Promise<void> {
         const contentList = this.content.find(content => content.contentName === contentName);
         
         if (!contentList)
@@ -87,9 +87,11 @@ class LocalContentManagementPersistency implements IContentDefinitionPersistency
             throw new Error("Content not found.");
 
         contentList.content.splice(contentIndex, 1);
+
+        return Promise.resolve();
     }
 
-    async updateContent(contentName: string, content: any) {
+    updateContent(contentName: string, content: any): Promise<void> {
         const contentList = this.content.find(content => content.contentName === contentName);
         
         if (!contentList)
@@ -102,15 +104,17 @@ class LocalContentManagementPersistency implements IContentDefinitionPersistency
 
         contentList.content.splice(oldContentIndex, 1);
         contentList.content.push(content);
+
+        return Promise.resolve();
     }
 
-    async listContent(contentName: string) {
+    listContent(contentName: string) {
         const list = this.content.find(content => content.contentName === contentName);
 
-        return list ? list.content : [];
+        return list ? Promise.resolve(list.content) : Promise.resolve([]);
     }
 
-    async readContent(contentName: string, id: string) {
+    readContent(contentName: string, id: string) {
         const contentList = this.content.find(content => content.contentName === contentName);
         
         if (!contentList)
@@ -124,7 +128,7 @@ class LocalContentManagementPersistency implements IContentDefinitionPersistency
         return content;
     }
 
-    async readContentByFieldValue(fieldValue: { name: string; value: any; }, contentName: string) {
+    readContentByFieldValue(fieldValue: { name: string; value: any; }, contentName: string) {
         const contentList = this.content.find(content => content.contentName === contentName);
         
         if (!contentList)

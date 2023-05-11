@@ -4,8 +4,8 @@ import contentDefinitionRepository from '../../../repository/content-definition-
 import { ContentDefinition } from '../../entity/content-definition';
 
 class CreateContentDefinition {
-    execute(contentDefinition: ContentDefinition): Result {
-        contentDefinitionRepository.createContentDefinition(contentDefinition);
+    async execute(contentDefinition: ContentDefinition): Promise<Result> {
+        await contentDefinitionRepository.createContentDefinition(contentDefinition);
 
         logger.info(`Content definition "%s" created successfully.`, contentDefinition.getName());
 

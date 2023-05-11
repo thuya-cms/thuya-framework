@@ -4,15 +4,15 @@ import { ContentFieldDefinitionDTO } from "../../content-management/app/dto/cont
 import ContentDefinitionDTO from "../../content-management/app/dto/content-definition";
 
 class ContentDefinitionUtility {
-    defineContentField(contentFieldDefinition: ContentFieldDefinitionDTO): ContentFieldDefinitionDTO {
-        const createContentFieldDefinitionResult = contentDefinitionManager.createContentFieldDefinition(contentFieldDefinition);
+    async defineContentField(contentFieldDefinition: ContentFieldDefinitionDTO): Promise<ContentFieldDefinitionDTO> {
+        const createContentFieldDefinitionResult = await contentDefinitionManager.createContentFieldDefinition(contentFieldDefinition);
         should().equal(createContentFieldDefinitionResult.getIsSuccessful(), true, createContentFieldDefinitionResult.getMessage());
 
         return contentFieldDefinition;
     }
 
-    defineContent(contentDefinition: ContentDefinitionDTO): ContentDefinitionDTO {
-        const createContentDefinitionResult = contentDefinitionManager.createContentDefinition(contentDefinition);
+    async defineContent(contentDefinition: ContentDefinitionDTO): Promise<ContentDefinitionDTO> {
+        const createContentDefinitionResult = await contentDefinitionManager.createContentDefinition(contentDefinition);
         should().equal(createContentDefinitionResult.getIsSuccessful(), true, createContentDefinitionResult.getMessage());
 
         return contentDefinition;

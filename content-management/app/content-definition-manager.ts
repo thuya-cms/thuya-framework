@@ -14,20 +14,20 @@ import { ContentFieldDefinitionDTO, ContentFieldType } from "./dto/content-field
 import GroupContentFieldDefinitionDTO from "./dto/content-field-definition/group-content-field-definition";
 
 class ContentDefinitionManager {
-    createContentDefinition(contentDefinition: ContentDefinitionDTO): Result {
+    async createContentDefinition(contentDefinition: ContentDefinitionDTO): Promise<Result> {
         const contentDefinitionEntityResult = this.convertDtoToEntity(contentDefinition);
         if (contentDefinitionEntityResult.getIsFailing())
             return Result.error(contentDefinitionEntityResult.getMessage());
 
-        return createContentDefinition.execute(contentDefinitionEntityResult.getResult()!);
+        return await createContentDefinition.execute(contentDefinitionEntityResult.getResult()!);
     }
 
-    createContentFieldDefinition(contentFieldDefinition: ContentFieldDefinitionDTO): Result {
+    async createContentFieldDefinition(contentFieldDefinition: ContentFieldDefinitionDTO): Promise<Result> {
         const contentFieldDefinitionEntityResult = this.convertFieldDefinitionDtoToEntity(contentFieldDefinition);
         if (contentFieldDefinitionEntityResult.getIsFailing())
             return Result.error(contentFieldDefinitionEntityResult.getMessage());
 
-        return createContentFieldDefinition.execute(contentFieldDefinitionEntityResult.getResult()!);
+        return await createContentFieldDefinition.execute(contentFieldDefinitionEntityResult.getResult()!);
     }
 
 

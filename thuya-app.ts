@@ -95,20 +95,20 @@ class ThuyaApp {
     private async useContentProvider(contentProvider: ContentProvider) {
         logger.debug(`Creating content field definitions.`);
         for (const contentFieldDefinition of contentProvider.getContentFieldDefinitions()) {
-            contentDefinitionManager.createContentFieldDefinition(contentFieldDefinition);
+            await contentDefinitionManager.createContentFieldDefinition(contentFieldDefinition);
         }
 
         logger.debug(`Creating content definitions.`);
         for (const contentDefinition of contentProvider.getContentDefinitions()) {
-            this.registerContentDefinition(contentDefinition);
+            await this.registerContentDefinition(contentDefinition);
         }
 
         logger.debug(`Creating content.`);
         await contentProvider.createContent();
     }
 
-    private registerContentDefinition(contentDefinition: ContentDefinitionDTO) {
-        contentDefinitionManager.createContentDefinition(contentDefinition);
+    private async registerContentDefinition(contentDefinition: ContentDefinitionDTO) {
+        await contentDefinitionManager.createContentDefinition(contentDefinition);
 
         this._expressApp.get("/" + contentDefinition.getName(), expressContentManager.listContent.bind(expressContentManager));
         this._expressApp.get("/" + contentDefinition.getName() + "/:id", expressContentManager.readContent.bind(expressContentManager));

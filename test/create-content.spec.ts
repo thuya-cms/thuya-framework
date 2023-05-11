@@ -13,14 +13,14 @@ describe("create content", () => {
     let contentDefinition: ContentDefinitionDTO;
     
     
-    beforeEach(() => {
-        contentDefinitionUtil.defineContentField(new TextContentFieldDefinitionDTO("", "id"));
+    beforeEach(async () => {
+        await contentDefinitionUtil.defineContentField(new TextContentFieldDefinitionDTO("", "id"));
 
-        const textField = contentDefinitionUtil.defineContentField(new TextContentFieldDefinitionDTO("", "text-field"));
-        const numField = contentDefinitionUtil.defineContentField(new NumericContentFieldDefinitionDTO("", "numeric-field-1"));
-        const dateField = contentDefinitionUtil.defineContentField(new DateContentFieldDefinitionDTO("", "date-field-1"));
-        const arrayElementField = contentDefinitionUtil.defineContentField(new TextContentFieldDefinitionDTO("", "array-content"));
-        const arrayField = contentDefinitionUtil.defineContentField(new ArrayContentFieldDefinitionDTO("", "array-field-1", arrayElementField));
+        const textField = await contentDefinitionUtil.defineContentField(new TextContentFieldDefinitionDTO("", "text-field"));
+        const numField = await contentDefinitionUtil.defineContentField(new NumericContentFieldDefinitionDTO("", "numeric-field-1"));
+        const dateField = await contentDefinitionUtil.defineContentField(new DateContentFieldDefinitionDTO("", "date-field-1"));
+        const arrayElementField = await contentDefinitionUtil.defineContentField(new TextContentFieldDefinitionDTO("", "array-content"));
+        const arrayField = await contentDefinitionUtil.defineContentField(new ArrayContentFieldDefinitionDTO("", "array-field-1", arrayElementField));
 
         contentDefinition = new ContentDefinitionDTO("", "test-definition")
         contentDefinition.addContentField(
@@ -32,7 +32,7 @@ describe("create content", () => {
         contentDefinition.addContentField("dateField", dateField);
         contentDefinition.addContentField("arrayField", arrayField);
         
-        contentDefinitionUtil.defineContent(contentDefinition);
+        await contentDefinitionUtil.defineContent(contentDefinition);
     });
 
     afterEach(() => {

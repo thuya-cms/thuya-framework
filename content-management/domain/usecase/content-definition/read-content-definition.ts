@@ -3,8 +3,8 @@ import contentDefinitionRepository from "../../../repository/content-definition-
 import { ContentDefinition } from "../../entity/content-definition";
 
 class ReadContentDefinition {
-    execute(contentName: string): Result<ContentDefinition> {
-        const contentDefinition = contentDefinitionRepository.readContentDefinition(contentName);
+    async execute(contentName: string): Promise<Result<ContentDefinition>> {
+        const contentDefinition = await contentDefinitionRepository.readContentDefinition(contentName);
 
         if (!contentDefinition) {
             logger.error(`Content definition "%s" not found.`, contentName);

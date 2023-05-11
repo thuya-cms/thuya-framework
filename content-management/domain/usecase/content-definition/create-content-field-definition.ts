@@ -3,8 +3,8 @@ import contentDefinitionRepository from "../../../repository/content-definition-
 import { ContentFieldDefinition } from "../../entity/content-field-definition/content-field-definition";
 
 class CreateContentFieldDefinition {
-    execute(contentFieldDefinition: ContentFieldDefinition): Result {
-        contentDefinitionRepository.createContentFieldDefinition(contentFieldDefinition);
+    async execute(contentFieldDefinition: ContentFieldDefinition): Promise<Result> {
+        await contentDefinitionRepository.createContentFieldDefinition(contentFieldDefinition);
 
         logger.info(`Content field definition "%s" created successfully.`, contentFieldDefinition.getName());
 

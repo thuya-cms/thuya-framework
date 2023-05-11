@@ -26,11 +26,11 @@ type ContentFieldDefinitionData = {
 }
 
 interface IContentDefinitionPersistency {
-    readContentDefinition(contentName: string): ContentDefinitionData;
-    readContentFieldDefinitionById(id: string): ContentFieldDefinitionData;
-    readContentFieldDefinitionByName(name: string): ContentFieldDefinitionData;
-    createContentDefinition(contentDefinitionData: ContentDefinitionData): string;
-    createContentFieldDefinition(contentFieldDefinitionData: ContentFieldDefinitionData): string;
+    readContentDefinition(contentName: string): Promise<ContentDefinitionData>;
+    readContentFieldDefinitionById(id: string): Promise<ContentFieldDefinitionData>;
+    readContentFieldDefinitionByName(name: string): Promise<ContentFieldDefinitionData>;
+    createContentDefinition(contentDefinitionData: ContentDefinitionData): Promise<string>;
+    createContentFieldDefinition(contentFieldDefinitionData: ContentFieldDefinitionData): Promise<string>;
 }
 
 export default IContentDefinitionPersistency;

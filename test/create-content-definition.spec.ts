@@ -7,8 +7,8 @@ import contentDefinitionUtil from "./util/content-definition-util";
 import handlerAccessor from "../content-management/persistency/handler-accessor";
 
 describe("create content definition", () => {
-    beforeEach(() => {
-        contentDefinitionUtil.defineContentField(new TextContentFieldDefinitionDTO("", "id"));
+    beforeEach(async () => {
+        await contentDefinitionUtil.defineContentField(new TextContentFieldDefinitionDTO("", "id"));
     });
 
     afterEach(() => {
@@ -17,34 +17,34 @@ describe("create content definition", () => {
     });
 
 
-    it("should be created wo fields", () => {
-        contentDefinitionUtil.defineContent(new ContentDefinitionDTO("", "test-definition"));
+    it("should be created wo fields", async () => {
+        await contentDefinitionUtil.defineContent(new ContentDefinitionDTO("", "test-definition"));
     });
     
-    it("should fail for empty name", () => {
+    it("should fail for empty name", async () => {
         const contentDefinition = new ContentDefinitionDTO("", "");
-        const createContentDefinitionResult = contentDefinitionManager.createContentDefinition(contentDefinition);
+        const createContentDefinitionResult = await contentDefinitionManager.createContentDefinition(contentDefinition);
 
         should().equal(createContentDefinitionResult.getIsFailing(), true);
     });
 
-    it("should be created with one field", () => {
-        const testField = contentDefinitionUtil.defineContentField(new TextContentFieldDefinitionDTO("", "test-field"));
+    it("should be created with one field", async () => {
+        const testField = await contentDefinitionUtil.defineContentField(new TextContentFieldDefinitionDTO("", "test-field"));
 
         const contentDefinition = new ContentDefinitionDTO("", "test-definition");
         contentDefinition.addContentField("test", testField);
 
-        contentDefinitionUtil.defineContent(new ContentDefinitionDTO("", "test-definition"));
+        await contentDefinitionUtil.defineContent(new ContentDefinitionDTO("", "test-definition"));
     });
     
-    it("should fail with duplicate fields", () => {
-        const testField = contentDefinitionUtil.defineContentField(new TextContentFieldDefinitionDTO("", "test-field"));
+    it("should fail with duplicate fields", async () => {
+        const testField = await contentDefinitionUtil.defineContentField(new TextContentFieldDefinitionDTO("", "test-field"));
 
         const contentDefinition = new ContentDefinitionDTO("", "test-definition");
         contentDefinition.addContentField("test", testField);
         contentDefinition.addContentField("test", testField);
 
-        const createContentDefinitionResult = contentDefinitionManager.createContentDefinition(contentDefinition);
+        const createContentDefinitionResult = await contentDefinitionManager.createContentDefinition(contentDefinition);
         should().equal(createContentDefinitionResult.getIsFailing(), true);
         should().equal(createContentDefinitionResult.getMessage(), `Field with name "test" is already added.`);
     });
