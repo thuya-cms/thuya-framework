@@ -8,17 +8,18 @@ import contentDefinitionManager from './content-management/app/content-definitio
 import Module from './module';
 import ContentDefinitionDTO from './content-management/app/dto/content-definition';
 import dotenv from "dotenv";
-import TextContentFieldDefinitionDTO from './content-management/app/dto/content-field-definition/text-content-field-definition';
 import IContentDefinitionPersistency from './content-management/persistency/content-definition-persistency.interface';
 import factory from './content-management/domain/factory';
 import { IContentPersistency } from './content-management/domain';
 import correlator from 'express-correlation-id';
+import frameworkSettingsContentDefinition from './content/framework-settings-content-definition';
+import frameworkSettingsContentProvider from './content/framework-settings-content-provider';
 
 class ThuyaApp {
     private _expressApp: express.Application;
     private _port: string = process.env.PORT || "8080";
     private _expressServer?: http.Server;
-
+    private _frameworkSettings: any;
     
 
     constructor() {
@@ -32,11 +33,24 @@ class ThuyaApp {
 		this._expressApp.use(bodyParser.urlencoded({ extended: false }));
 
         this._expressServer = undefined;
-        
-        contentDefinitionManager.createContentFieldDefinition(new TextContentFieldDefinitionDTO("", "id"));
     }
 
 
+    public async initialize() {
+        logger.debug("Initializing framework...");
+
+        const frameworkSettingsContentDefinitionResult = await contentDefinitionManager.readContentDefinitionByName(frameworkSettingsContentDefinition.getName());
+        if (frameworkSettingsContentDefinitionResult.getIsFailing()) {
+            logger.debug("Framework not yet initialized. Starting initialization.");
+            await this.useContentProvider(frameworkSettingsContentProvider);
+        }
+        else{
+            logger.debug(`Framework is already initialized.`);
+            this._frameworkSettings = frameworkSettingsContentDefinitionResult.getResult()!;
+        }
+
+        logger.debug("...Framework initialization complete.");
+    }
 
     /**
      * Load content types and start the Thuya CMS application.
@@ -78,9 +92,11 @@ class ThuyaApp {
         for (const controller of module.getControllers()) 
             this._expressApp.use(controller.getRouter())
 
-        logger.debug(`Using content providers of module "%s".`, module.getMetadata().name);
-        for (const contentProvider of module.getContentProviders()) 
-            await this.useContentProvider(contentProvider);
+        if (!this._frameworkSettings) {
+            logger.debug(`Using content providers of module "%s".`, module.getMetadata().name);
+            for (const contentProvider of module.getContentProviders()) 
+                await this.useContentProvider(contentProvider);
+        }
     }
 
     public useContentDefinitionPersistency(persistency: IContentDefinitionPersistency) {

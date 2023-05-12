@@ -8,10 +8,14 @@ import NumericContentFieldDefinition from "../domain/entity/content-field-defini
 import TextContentFieldDefinition from "../domain/entity/content-field-definition/text-content-field-definition";
 import createContentDefinition from "../domain/usecase/content-definition/create-content-definition";
 import createContentFieldDefinition from "../domain/usecase/content-definition/create-content-field-definition";
+import readContentDefinition from "../domain/usecase/content-definition/read-content-definition";
 import ContentDefinitionDTO from "./dto/content-definition";
 import ArrayContentFieldDefinitionDTO from "./dto/content-field-definition/array-content-field-definition";
 import { ContentFieldDefinitionDTO, ContentFieldType } from "./dto/content-field-definition/content-field-definition";
+import DateContentFieldDefinitionDTO from "./dto/content-field-definition/date-content-field-definition";
 import GroupContentFieldDefinitionDTO from "./dto/content-field-definition/group-content-field-definition";
+import NumericContentFieldDefinitionDTO from "./dto/content-field-definition/numeric-content-field-definition";
+import TextContentFieldDefinitionDTO from "./dto/content-field-definition/text-content-field-definition";
 
 class ContentDefinitionManager {
     async createContentDefinition(contentDefinition: ContentDefinitionDTO): Promise<Result> {
@@ -28,6 +32,16 @@ class ContentDefinitionManager {
             return Result.error(contentFieldDefinitionEntityResult.getMessage());
 
         return await createContentFieldDefinition.execute(contentFieldDefinitionEntityResult.getResult()!);
+    }
+
+    async readContentDefinitionByName(contentDefinitionName: string): Promise<Result<ContentDefinitionDTO>> {
+        const contentDefinitionResult = await readContentDefinition.execute(contentDefinitionName);
+        if (contentDefinitionResult.getIsFailing())
+            return Result.error(contentDefinitionResult.getMessage());
+
+        const contentDefinitionDTO = this.convertEntityToDto(contentDefinitionResult.getResult()!);
+
+        return Result.success(contentDefinitionDTO);
     }
 
 
@@ -51,6 +65,18 @@ class ContentDefinitionManager {
         }
 
         return Result.success(contentDefinitionEntity);
+    }
+
+    private convertEntityToDto(contentDefinition: ContentDefinition): ContentDefinitionDTO {
+        const contentDefinitionDTO = new ContentDefinitionDTO(contentDefinition.getId(), contentDefinition.getName());
+        
+        for (const contentField of contentDefinition.getContentFields()) {
+            const fieldDefinitionDTO = this.convertFieldDefinitionEntityToDto(contentField.contentFieldDefinition);
+
+            contentDefinitionDTO.addContentField(contentField.name, fieldDefinitionDTO, contentField.options);
+        }
+
+        return contentDefinitionDTO;
     }
 
     private convertFieldDefinitionDtoToEntity(contentFieldDefinitionDTO: ContentFieldDefinitionDTO): Result<ContentFieldDefinition> {
@@ -150,6 +176,80 @@ class ContentDefinitionManager {
         contentFieldDefinitionDTO.getDeterminations().forEach(determination => contentFieldEntity.addDetermination(determination));
 
         return Result.success(contentFieldEntity);
+    }
+    
+    private convertFieldDefinitionEntityToDto(contentFieldDefinition: ContentFieldDefinition): ContentFieldDefinitionDTO {
+        let contentFieldDTO!: ContentFieldDefinitionDTO;
+
+        switch (contentFieldDefinition.getType()) {
+            case ContentFieldType.Array: {
+                const arrayContentFieldDefinition: ArrayContentFieldDefinition = contentFieldDefinition as ArrayContentFieldDefinition;
+
+                const arrayElementField = this.convertFieldDefinitionEntityToDto(arrayContentFieldDefinition.getArrayElementType());
+                
+                const arrayField = new ArrayContentFieldDefinitionDTO(
+                    arrayContentFieldDefinition.getId(),
+                    arrayContentFieldDefinition.getName(),
+                    arrayElementField);
+                
+                contentFieldDTO = arrayField;
+
+                break;
+            }
+
+            case ContentFieldType.Date: {
+                const dateFieldDTO = new DateContentFieldDefinitionDTO(contentFieldDefinition.getId(), contentFieldDefinition.getName());
+
+                contentFieldDTO = dateFieldDTO;
+
+                break;
+            }
+
+            case ContentFieldType.Numeric: {
+                const numericFieldDTO = new NumericContentFieldDefinitionDTO(contentFieldDefinition.getId(), contentFieldDefinition.getName());
+
+                contentFieldDTO = numericFieldDTO;
+
+                break;
+            }
+
+            case ContentFieldType.Text: {
+                const textFieldDTO = new TextContentFieldDefinitionDTO(contentFieldDefinition.getId(), contentFieldDefinition.getName());
+
+                contentFieldDTO = textFieldDTO;
+
+                break;
+            }
+
+            case ContentFieldType.Group: {
+                const groupContentFieldDefinition: GroupContentFieldDefinition = contentFieldDefinition as GroupContentFieldDefinition;
+                
+                const groupFieldDTO = new GroupContentFieldDefinitionDTO(contentFieldDefinition.getId(), contentFieldDefinition.getName());
+                
+                contentFieldDTO = groupFieldDTO;
+                const groupContentFieldDTO: GroupContentFieldDefinitionDTO = contentFieldDTO as GroupContentFieldDefinitionDTO;
+                
+                for(const contentField of groupContentFieldDefinition.getContentFields()) {
+                    const groupElementField = this.convertFieldDefinitionEntityToDto(contentField.contentFieldDefinition);
+
+                    groupContentFieldDTO.addContentField(
+                        contentField.name, 
+                        groupElementField,
+                        contentField.options);
+                }
+
+                break;
+            }
+
+            default:
+                logger.error(`Field type "%s" is not valid.`, contentFieldDefinition.getType())
+                throw new Error(`Field type "${contentFieldDefinition.getType()}" is not valid.`);
+        }
+
+        contentFieldDefinition.getValidators().forEach(validator => contentFieldDTO.addValidator(validator));
+        contentFieldDefinition.getDeterminations().forEach(determination => contentFieldDTO.addDetermination(determination));
+
+        return contentFieldDTO;
     }
 }
 
