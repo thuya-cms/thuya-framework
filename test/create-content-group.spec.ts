@@ -7,7 +7,6 @@ import NumericContentFieldDefinitionDTO from "../content-management/app/dto/cont
 import TextContentFieldDefinitionDTO from "../content-management/app/dto/content-field-definition/text-content-field-definition";
 import localContentManagementPersistency from "../content-management/persistency/local-content-management-persistency";
 import contentDefinitionUtil from "./util/content-definition-util";
-import handlerAccessor from "../content-management/persistency/handler-accessor";
 
 describe("create content with group", () => {
     let contentDefinition: ContentDefinitionDTO;
@@ -21,7 +20,6 @@ describe("create content with group", () => {
 
     afterEach(() => {
         localContentManagementPersistency.clear();
-        handlerAccessor.clear();
     });
 
 

@@ -1,5 +1,6 @@
 import { Result, logger } from "../../../../common";
 import Entity from "../../../../common/entity";
+import IContentFieldHandlerProvider, { ContentFieldDetermination, ContentFieldValidator, ContentFieldValue } from "./content-field-handler-provider.interface";
 
 enum ContentFieldType {
     Numeric = "numeric",
@@ -9,11 +10,7 @@ enum ContentFieldType {
     Group = "group"
 }
 
-type ContentFieldValue = string | Date | number | string[] | Date[] | number[] | any; // TODO: any could be used.
-type ContentFieldValidator = (contentFieldData: ContentFieldValue) => Result;
-type ContentFieldDetermination = (contentFieldData: ContentFieldValue) => ContentFieldValue;
-
-abstract class ContentFieldDefinition extends Entity {
+abstract class ContentFieldDefinition extends Entity implements IContentFieldHandlerProvider {
     private validators: ContentFieldValidator[] = [];
     private determinations: ContentFieldDetermination[] = [];
 
@@ -22,7 +19,8 @@ abstract class ContentFieldDefinition extends Entity {
     constructor(
             id: string, 
             private name: string, 
-            private type: ContentFieldType) {
+            private type: ContentFieldType,
+            private filePath?: string) {
         super(id);
         
         if (!name) {
@@ -37,6 +35,10 @@ abstract class ContentFieldDefinition extends Entity {
     }
 
 
+
+    getPath(): string {
+        return this.filePath || "";
+    }
 
     getName(): string {
         return this.name;
@@ -86,4 +88,4 @@ abstract class ContentFieldDefinition extends Entity {
     }
 }
 
-export { ContentFieldDefinition, ContentFieldType, ContentFieldValue, ContentFieldValidator, ContentFieldDetermination };
+export { ContentFieldDefinition, ContentFieldType };

@@ -1,17 +1,18 @@
 import { Result } from "../../../../common";
 import logger from "../../../../common/utility/logger";
-import { ContentFieldDefinition, ContentFieldType, ContentFieldValue } from "./content-field-definition";
+import { ContentFieldDefinition, ContentFieldType } from "./content-field-definition";
+import { ContentFieldValue } from "./content-field-handler-provider.interface";
 
 class ArrayContentFieldDefinition extends ContentFieldDefinition {    
-    protected constructor(id: string, name: string, private arrayElementType: ContentFieldDefinition) {
-        super(id, name, ContentFieldType.Array);
+    protected constructor(id: string, name: string, private arrayElementType: ContentFieldDefinition, filePath?: string) {
+        super(id, name, ContentFieldType.Array, filePath);
     }
 
 
 
-    static create(id: string, name: string, arrayElementType: ContentFieldDefinition): Result<ArrayContentFieldDefinition> {
+    static create(id: string, name: string, arrayElementType: ContentFieldDefinition, filePath?: string): Result<ArrayContentFieldDefinition> {
         try {
-            const contentFieldDefinition = new ArrayContentFieldDefinition(id, name, arrayElementType);
+            const contentFieldDefinition = new ArrayContentFieldDefinition(id, name, arrayElementType, filePath);
             return Result.success(contentFieldDefinition);
         }
 
@@ -33,11 +34,11 @@ class ArrayContentFieldDefinition extends ContentFieldDefinition {
 
         const array: any[] = fieldValue;
 
-        array.forEach(arrayElementValue => {
+        for (const arrayElementValue of array) {
             const result = this.arrayElementType.validateValue(arrayElementValue);
-
+    
             if (result.getIsFailing()) return result;
-        });
+        }
         
         return super.validateValue(fieldValue);
     }

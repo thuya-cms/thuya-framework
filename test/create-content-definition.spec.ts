@@ -4,7 +4,6 @@ import ContentDefinitionDTO from "../content-management/app/dto/content-definiti
 import TextContentFieldDefinitionDTO from "../content-management/app/dto/content-field-definition/text-content-field-definition";
 import localContentManagementPersistency from "../content-management/persistency/local-content-management-persistency";
 import contentDefinitionUtil from "./util/content-definition-util";
-import handlerAccessor from "../content-management/persistency/handler-accessor";
 
 describe("create content definition", () => {
     beforeEach(async () => {
@@ -13,7 +12,6 @@ describe("create content definition", () => {
 
     afterEach(() => {
         localContentManagementPersistency.clear();
-        handlerAccessor.clear();
     });
 
 

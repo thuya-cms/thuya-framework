@@ -1,4 +1,4 @@
-import { Result } from "../../../../common";
+import IContentFieldHandlerProvider, { ContentFieldDetermination, ContentFieldValidator, ContentFieldValue } from "../../../domain/entity/content-field-definition/content-field-handler-provider.interface";
 
 enum ContentFieldType {
     Numeric = "numeric",
@@ -8,16 +8,14 @@ enum ContentFieldType {
     Group = "group"
 }
 
-type ContentFieldValue = string | Date | number | string[] | Date[] | number[]; 
-type ContentFieldValidator = (contentFieldData: ContentFieldValue) => Result;
-type ContentFieldDetermination = (contentFieldData: ContentFieldValue) => ContentFieldValue;
-
-abstract class ContentFieldDefinitionDTO {
+abstract class ContentFieldDefinitionDTO implements IContentFieldHandlerProvider {
     private validators: ContentFieldValidator[] = [];
     private determinations: ContentFieldDetermination[] = [];
 
+    protected filePath = "";
     
     
+
     constructor(
             private id: string, 
             private name: string, 
@@ -25,6 +23,10 @@ abstract class ContentFieldDefinitionDTO {
     }
 
 
+
+    getPath(): string {
+        return this.filePath;
+    }
 
     getId(): string {
         return this.id;
@@ -38,21 +40,22 @@ abstract class ContentFieldDefinitionDTO {
         return this.type;
     }
 
-    addValidator(validator: ContentFieldValidator) {
-        this.validators.push(validator);
-    }
-
     getValidators(): ContentFieldValidator[] {
         return this.validators;
-    }
-    
-    addDetermination(determination: ContentFieldDetermination) {
-        this.determinations.push(determination);
     }
 
     getDeterminations(): ContentFieldDetermination[] {
         return this.determinations;
     }
+
+
+    protected addValidator(validator: ContentFieldValidator) {
+        this.validators.push(validator);
+    }
+    
+    protected addDetermination(determination: ContentFieldDetermination) {
+        this.determinations.push(determination);
+    }
 }
 
-export { ContentFieldDefinitionDTO, ContentFieldType, ContentFieldValue };
+export { ContentFieldDefinitionDTO, ContentFieldType };

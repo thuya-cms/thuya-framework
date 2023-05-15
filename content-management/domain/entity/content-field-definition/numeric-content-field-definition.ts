@@ -1,17 +1,18 @@
 import { Result } from "../../../../common";
 import logger from "../../../../common/utility/logger";
-import { ContentFieldDefinition, ContentFieldType, ContentFieldValue } from "./content-field-definition";
+import { ContentFieldDefinition, ContentFieldType } from "./content-field-definition";
+import { ContentFieldValue } from "./content-field-handler-provider.interface";
 
 class NumericContentFieldDefinition extends ContentFieldDefinition {
-    protected constructor(id: string, name: string) {
-        super(id, name, ContentFieldType.Numeric);
+    protected constructor(id: string, name: string, filePath?: string) {
+        super(id, name, ContentFieldType.Numeric, filePath);
     }
 
 
 
-    static create(id: string, name: string): Result<NumericContentFieldDefinition> {
+    static create(id: string, name: string, filePath?: string): Result<NumericContentFieldDefinition> {
         try {
-            const contentFieldDefinition = new NumericContentFieldDefinition(id, name);
+            const contentFieldDefinition = new NumericContentFieldDefinition(id, name, filePath);
             return Result.success(contentFieldDefinition);
         }
 

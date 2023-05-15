@@ -2,6 +2,7 @@ import { logger } from "../../common";
 import { ContentDefinition } from "../domain/entity/content-definition";
 import ArrayContentFieldDefinition from "../domain/entity/content-field-definition/array-content-field-definition";
 import { ContentFieldDefinition, ContentFieldType } from "../domain/entity/content-field-definition/content-field-definition";
+import IContentFieldHandlerProvider from "../domain/entity/content-field-definition/content-field-handler-provider.interface";
 import DateContentFieldDefinition from "../domain/entity/content-field-definition/date-content-field-definition";
 import GroupContentFieldDefinition from "../domain/entity/content-field-definition/group-content-field-definition";
 import NumericContentFieldDefinition from "../domain/entity/content-field-definition/numeric-content-field-definition";
@@ -9,7 +10,6 @@ import TextContentFieldDefinition from "../domain/entity/content-field-definitio
 import factory from "../domain/factory";
 import IContentDefinitionRepository from "../domain/usecase/content-definition-repository.interface";
 import { ContentDefinitionData, ContentFieldDefinitionData } from "../persistency/content-definition-persistency.interface";
-import handlerAccessor from "../persistency/handler-accessor";
 
 class ContentDefinitionRepository implements IContentDefinitionRepository {
     async readContentDefinition(contentName: string): Promise<ContentDefinition | void> {
@@ -30,12 +30,15 @@ class ContentDefinitionRepository implements IContentDefinitionRepository {
             for (const contentFieldDefinitionAssignment of contentDefinitionData.fields) {
                 const contentFieldDefinitionData = await contentDefinitionPersistency.readContentFieldDefinitionById(contentFieldDefinitionAssignment.id);
                 const contentFieldDefinition = await this.convertFieldDataToEntity(contentFieldDefinitionData);
+                const handlerProvider = this.getHandlerProvider(contentFieldDefinitionData.path);
 
-                for (const validator of handlerAccessor.getValidatorsForContentFieldDefinition(contentFieldDefinitionData.id)) 
-                    contentFieldDefinition.addValidator(validator);
-                
-                for (const determination of handlerAccessor.getDeterminationsForContentFieldDefinition(contentFieldDefinitionData.id)) 
-                    contentFieldDefinition.addDetermination(determination);
+                if (handlerProvider) {
+                    for (const validator of handlerProvider.getValidators()) 
+                        contentFieldDefinition.addValidator(validator);
+                    
+                    for (const determination of handlerProvider.getDeterminations()) 
+                        contentFieldDefinition.addDetermination(determination);
+                }
 
                 contentDefinition.addContentField(contentFieldDefinitionAssignment.name, contentFieldDefinition, contentFieldDefinitionAssignment.options);
             }
@@ -84,6 +87,7 @@ class ContentDefinitionRepository implements IContentDefinitionRepository {
     async createContentFieldDefinition(contentFieldDefinition: ContentFieldDefinition): Promise<string> {
         const contentFieldDefinitionData: ContentFieldDefinitionData = {
             id: "",
+            path: contentFieldDefinition.getPath(),
             name: contentFieldDefinition.getName(),
             type: contentFieldDefinition.getType()
         };
@@ -127,13 +131,18 @@ class ContentDefinitionRepository implements IContentDefinitionRepository {
         }
 
         const contentFieldDefinitionId = await factory.getContentDefinitionPersistency().createContentFieldDefinition(contentFieldDefinitionData);
-        
-        handlerAccessor.addValidatorsForContentFieldDefinition(contentFieldDefinitionData.id, contentFieldDefinition.getValidators());
-        handlerAccessor.addDeterminationsForContentFieldDefinition(contentFieldDefinitionData.id, contentFieldDefinition.getDeterminations());
 
         return contentFieldDefinitionId;
     }
 
+
+    private getHandlerProvider(path: string): IContentFieldHandlerProvider | undefined {
+        if (!path || path.trim() === "")
+            return undefined;
+
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        return require(path).default as IContentFieldHandlerProvider;
+    }
 
     private async convertFieldDataToEntity(contentFieldDefinitionData: ContentFieldDefinitionData): Promise<ContentFieldDefinition> {
         let contentFieldDefinition: ContentFieldDefinition;

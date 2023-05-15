@@ -4,7 +4,7 @@ import ContentDefinitionDTO from "../content-management/app/dto/content-definiti
 import TextContentFieldDefinitionDTO from "../content-management/app/dto/content-field-definition/text-content-field-definition";
 import localContentManagementPersistency from "../content-management/persistency/local-content-management-persistency";
 import contentDefinitionUtil from "./util/content-definition-util";
-import handlerAccessor from "../content-management/persistency/handler-accessor";
+import fieldWithDetermination from "./content/field-with-determination";
 
 describe("determinations when creating content", () => {
     beforeEach(async () => {
@@ -13,15 +13,11 @@ describe("determinations when creating content", () => {
     
     afterEach(() => {
         localContentManagementPersistency.clear();
-        handlerAccessor.clear();
     });
 
     
     it("should update the value with determination", async () => {
-        const contentField = new TextContentFieldDefinitionDTO("", "field");
-        contentField.addDetermination((data) => {
-            return "Updated " + data;
-        });
+        const contentField = fieldWithDetermination;
         await contentDefinitionUtil.defineContentField(contentField);
 
         const contentDefinition = new ContentDefinitionDTO("", "definition");

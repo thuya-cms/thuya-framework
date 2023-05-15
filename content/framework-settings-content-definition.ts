@@ -3,7 +3,7 @@ import frameworkVersionContentFieldDefinition from "./framework-version-content-
 
 class FrameworkSettingsContentDefinition extends ContentDefinitionDTO {
     constructor() {
-        super("", "frameworkSettings");
+        super("", "framework-settings");
 
         this.addContentField("frameworkVersion", frameworkVersionContentFieldDefinition, { isRequired: true });
     }

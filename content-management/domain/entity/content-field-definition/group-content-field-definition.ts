@@ -1,7 +1,8 @@
 import { Result, logger } from "../../../../common";
 import contentHelper from "../../../../common/utility/content-helper";
 import expressHelper from "../../../../common/utility/express-helper";
-import { ContentFieldDefinition, ContentFieldType, ContentFieldValue } from "./content-field-definition";
+import { ContentFieldDefinition, ContentFieldType } from "./content-field-definition";
+import { ContentFieldValue } from "./content-field-handler-provider.interface";
 
 type ContentFieldOptions = {
     isRequired?: boolean
@@ -12,15 +13,15 @@ class GroupContentFieldDefinition extends ContentFieldDefinition {
 
     
     
-    protected constructor(id: string, name: string) {
-        super(id, name, ContentFieldType.Group);
+    protected constructor(id: string, name: string, filePath?: string) {
+        super(id, name, ContentFieldType.Group, filePath);
     }
 
 
 
-    static create(id: string, name: string): Result<GroupContentFieldDefinition> {
+    static create(id: string, name: string, filePath?: string): Result<GroupContentFieldDefinition> {
         try {
-            const contentFieldDefinition = new GroupContentFieldDefinition(id, name);
+            const contentFieldDefinition = new GroupContentFieldDefinition(id, name, filePath);
             return Result.success(contentFieldDefinition);
         }
 

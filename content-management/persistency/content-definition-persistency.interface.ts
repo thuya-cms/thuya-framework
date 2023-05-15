@@ -15,6 +15,7 @@ type ContentFieldDefinitionData = {
     id: string,
     name: string,
     type: string,
+    path: string,
     arrayElementDefinitionId?: string,
     groupElements?: {
         id: string,

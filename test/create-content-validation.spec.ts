@@ -5,7 +5,7 @@ import ContentDefinitionDTO from "../content-management/app/dto/content-definiti
 import TextContentFieldDefinitionDTO from "../content-management/app/dto/content-field-definition/text-content-field-definition";
 import localContentManagementPersistency from "../content-management/persistency/local-content-management-persistency";
 import contentDefinitionUtil from "./util/content-definition-util";
-import handlerAccessor from "../content-management/persistency/handler-accessor";
+import fieldWithFailingValidation from "./content/field-with-failing-validation";
 
 describe("validations when creating content", () => {
     beforeEach(async () => {
@@ -14,15 +14,11 @@ describe("validations when creating content", () => {
     
     afterEach(() => {
         localContentManagementPersistency.clear();
-        handlerAccessor.clear();
     });
 
     
     it("should fail with failing validation", async () => {
-        const contentField = new TextContentFieldDefinitionDTO("", "field");
-        contentField.addValidator((data) => {
-            return Result.error(`Validation failed with data ${ data }.`);
-        });
+        const contentField = fieldWithFailingValidation;
         await contentDefinitionUtil.defineContentField(contentField);
 
         const contentDefinition = new ContentDefinitionDTO("", "definition");

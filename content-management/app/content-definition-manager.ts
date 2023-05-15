@@ -94,7 +94,8 @@ class ContentDefinitionManager {
                 const arrayFieldResult = ArrayContentFieldDefinition.create(
                     arrayContentFieldDefinitionDTO.getId(),
                     arrayContentFieldDefinitionDTO.getName(),
-                    arrayElementFieldResult.getResult()!);
+                    arrayElementFieldResult.getResult()!,
+                    arrayContentFieldDefinitionDTO.getPath());
                 
                 if (arrayFieldResult.getIsSuccessful()) 
                     contentFieldEntity = arrayFieldResult.getResult()!;
@@ -105,7 +106,10 @@ class ContentDefinitionManager {
             }
 
             case ContentFieldType.Date: {
-                const dateFieldResult = DateContentFieldDefinition.create(contentFieldDefinitionDTO.getId(), contentFieldDefinitionDTO.getName());
+                const dateFieldResult = DateContentFieldDefinition.create(
+                    contentFieldDefinitionDTO.getId(), 
+                    contentFieldDefinitionDTO.getName(), 
+                    contentFieldDefinitionDTO.getPath());
 
                 if (dateFieldResult.getIsSuccessful()) 
                     contentFieldEntity = dateFieldResult.getResult()!;
@@ -116,7 +120,10 @@ class ContentDefinitionManager {
             }
 
             case ContentFieldType.Numeric: {
-                const numericFieldResult = NumericContentFieldDefinition.create(contentFieldDefinitionDTO.getId(), contentFieldDefinitionDTO.getName());
+                const numericFieldResult = NumericContentFieldDefinition.create(
+                    contentFieldDefinitionDTO.getId(), 
+                    contentFieldDefinitionDTO.getName(), 
+                    contentFieldDefinitionDTO.getPath());
 
                 if (numericFieldResult.getIsSuccessful()) 
                     contentFieldEntity = numericFieldResult.getResult()!;
@@ -127,7 +134,10 @@ class ContentDefinitionManager {
             }
 
             case ContentFieldType.Text: {
-                const textFieldResult = TextContentFieldDefinition.create(contentFieldDefinitionDTO.getId(), contentFieldDefinitionDTO.getName());
+                const textFieldResult = TextContentFieldDefinition.create(
+                    contentFieldDefinitionDTO.getId(), 
+                    contentFieldDefinitionDTO.getName(), 
+                    contentFieldDefinitionDTO.getPath());
 
                 if (textFieldResult.getIsSuccessful()) 
                     contentFieldEntity = textFieldResult.getResult()!;
@@ -140,7 +150,10 @@ class ContentDefinitionManager {
             case ContentFieldType.Group: {
                 const groupContentFieldDefinitionDTO: GroupContentFieldDefinitionDTO = contentFieldDefinitionDTO as GroupContentFieldDefinitionDTO;
                 
-                const groupFieldResult = GroupContentFieldDefinition.create(contentFieldDefinitionDTO.getId(), contentFieldDefinitionDTO.getName());
+                const groupFieldResult = GroupContentFieldDefinition.create(
+                    contentFieldDefinitionDTO.getId(), 
+                    contentFieldDefinitionDTO.getName(), 
+                    contentFieldDefinitionDTO.getPath());
                 
                 if (groupFieldResult.getIsSuccessful()) 
                     contentFieldEntity = groupFieldResult.getResult()!;
@@ -180,6 +193,11 @@ class ContentDefinitionManager {
     
     private convertFieldDefinitionEntityToDto(contentFieldDefinition: ContentFieldDefinition): ContentFieldDefinitionDTO {
         let contentFieldDTO!: ContentFieldDefinitionDTO;
+
+        if (contentFieldDefinition.getPath() && contentFieldDefinition.getPath().trim() !== "") {
+            // eslint-disable-next-line @typescript-eslint/no-var-requires
+            return require(contentFieldDefinition.getPath()).default as ContentFieldDefinitionDTO;
+        }
 
         switch (contentFieldDefinition.getType()) {
             case ContentFieldType.Array: {
@@ -245,9 +263,6 @@ class ContentDefinitionManager {
                 logger.error(`Field type "%s" is not valid.`, contentFieldDefinition.getType())
                 throw new Error(`Field type "${contentFieldDefinition.getType()}" is not valid.`);
         }
-
-        contentFieldDefinition.getValidators().forEach(validator => contentFieldDTO.addValidator(validator));
-        contentFieldDefinition.getDeterminations().forEach(determination => contentFieldDTO.addDetermination(determination));
 
         return contentFieldDTO;
     }

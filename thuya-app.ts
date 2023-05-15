@@ -56,16 +56,15 @@ class ThuyaApp {
      * Load content types and start the Thuya CMS application.
      * 
      * @throws will throw an exception if the app is already running
-     * @throws will throw an exception if there is no persistency implementation set
      */
     public start(): void {
-        logger.debug(`Starting Thuya application.`);
+        logger.debug(`Starting Thuya application...`);
 
         if (this._expressServer)
             throw new Error("App is already running.");
 
         this._expressServer = this._expressApp.listen(this._port, () => {
-            logger.debug(`Thuya application started on port ${this._port}`);
+            logger.debug(`...Thuya application started on port ${this._port}.`);
         });
     }
 
@@ -75,16 +74,18 @@ class ThuyaApp {
      * @throws will throw an exception if the app is not running
      */
     public stop(): void {
-        logger.debug(`Stopping Thuya application.`);
+        logger.debug(`Stopping Thuya application...`);
 
         if (!this._expressServer) 
             throw new Error("App is not running.");
 
         this._expressServer.close();
+
+        logger.debug(`...Thuya application stopped.`);
     }
 
     public async useModule(module: Module): Promise<void> {
-        logger.debug(`Using module "%s".`, module.getMetadata().name);
+        logger.debug(`Using module "%s"...`, module.getMetadata().name);
 
         module.setupMiddlewares(this._expressApp);
         
@@ -92,11 +93,11 @@ class ThuyaApp {
         for (const controller of module.getControllers()) 
             this._expressApp.use(controller.getRouter())
 
-        if (!this._frameworkSettings) {
-            logger.debug(`Using content providers of module "%s".`, module.getMetadata().name);
-            for (const contentProvider of module.getContentProviders()) 
-                await this.useContentProvider(contentProvider);
-        }
+        logger.debug(`Using content providers of module "%s".`, module.getMetadata().name);
+        for (const contentProvider of module.getContentProviders()) 
+            await this.useContentProvider(contentProvider);
+
+        logger.debug(`...Module "%s" is successfully used.`, module.getMetadata().name);
     }
 
     public useContentDefinitionPersistency(persistency: IContentDefinitionPersistency) {
@@ -109,23 +110,28 @@ class ThuyaApp {
 
 
     private async useContentProvider(contentProvider: ContentProvider) {
-        logger.debug(`Creating content field definitions.`);
-        for (const contentFieldDefinition of contentProvider.getContentFieldDefinitions()) {
-            await contentDefinitionManager.createContentFieldDefinition(contentFieldDefinition);
-        }
-
-        logger.debug(`Creating content definitions.`);
+        if (!this._frameworkSettings) {
+            logger.debug(`Creating content field definitions.`);
+            for (const contentFieldDefinition of contentProvider.getContentFieldDefinitions()) {
+                await contentDefinitionManager.createContentFieldDefinition(contentFieldDefinition);
+            }
+            
+            logger.debug(`Creating content definitions.`);
+            for (const contentDefinition of contentProvider.getContentDefinitions()) {
+                await contentDefinitionManager.createContentDefinition(contentDefinition);
+            }
+            
+            logger.debug(`Creating content.`);
+            await contentProvider.createContent();
+        }   
+        
+        logger.debug(`Registering content definitions.`);
         for (const contentDefinition of contentProvider.getContentDefinitions()) {
-            await this.registerContentDefinition(contentDefinition);
+            this.registerContentDefinition(contentDefinition);
         }
-
-        logger.debug(`Creating content.`);
-        await contentProvider.createContent();
     }
 
-    private async registerContentDefinition(contentDefinition: ContentDefinitionDTO) {
-        await contentDefinitionManager.createContentDefinition(contentDefinition);
-
+    private registerContentDefinition(contentDefinition: ContentDefinitionDTO) {
         this._expressApp.get("/" + contentDefinition.getName(), expressContentManager.listContent.bind(expressContentManager));
         this._expressApp.get("/" + contentDefinition.getName() + "/:id", expressContentManager.readContent.bind(expressContentManager));
         this._expressApp.post("/" + contentDefinition.getName(), expressContentManager.createContent.bind(expressContentManager));
