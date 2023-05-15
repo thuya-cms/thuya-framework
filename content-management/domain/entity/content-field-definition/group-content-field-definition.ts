@@ -2,13 +2,12 @@ import { Result, logger } from "../../../../common";
 import contentHelper from "../../../../common/utility/content-helper";
 import expressHelper from "../../../../common/utility/express-helper";
 import { ContentFieldDefinition, ContentFieldType } from "./content-field-definition";
-import { ContentFieldValue } from "./content-field-handler-provider.interface";
 
 type ContentFieldOptions = {
     isRequired?: boolean
 }
 
-class GroupContentFieldDefinition extends ContentFieldDefinition {
+class GroupContentFieldDefinition<T = any> extends ContentFieldDefinition<T> {
     private contentFields: { name: string, contentFieldDefinition: ContentFieldDefinition, options: ContentFieldOptions }[] = [];
 
     
@@ -52,13 +51,9 @@ class GroupContentFieldDefinition extends ContentFieldDefinition {
         return this.contentFields;
     }
 
-    override validateValue(fieldValue: ContentFieldValue): Result {
+    override validateValue(fieldValue: any): Result {
         for (const contentField of this.getContentFields()) {
-            const propertyName = contentHelper.getContentPropertyName(contentField.name, fieldValue);
-            let singleFieldValue;
-
-            if (propertyName)
-                singleFieldValue = contentHelper.getFieldValue(propertyName.toString(), fieldValue);
+            const singleFieldValue = contentHelper.getFieldValue(contentField.name, fieldValue);
 
             if (contentField.options.isRequired && !singleFieldValue) {
                 logger.debug(`Value for field "%s" is required.`, contentField.name);
@@ -73,7 +68,7 @@ class GroupContentFieldDefinition extends ContentFieldDefinition {
         return super.validateValue(fieldValue);
     }
     
-    override executeDeterminations(fieldValue: any): ContentFieldValue {
+    override executeDeterminations(fieldValue: any): any {
         expressHelper.deleteNotExistingProperties(fieldValue, this.getContentFields().map(contentField => contentField.name));
         
         return super.executeDeterminations(fieldValue);

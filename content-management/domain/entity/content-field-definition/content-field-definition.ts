@@ -1,6 +1,6 @@
 import { Result, logger } from "../../../../common";
 import Entity from "../../../../common/entity";
-import IContentFieldHandlerProvider, { ContentFieldDetermination, ContentFieldValidator, ContentFieldValue } from "./content-field-handler-provider.interface";
+import IContentFieldHandlerProvider, { ContentFieldDetermination, ContentFieldValidator } from "./content-field-handler-provider.interface";
 
 enum ContentFieldType {
     Numeric = "numeric",
@@ -10,9 +10,9 @@ enum ContentFieldType {
     Group = "group"
 }
 
-abstract class ContentFieldDefinition extends Entity implements IContentFieldHandlerProvider {
-    private validators: ContentFieldValidator[] = [];
-    private determinations: ContentFieldDetermination[] = [];
+abstract class ContentFieldDefinition<T = any> extends Entity implements IContentFieldHandlerProvider<T> {
+    private validators: ContentFieldValidator<T>[] = [];
+    private determinations: ContentFieldDetermination<T>[] = [];
 
     
     
@@ -48,23 +48,23 @@ abstract class ContentFieldDefinition extends Entity implements IContentFieldHan
         return this.type;
     }
 
-    addValidator(validator: ContentFieldValidator) {
+    addValidator(validator: ContentFieldValidator<T>) {
         this.validators.push(validator);
     }
 
-    getValidators(): ContentFieldValidator[] {
+    getValidators(): ContentFieldValidator<T>[] {
         return this.validators;
     }
     
-    addDetermination(determination: ContentFieldDetermination) {
+    addDetermination(determination: ContentFieldDetermination<T>) {
         this.determinations.push(determination);
     }
 
-    getDeterminations(): ContentFieldDetermination[] {
+    getDeterminations(): ContentFieldDetermination<T>[] {
         return this.determinations;
     }
 
-    validateValue(fieldValue: ContentFieldValue): Result {
+    validateValue(fieldValue: T): Result {
         for (const validator of this.getValidators()) {
             const result = validator(fieldValue);
 
@@ -77,7 +77,7 @@ abstract class ContentFieldDefinition extends Entity implements IContentFieldHan
         return Result.success();
     }
 
-    executeDeterminations(fieldValue: ContentFieldValue): ContentFieldValue {
+    executeDeterminations(fieldValue: T): T {
         let updatedValue = fieldValue;
 
         for (const determination of this.getDeterminations()) { 

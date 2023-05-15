@@ -1,6 +1,6 @@
 import { ContentFieldDefinitionDTO, ContentFieldType } from "./content-field-definition";
 
-class ArrayContentFieldDefinitionDTO extends ContentFieldDefinitionDTO {    
+class ArrayContentFieldDefinitionDTO<T = any> extends ContentFieldDefinitionDTO<T[]> {    
     constructor(id: string, name: string, private arrayElementType: ContentFieldDefinitionDTO) {
         super(id, name, ContentFieldType.Array);
     }

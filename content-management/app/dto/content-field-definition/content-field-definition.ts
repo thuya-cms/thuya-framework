@@ -1,4 +1,4 @@
-import IContentFieldHandlerProvider, { ContentFieldDetermination, ContentFieldValidator, ContentFieldValue } from "../../../domain/entity/content-field-definition/content-field-handler-provider.interface";
+import IContentFieldHandlerProvider, { ContentFieldDetermination, ContentFieldValidator } from "../../../domain/entity/content-field-definition/content-field-handler-provider.interface";
 
 enum ContentFieldType {
     Numeric = "numeric",
@@ -8,9 +8,9 @@ enum ContentFieldType {
     Group = "group"
 }
 
-abstract class ContentFieldDefinitionDTO implements IContentFieldHandlerProvider {
-    private validators: ContentFieldValidator[] = [];
-    private determinations: ContentFieldDetermination[] = [];
+abstract class ContentFieldDefinitionDTO<T = any> implements IContentFieldHandlerProvider<T> {
+    private validators: ContentFieldValidator<T>[] = [];
+    private determinations: ContentFieldDetermination<T>[] = [];
 
     protected filePath = "";
     
@@ -40,20 +40,20 @@ abstract class ContentFieldDefinitionDTO implements IContentFieldHandlerProvider
         return this.type;
     }
 
-    getValidators(): ContentFieldValidator[] {
+    getValidators(): ContentFieldValidator<T>[] {
         return this.validators;
     }
 
-    getDeterminations(): ContentFieldDetermination[] {
+    getDeterminations(): ContentFieldDetermination<T>[] {
         return this.determinations;
     }
 
 
-    protected addValidator(validator: ContentFieldValidator) {
+    protected addValidator(validator: ContentFieldValidator<T>) {
         this.validators.push(validator);
     }
     
-    protected addDetermination(determination: ContentFieldDetermination) {
+    protected addDetermination(determination: ContentFieldDetermination<T>) {
         this.determinations.push(determination);
     }
 }

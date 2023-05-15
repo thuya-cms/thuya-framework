@@ -1,9 +1,8 @@
 import { Result } from "../../../../common";
 import logger from "../../../../common/utility/logger";
 import { ContentFieldDefinition, ContentFieldType } from "./content-field-definition";
-import { ContentFieldValue } from "./content-field-handler-provider.interface";
 
-class NumericContentFieldDefinition extends ContentFieldDefinition {
+class NumericContentFieldDefinition extends ContentFieldDefinition<number> {
     protected constructor(id: string, name: string, filePath?: string) {
         super(id, name, ContentFieldType.Numeric, filePath);
     }
@@ -22,7 +21,7 @@ class NumericContentFieldDefinition extends ContentFieldDefinition {
     }
 
 
-    override validateValue(fieldValue: ContentFieldValue): Result {
+    override validateValue(fieldValue: number): Result {
         if (Number.isNaN(Number(fieldValue))) {
             logger.debug(`Invalid numeric value "%s" for field "%s".`, fieldValue, this.getName());
             return Result.error(`Invalid numeric value "${ fieldValue }" for field "${ this.getName() }".`);

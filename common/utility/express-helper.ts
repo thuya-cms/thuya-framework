@@ -18,7 +18,7 @@ class ExpressHelper {
     
 
     private contentFieldExists(contentFieldNames: string[], contentProperty: Extract<keyof any, string>) {
-        return contentFieldNames.find(contentFieldName => contentHelper.adjustContentFieldName(contentFieldName) === contentProperty.toLowerCase());
+        return contentFieldNames.find(contentFieldName => contentFieldName === contentProperty);
     }
 }
 

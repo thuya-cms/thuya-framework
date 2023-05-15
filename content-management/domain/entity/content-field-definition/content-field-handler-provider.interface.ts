@@ -1,13 +1,12 @@
 import { Result } from "../../../../common";
 
-type ContentFieldValue = string | Date | number | string[] | Date[] | number[] | any; 
-type ContentFieldValidator = (contentFieldData: ContentFieldValue) => Result;
-type ContentFieldDetermination = (contentFieldData: ContentFieldValue) => ContentFieldValue;
+type ContentFieldValidator<T> = (contentFieldData: T) => Result;
+type ContentFieldDetermination<T> = (contentFieldData: T) => T;
 
-interface IContentFieldHandlerProvider {
-    getValidators(): ContentFieldValidator[];
-    getDeterminations(): ContentFieldDetermination[];
+interface IContentFieldHandlerProvider<T = any> {
+    getValidators(): ContentFieldValidator<T>[];
+    getDeterminations(): ContentFieldDetermination<T>[];
 }
 
-export { ContentFieldValue, ContentFieldValidator, ContentFieldDetermination };
+export { ContentFieldValidator, ContentFieldDetermination };
 export default IContentFieldHandlerProvider;

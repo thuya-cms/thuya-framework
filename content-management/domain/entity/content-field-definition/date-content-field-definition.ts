@@ -2,9 +2,8 @@ import moment from "moment";
 import logger from "../../../../common/utility/logger";
 import { ContentFieldDefinition, ContentFieldType } from "./content-field-definition";
 import { Result } from "../../../../common";
-import { ContentFieldValue } from "./content-field-handler-provider.interface";
 
-class DateContentFieldDefinition extends ContentFieldDefinition {
+class DateContentFieldDefinition extends ContentFieldDefinition<Date> {
     protected constructor(id: string, name: string, filePath?: string) {
         super(id, name, ContentFieldType.Date, filePath);
     }
@@ -23,12 +22,7 @@ class DateContentFieldDefinition extends ContentFieldDefinition {
     }
 
     
-    override validateValue(fieldValue: ContentFieldValue): Result {
-        if (Array.isArray(fieldValue)) {
-            logger.debug(`Invalid date "%s" for field "%s".`, fieldValue, this.getName());
-            return Result.error(`Invalid date "${ fieldValue }" for field "${ this.getName() }".`);
-        }
-
+    override validateValue(fieldValue: Date): Result {
         if (!moment(fieldValue).isValid()) {
             logger.debug(`Invalid date "%s" for field "%s".`, fieldValue, this.getName());
             return Result.error(`Invalid date "${ fieldValue }" for field "${ this.getName() }".`);

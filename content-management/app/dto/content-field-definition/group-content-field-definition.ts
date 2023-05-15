@@ -4,7 +4,7 @@ type ContentFieldOptions = {
     isRequired?: boolean
 }
 
-class GroupContentFieldDefinitionDTO extends ContentFieldDefinitionDTO {
+class GroupContentFieldDefinitionDTO<T = any> extends ContentFieldDefinitionDTO<T> {
     private contentFields: { name: string, contentFieldDefinition: ContentFieldDefinitionDTO, options: ContentFieldOptions }[] = [];
 
     

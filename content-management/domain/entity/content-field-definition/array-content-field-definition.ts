@@ -1,9 +1,8 @@
 import { Result } from "../../../../common";
 import logger from "../../../../common/utility/logger";
 import { ContentFieldDefinition, ContentFieldType } from "./content-field-definition";
-import { ContentFieldValue } from "./content-field-handler-provider.interface";
 
-class ArrayContentFieldDefinition extends ContentFieldDefinition {    
+class ArrayContentFieldDefinition<T = any> extends ContentFieldDefinition<T[]> {    
     protected constructor(id: string, name: string, private arrayElementType: ContentFieldDefinition, filePath?: string) {
         super(id, name, ContentFieldType.Array, filePath);
     }
@@ -26,15 +25,13 @@ class ArrayContentFieldDefinition extends ContentFieldDefinition {
         return this.arrayElementType;
     }
 
-    override validateValue(fieldValue: ContentFieldValue): Result<void> {
+    override validateValue(fieldValue: any[]): Result<void> {
         if (!Array.isArray(fieldValue)) {
             logger.debug(`Invalid array value "%s" for "%s".`, fieldValue, this.getName());
             return Result.error(`Invalid array value "${ fieldValue }" for "${ this.getName() }".`);
         }
 
-        const array: any[] = fieldValue;
-
-        for (const arrayElementValue of array) {
+        for (const arrayElementValue of fieldValue) {
             const result = this.arrayElementType.validateValue(arrayElementValue);
     
             if (result.getIsFailing()) return result;

@@ -1,7 +1,7 @@
 import { Result } from "../../../../common";
 import { ContentFieldDefinition, ContentFieldType } from "./content-field-definition";
 
-class TextContentFieldDefinition extends ContentFieldDefinition {
+class TextContentFieldDefinition extends ContentFieldDefinition<string> {
     protected constructor(id: string, name: string, filePath?: string) {
         super(id, name, ContentFieldType.Text, filePath);
     }
