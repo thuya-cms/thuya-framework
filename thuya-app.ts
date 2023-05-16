@@ -86,8 +86,6 @@ class ThuyaApp {
 
     public async useModule(module: Module): Promise<void> {
         logger.debug(`Using module "%s"...`, module.getMetadata().name);
-
-        module.setupMiddlewares(this._expressApp);
         
         logger.debug(`Using controllers of module "%s".`, module.getMetadata().name);
         for (const controller of module.getControllers()) 

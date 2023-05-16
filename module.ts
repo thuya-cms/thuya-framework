@@ -1,4 +1,3 @@
-import express from 'express';
 import ContentProvider from './content-management/app/content-provider';
 import { IController } from './common';
 
@@ -7,11 +6,6 @@ abstract class Module {
         return { 
             name: "Unknown"
         };
-    }
-
-    // TODO: Should be removed.
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
-    setupMiddlewares(expressApp: express.Application): void {
     }
 
     getContentProviders(): ContentProvider[] {
