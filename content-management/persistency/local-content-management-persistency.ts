@@ -1,4 +1,4 @@
-import IContentDefinitionPersistency, { ContentDefinitionData, ContentFieldDefinitionData } from "./content-definition-persistency.interface";
+import IContentDefinitionPersistency, { ContentDefinitionData, ContentFieldDefinitionData, ExpandedContentDefinitionData } from "./content-definition-persistency.interface";
 import {v4 as uuid} from 'uuid';
 import IContentPersistency from "../domain/usecase/content-persistency.interface";
 import { ContentFieldDefinition, ContentFieldType } from "../domain/entity/content-field-definition/content-field-definition";
@@ -29,6 +29,34 @@ class LocalContentManagementPersistency implements IContentDefinitionPersistency
             throw new Error("Content definition not found.");
 
         return Promise.resolve(contentDefinitionData);
+    }
+
+    readContentDefinitionExpandingFields(contentName: string): Promise<ExpandedContentDefinitionData> {
+        const contentDefinitionData = this.contentDefinitions.find(contentDefinition => contentDefinition.name === contentName);
+        
+        if (!contentDefinitionData)
+            throw new Error("Content definition not found.");
+        
+        const expandedData: ExpandedContentDefinitionData = {
+            id: contentDefinitionData.id,
+            name: contentDefinitionData.name,
+            fields: []
+        };
+
+        for (const fieldReference of contentDefinitionData.fields) {
+            const field = this.contentFieldDefinitions.find(field => field.id === fieldReference.id);
+
+            if (!field)
+                throw new Error("Not existing field.");
+
+            expandedData.fields.push({
+                name: fieldReference.name,
+                options: fieldReference.options,
+                field: field
+            });
+        }
+
+        return Promise.resolve(expandedData);
     }
     
     readContentFieldDefinitionById(id: string): Promise<ContentFieldDefinitionData> {

@@ -15,7 +15,7 @@ class ContentDefinitionRepository implements IContentDefinitionRepository {
     async readContentDefinition(contentName: string): Promise<ContentDefinition | void> {
         try {
             const contentDefinitionPersistency = factory.getContentDefinitionPersistency();
-            const contentDefinitionData = await contentDefinitionPersistency.readContentDefinition(contentName);
+            const contentDefinitionData = await contentDefinitionPersistency.readContentDefinitionExpandingFields(contentName);
             const contentDefinitionResult = ContentDefinition.create(contentDefinitionData.id, contentDefinitionData.name);
 
             if (contentDefinitionResult.getIsFailing()) {
@@ -28,9 +28,8 @@ class ContentDefinitionRepository implements IContentDefinitionRepository {
             const contentDefinition = contentDefinitionResult.getResult()!;
 
             for (const contentFieldDefinitionAssignment of contentDefinitionData.fields) {
-                const contentFieldDefinitionData = await contentDefinitionPersistency.readContentFieldDefinitionById(contentFieldDefinitionAssignment.id);
-                const contentFieldDefinition = await this.convertFieldDataToEntity(contentFieldDefinitionData);
-                const handlerProvider = this.getHandlerProvider(contentFieldDefinitionData.path);
+                const contentFieldDefinition = await this.convertFieldDataToEntity(contentFieldDefinitionAssignment.field);
+                const handlerProvider = this.getHandlerProvider(contentFieldDefinitionAssignment.field.path);
 
                 if (handlerProvider) {
                     for (const validator of handlerProvider.getValidators()) 

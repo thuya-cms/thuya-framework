@@ -46,7 +46,7 @@ class ThuyaApp {
         }
         else{
             logger.debug(`Framework is already initialized.`);
-            this._frameworkSettings = frameworkSettingsContentDefinitionResult.getResult()!;
+            this._frameworkSettings = frameworkSettingsContentDefinitionResult.getResult()!; // TODO: Should read settings content.
         }
 
         logger.debug("...Framework initialization complete.");

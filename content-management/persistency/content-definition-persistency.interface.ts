@@ -12,6 +12,20 @@ type ContentDefinitionData = {
     }[]
 }
 
+type ExpandedContentDefinitionData = {
+    id: string,
+    name: string,
+    fields: {
+        field: ContentFieldDefinitionData,
+        name: string,
+        options: {
+            isRequired: boolean,
+            isUnique: boolean,
+            isIndexed: boolean
+        }
+    }[]
+}
+
 type ContentFieldDefinitionData = {
     id: string,
     name: string,
@@ -29,6 +43,7 @@ type ContentFieldDefinitionData = {
 
 interface IContentDefinitionPersistency {
     readContentDefinition(contentName: string): Promise<ContentDefinitionData>;
+    readContentDefinitionExpandingFields(contentName: string): Promise<ExpandedContentDefinitionData>;
     readContentFieldDefinitionById(id: string): Promise<ContentFieldDefinitionData>;
     readContentFieldDefinitionByName(name: string): Promise<ContentFieldDefinitionData>;
     createContentDefinition(contentDefinitionData: ContentDefinitionData): Promise<string>;
@@ -36,4 +51,4 @@ interface IContentDefinitionPersistency {
 }
 
 export default IContentDefinitionPersistency;
-export { ContentDefinitionData, ContentFieldDefinitionData };
+export { ContentDefinitionData, ContentFieldDefinitionData, ExpandedContentDefinitionData };
