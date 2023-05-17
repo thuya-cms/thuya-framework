@@ -6,7 +6,8 @@ type ContentDefinitionData = {
         id: string,
         options: {
             isRequired: boolean,
-            isUnique: boolean
+            isUnique: boolean,
+            isIndexed: boolean
         }
     }[]
 }

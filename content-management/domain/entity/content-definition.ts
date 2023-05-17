@@ -5,7 +5,8 @@ import { Result, logger } from "../../../common";
 
 type ContentFieldOptions = {
     isRequired?: boolean,
-    isUnique?: boolean
+    isUnique?: boolean,
+    isIndexed?: boolean
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars

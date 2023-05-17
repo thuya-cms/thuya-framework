@@ -69,13 +69,15 @@ class ContentDefinitionRepository implements IContentDefinitionRepository {
                 name: contentField.name,
                 options: {
                     isRequired: false,
-                    isUnique: false
+                    isUnique: false,
+                    isIndexed: false
                 }
             };
 
             if (contentField.options) {
                 fieldData.options.isRequired = contentField.options.isRequired || false;
                 fieldData.options.isUnique = contentField.options.isUnique || false;
+                fieldData.options.isIndexed = contentField.options.isIndexed || false;
             }
 
             contentDefinitionData.fields.push(fieldData);

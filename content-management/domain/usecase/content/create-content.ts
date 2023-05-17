@@ -10,7 +10,13 @@ class CreateContent<T> {
         if (finalContentResult.getIsFailing()) 
             return Result.error(finalContentResult.getMessage());
 
-        const id = await factory.getContentPersistency().createContent(contentDefinition.getName(), finalContentResult.getResult());
+        const indexedFields = contentDefinition.getContentFields()
+            .filter(contentField => contentField.options.isIndexed)
+            .map(contentField => contentField.name);
+
+        const id = await factory.getContentPersistency().createContent(contentDefinition.getName(), finalContentResult.getResult(), {
+            indexedFields: indexedFields
+        });
         logger.info(`Content of type "%s" is created successfully.`, contentDefinition.getName());
 
         return Result.success(id);
