@@ -9,6 +9,7 @@ import NumericContentFieldDefinition from "../domain/entity/content-field-defini
 import TextContentFieldDefinition from "../domain/entity/content-field-definition/text-content-field-definition";
 import factory from "../domain/factory";
 import IContentDefinitionRepository from "../domain/usecase/content-definition-repository.interface";
+import { ContentSchema } from "../persistency/content-persistency.interface";
 import { ContentDefinitionData, ContentFieldDefinitionData } from "../persistency/content-definition-persistency.interface";
 
 class ContentDefinitionRepository implements IContentDefinitionRepository {
@@ -56,6 +57,7 @@ class ContentDefinitionRepository implements IContentDefinitionRepository {
             name: contentDefinition.getName(),
             fields: []
         };
+        const contentSchema: ContentSchema = []; 
 
         for (const contentField of contentDefinition.getContentFields()) {
             const field = await factory.getContentDefinitionPersistency().readContentFieldDefinitionByName(contentField.contentFieldDefinition.getName());
@@ -80,7 +82,19 @@ class ContentDefinitionRepository implements IContentDefinitionRepository {
             }
 
             contentDefinitionData.fields.push(fieldData);
+
+            contentSchema.push({
+                name: field.name,
+                type: field.type,
+                options: {
+                    isIndexed: fieldData.options.isIndexed,
+                    isRequired: fieldData.options.isRequired,
+                    isUnique: fieldData.options.isUnique
+                }
+            });
         }
+
+        await factory.getContentPersistency().createContentSchema(contentDefinition.getName(), contentSchema);
 
         return await factory.getContentDefinitionPersistency().createContentDefinition(contentDefinitionData);
     }

@@ -10,10 +10,10 @@ import ContentDefinitionDTO from './content-management/app/dto/content-definitio
 import dotenv from "dotenv";
 import IContentDefinitionPersistency from './content-management/persistency/content-definition-persistency.interface';
 import factory from './content-management/domain/factory';
-import { IContentPersistency } from './content-management/domain';
 import correlator from 'express-correlation-id';
 import frameworkSettingsContentDefinition from './content/framework-settings-content-definition';
 import frameworkSettingsContentProvider from './content/framework-settings-content-provider';
+import { IContentPersistency } from './content-management/persistency';
 
 class ThuyaApp {
     private _expressApp: express.Application;

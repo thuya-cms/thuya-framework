@@ -1,1 +1,2 @@
-export { ContentDefinitionData, ContentFieldDefinitionData, ExpandedContentDefinitionData } from "./content-definition-persistency.interface";
+export { default as IContentDefinitionPersistency, ContentDefinitionData, ContentFieldDefinitionData, ExpandedContentDefinitionData } from "./content-definition-persistency.interface";
+export { default as IContentPersistency, ContentSchema, ContentSchemaElement } from "./content-persistency.interface";

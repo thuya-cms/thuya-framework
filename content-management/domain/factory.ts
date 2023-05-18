@@ -1,6 +1,6 @@
 import localContentManagementPersistency from "../persistency/local-content-management-persistency";
 import IContentDefinitionPersistency from "../persistency/content-definition-persistency.interface";
-import IContentPersistency from "./usecase/content-persistency.interface";
+import IContentPersistency from "../persistency/content-persistency.interface";
 
 class Factory {
     private contentDefinitionPersistency: IContentDefinitionPersistency;

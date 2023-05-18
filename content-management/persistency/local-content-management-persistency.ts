@@ -1,6 +1,6 @@
 import IContentDefinitionPersistency, { ContentDefinitionData, ContentFieldDefinitionData, ExpandedContentDefinitionData } from "./content-definition-persistency.interface";
 import {v4 as uuid} from 'uuid';
-import IContentPersistency from "../domain/usecase/content-persistency.interface";
+import IContentPersistency from "./content-persistency.interface";
 import { ContentFieldDefinition, ContentFieldType } from "../domain/entity/content-field-definition/content-field-definition";
 import ArrayContentFieldDefinition from "../domain/entity/content-field-definition/array-content-field-definition";
 import GroupContentFieldDefinition from "../domain/entity/content-field-definition/group-content-field-definition";
@@ -15,6 +15,10 @@ class LocalContentManagementPersistency implements IContentDefinitionPersistency
     
     
     
+    createContentSchema(): Promise<void> {
+        return Promise.resolve();
+    }
+
     createContentDefinition(contentDefinitionData: ContentDefinitionData): Promise<string> {
         contentDefinitionData.id = uuid();
         this.contentDefinitions.push(contentDefinitionData);
