@@ -9,7 +9,7 @@ import NumericContentFieldDefinition from "../domain/entity/content-field-defini
 import TextContentFieldDefinition from "../domain/entity/content-field-definition/text-content-field-definition";
 import factory from "../domain/factory";
 import IContentDefinitionRepository from "../domain/usecase/content-definition-repository.interface";
-import { ContentSchema } from "../persistency/content-persistency.interface";
+import { ContentSchema, ContentSchemaElement } from "../persistency/content-persistency.interface";
 import { ContentDefinitionData, ContentFieldDefinitionData } from "../persistency/content-definition-persistency.interface";
 
 class ContentDefinitionRepository implements IContentDefinitionRepository {
@@ -83,20 +83,51 @@ class ContentDefinitionRepository implements IContentDefinitionRepository {
 
             contentDefinitionData.fields.push(fieldData);
 
-            contentSchema.push({
-                name: field.name,
-                type: field.type,
-                options: {
-                    isIndexed: fieldData.options.isIndexed,
-                    isRequired: fieldData.options.isRequired,
-                    isUnique: fieldData.options.isUnique
-                }
-            });
+            const contentSchemaElement = await this.getContentSchemaElement(field, fieldData);
+            contentSchema.push(contentSchemaElement);
         }
 
         await factory.getContentPersistency().createContentSchema(contentDefinition.getName(), contentSchema);
 
         return await factory.getContentDefinitionPersistency().createContentDefinition(contentDefinitionData);
+    }
+
+    private async getContentSchemaElement(field: ContentFieldDefinitionData, fieldAssignment: any): Promise<ContentSchemaElement> {
+        const contentSchemaElement: ContentSchemaElement = {
+            name: fieldAssignment.name,
+            type: field.type,
+            options: {
+                isIndexed: fieldAssignment.options?.isIndexed || false,
+                isRequired: fieldAssignment.options?.isRequired || false,
+                isUnique: fieldAssignment.options?.isUnique || false
+            }
+        };
+
+        if (field.type === ContentFieldType.Array) {
+            const arrayFieldElement = await factory.getContentDefinitionPersistency().readContentFieldDefinitionById(field.arrayElementDefinitionId!);
+            contentSchemaElement.arrayElementType = {
+                type: arrayFieldElement.type,
+                groupElements: []
+            };
+
+            if (arrayFieldElement.type === ContentFieldType.Group) {
+                for (const groupElement of arrayFieldElement.groupElements!) {
+                    const groupFieldElement = await factory.getContentDefinitionPersistency().readContentFieldDefinitionById(groupElement.id);
+                    const groupElementSchema = await this.getContentSchemaElement(groupFieldElement, { name: groupElement.name, options: groupElement.options });
+                    contentSchemaElement.arrayElementType.groupElements!.push(groupElementSchema);
+                }
+            }
+        } else if (field.type === ContentFieldType.Group) {
+            contentSchemaElement.groupElements = [];
+
+            for (const groupElement of field.groupElements!) {
+                const groupFieldElement = await factory.getContentDefinitionPersistency().readContentFieldDefinitionById(groupElement.id);
+                const groupElementSchema = await this.getContentSchemaElement(groupFieldElement, { name: groupElement.name, options: groupElement.options });
+                contentSchemaElement.groupElements!.push(groupElementSchema);
+            }
+        }
+
+        return contentSchemaElement;
     }
 
     async createContentFieldDefinition(contentFieldDefinition: ContentFieldDefinition): Promise<string> {
