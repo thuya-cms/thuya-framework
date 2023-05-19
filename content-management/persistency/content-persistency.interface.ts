@@ -1,9 +1,14 @@
 import UnknownContent from "../domain/usecase/content/unknown-content.type";
 
+type ArrayElement = {
+    type: string,
+    groupElements?: ContentSchemaElement[]
+}
+
 type ContentSchemaElement = {
     name: string,
     type: string,
-    arrayElementType?: string,
+    arrayElementType?: ArrayElement,
     groupElements?: ContentSchemaElement[],
     options: {
         isRequired: boolean,
@@ -24,5 +29,5 @@ interface IContentPersistency {
     listContent(contentName: string): Promise<UnknownContent[]>;
 }
 
-export { ContentSchema, ContentSchemaElement };
+export { ContentSchema, ContentSchemaElement, ArrayElement };
 export default IContentPersistency;
