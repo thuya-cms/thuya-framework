@@ -1,6 +1,5 @@
 import { Request } from "express";
 import logger from "./logger";
-import contentHelper from "./content-helper";
 
 class ExpressHelper {
     getContentName(request: Request) {

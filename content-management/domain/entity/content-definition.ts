@@ -45,8 +45,8 @@ class ContentDefinition<T = any> extends Entity {
     }
 
     addContentField(name: string, contentField: ContentFieldDefinition, options?: ContentFieldOptions): Result {
-        if (name === "id") {
-            logger.debug(`Adding "id" field manually is not possible.`);
+        if (name === "id" && this.contentFields.find(existingContentField => existingContentField.name === "id")) {
+            logger.debug(`Field "id" is already added.`);
             return Result.success();
         }
 
