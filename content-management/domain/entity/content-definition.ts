@@ -12,7 +12,6 @@ type ContentFieldOptions = {
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 class ContentDefinition<T = any> extends Entity {
     private contentFields: { name: string, contentFieldDefinition: ContentFieldDefinition, options: ContentFieldOptions }[] = [];
-    private isCached: boolean;
 
 
 
@@ -43,14 +42,6 @@ class ContentDefinition<T = any> extends Entity {
 
     getName(): string {
         return this.name;
-    }
-
-    setIsCached(isCached: boolean) {
-        this.isCached = isCached;
-    }
-
-    getIsCached(): boolean {
-        return this.isCached;
     }
 
     addContentField(name: string, contentField: ContentFieldDefinition, options?: ContentFieldOptions): Result {
