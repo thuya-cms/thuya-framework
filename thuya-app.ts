@@ -1,4 +1,5 @@
 import express from 'express';
+import cors from "cors";
 import bodyParser from 'body-parser';
 import http from 'http';
 import logger from './common/utility/logger';
@@ -28,6 +29,7 @@ class ThuyaApp {
         logger.initializeLogLevel();
 
         this._expressApp = express();
+        this._expressApp.use(cors());
         this._expressApp.use(correlator());
         this._expressApp.use(bodyParser.json());	
 		this._expressApp.use(bodyParser.urlencoded({ extended: false }));
