@@ -14,12 +14,12 @@ class ModifyHelper<T> {
         for (const contentField of contentDefinition.getContentFields()) {
             let fieldValue = contentHelper.getFieldValue(contentField.name, content);
 
-            if (contentField.options.isRequired && !fieldValue) {
+            if (contentField.options.isRequired && !fieldValue && fieldValue !== 0) {
                 logger.debug(`Value for field "%s" is required.`, contentField.name);
                 return Result.error(`Value for field ${ contentField.name } is required.`);
             }
 
-            if (fieldValue) {
+            if (fieldValue || fieldValue === 0) {
                 if (contentField.options.isUnique) {
                     const uniquenessResult = await this.validateUniqueness(contentDefinition, contentField.name, fieldValue);
                     if (uniquenessResult.getIsFailing()) 
