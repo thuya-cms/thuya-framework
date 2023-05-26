@@ -91,7 +91,7 @@ class ExpressContentManager {
             if (deleteContentResult.getIsFailing())
                 throw new Error(deleteContentResult.getMessage());
 
-            response.sendStatus(200);
+            response.status(200).send();
         }
 
         catch (error: any) {
@@ -116,7 +116,7 @@ class ExpressContentManager {
             if (updateContentResult.getIsFailing())
                 throw new Error(updateContentResult.getMessage());
 
-            response.sendStatus(200);
+            response.status(200).send();
         }
 
         catch (error: any) {
