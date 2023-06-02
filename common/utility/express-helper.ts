@@ -1,7 +1,17 @@
 import { Request } from "express";
-import logger from "./logger";
+import Logger from "./logger";
 
 class ExpressHelper {
+    private logger: Logger;
+
+
+
+    constructor() {
+        this.logger = Logger.for(ExpressHelper.toString());
+    }
+
+
+
     getContentName(request: Request) {
         return request.url.split("/")[1];
     }
@@ -10,7 +20,7 @@ class ExpressHelper {
         for (const contentProperty in content) {
             if (!this.contentFieldExists(contentFieldNames, contentProperty)) {
                 delete content[contentProperty];
-                logger.debug(`Field "%s" is removed.`, contentProperty);
+                this.logger.debug(`Field "%s" is removed.`, contentProperty);
             }
         }
     }

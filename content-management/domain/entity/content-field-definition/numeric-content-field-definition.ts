@@ -1,10 +1,11 @@
-import { Result } from "../../../../common";
-import logger from "../../../../common/utility/logger";
+import { Logger, Result } from "../../../../common";
 import { ContentFieldDefinition, ContentFieldType } from "./content-field-definition";
 
 class NumericContentFieldDefinition extends ContentFieldDefinition<number> {
     protected constructor(id: string, name: string, filePath?: string) {
         super(id, name, ContentFieldType.Numeric, filePath);
+
+        this.logger = Logger.for(NumericContentFieldDefinition.toString());
     }
 
 
@@ -23,7 +24,7 @@ class NumericContentFieldDefinition extends ContentFieldDefinition<number> {
 
     override validateValue(fieldValue: number): Result {
         if (Number.isNaN(Number(fieldValue))) {
-            logger.debug(`Invalid numeric value "%s" for field "%s".`, fieldValue, this.getName());
+            this.logger.debug(`Invalid numeric value "%s" for field "%s".`, fieldValue, this.getName());
             return Result.error(`Invalid numeric value "${ fieldValue }" for field "${ this.getName() }".`);
         }
         

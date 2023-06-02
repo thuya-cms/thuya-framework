@@ -1,7 +1,7 @@
 import Entity from "../../../common/entity";
 import { ContentFieldDefinition } from "./content-field-definition/content-field-definition";
 import idContentFieldDefinition from "../../content/id-content-field-definition";
-import { Result, logger } from "../../../common";
+import { Result, Logger } from "../../../common";
 
 type ContentFieldOptions = {
     isRequired?: boolean,
@@ -12,14 +12,17 @@ type ContentFieldOptions = {
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 class ContentDefinition<T = any> extends Entity {
     private contentFields: { name: string, contentFieldDefinition: ContentFieldDefinition, options: ContentFieldOptions }[] = [];
+    private logger: Logger;
 
 
 
     protected constructor(id: string, private name: string) {
         super(id);
         
+        this.logger = Logger.for(ContentDefinition.toString());
+
         if (!name) {
-            logger.error(`Content definition name is required.`);
+            this.logger.error(`Content definition name is required.`);
             throw new Error("Content definition name is required.");
         }
 
@@ -31,7 +34,7 @@ class ContentDefinition<T = any> extends Entity {
 
     public static create<T>(id: string, name: string): Result<ContentDefinition<T>> {
         try {
-            return Result.success(new ContentDefinition(id, name));
+            return Result.success(new ContentDefinition<T>(id, name));
         }
 
         catch (error: any) {
@@ -46,12 +49,12 @@ class ContentDefinition<T = any> extends Entity {
 
     addContentField(name: string, contentField: ContentFieldDefinition, options?: ContentFieldOptions): Result {
         if (name === "id" && this.contentFields.find(existingContentField => existingContentField.name === "id")) {
-            logger.debug(`Field "id" is already added.`);
+            this.logger.debug(`Field "id" is already added.`);
             return Result.success();
         }
 
         if (this.contentFields.find(existingContentField => existingContentField.name === name)) {
-            logger.error(`Field with name "%s" is already added.`, name);
+            this.logger.error(`Field with name "%s" is already added.`, name);
             return Result.error(`Field with name "${ name }" is already added.`);
         }
 
@@ -61,7 +64,7 @@ class ContentDefinition<T = any> extends Entity {
             options: options || {}
         });
 
-        logger.debug(`Field "%s" is added to "%s".`, name, this.getName());
+        this.logger.debug(`Field "%s" is added to "%s".`, name, this.getName());
 
         return Result.success();
     }

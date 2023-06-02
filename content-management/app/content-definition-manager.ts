@@ -1,4 +1,4 @@
-import { Result, logger } from "../../common";
+import { Result } from "../../common";
 import { ContentDefinition } from "../domain/entity/content-definition";
 import ArrayContentFieldDefinition from "../domain/entity/content-field-definition/array-content-field-definition";
 import { ContentFieldDefinition } from "../domain/entity/content-field-definition/content-field-definition";
@@ -17,8 +17,17 @@ import GroupContentFieldDefinitionDTO from "./dto/content-field-definition/group
 import NumericContentFieldDefinitionDTO from "./dto/content-field-definition/numeric-content-field-definition";
 import TextContentFieldDefinitionDTO from "./dto/content-field-definition/text-content-field-definition";
 
+/**
+ * Manager for content definition and content field definition.
+ */
 class ContentDefinitionManager {
-    async createContentDefinition(contentDefinition: ContentDefinitionDTO): Promise<Result> {
+    /**
+     * Create a content definition.
+     * 
+     * @param contentDefinition the content definition
+     * @returns result containing the id of the created content definition
+     */
+    async createContentDefinition(contentDefinition: ContentDefinitionDTO): Promise<Result<string>> {
         const contentDefinitionEntityResult = this.convertDtoToEntity(contentDefinition);
         if (contentDefinitionEntityResult.getIsFailing())
             return Result.error(contentDefinitionEntityResult.getMessage());
@@ -26,7 +35,13 @@ class ContentDefinitionManager {
         return await createContentDefinition.execute(contentDefinitionEntityResult.getResult()!);
     }
 
-    async createContentFieldDefinition(contentFieldDefinition: ContentFieldDefinitionDTO): Promise<Result> {
+    /**
+     * Create a content field definition.
+     * 
+     * @param contentFieldDefinition the content field definition
+     * @returns result containing the id of the created content field definition
+     */
+    async createContentFieldDefinition(contentFieldDefinition: ContentFieldDefinitionDTO): Promise<Result<string>> {
         const contentFieldDefinitionEntityResult = this.convertFieldDefinitionDtoToEntity(contentFieldDefinition);
         if (contentFieldDefinitionEntityResult.getIsFailing())
             return Result.error(contentFieldDefinitionEntityResult.getMessage());
@@ -34,6 +49,12 @@ class ContentDefinitionManager {
         return await createContentFieldDefinition.execute(contentFieldDefinitionEntityResult.getResult()!);
     }
 
+    /**
+     * Read a content definition by name.
+     * 
+     * @param contentDefinitionName name of the content definition
+     * @returns result containing the content definition
+     */
     async readContentDefinitionByName(contentDefinitionName: string): Promise<Result<ContentDefinitionDTO>> {
         const contentDefinitionResult = await readContentDefinition.execute(contentDefinitionName);
         if (contentDefinitionResult.getIsFailing())
@@ -181,7 +202,6 @@ class ContentDefinitionManager {
             }
 
             default:
-                logger.error(`Field type "%s" is not valid.`, contentFieldDefinitionDTO.getType())
                 throw new Error(`Field type "${contentFieldDefinitionDTO.getType()}" is not valid.`);
         }
 
@@ -260,7 +280,6 @@ class ContentDefinitionManager {
             }
 
             default:
-                logger.error(`Field type "%s" is not valid.`, contentFieldDefinition.getType())
                 throw new Error(`Field type "${contentFieldDefinition.getType()}" is not valid.`);
         }
 

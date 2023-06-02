@@ -1,4 +1,3 @@
-import { logger } from "../../common";
 import { ContentDefinition } from "../domain/entity/content-definition";
 import ArrayContentFieldDefinition from "../domain/entity/content-field-definition/array-content-field-definition";
 import { ContentFieldDefinition, ContentFieldType } from "../domain/entity/content-field-definition/content-field-definition";
@@ -11,24 +10,29 @@ import factory from "../domain/factory";
 import IContentDefinitionRepository from "../domain/usecase/content-definition-repository.interface";
 import { ContentSchema, ContentSchemaElement } from "../persistency/content-persistency.interface";
 import { ContentDefinitionData, ContentFieldDefinitionData } from "../persistency/content-definition-persistency.interface";
+import Logger from "../../common/utility/logger";
 
 class ContentDefinitionRepository implements IContentDefinitionRepository {
+    private logger: Logger;
+
+
+
+    constructor() {
+        this.logger = Logger.for(ContentDefinitionRepository.toString());
+    }
+
+
+
     async readContentDefinition(contentName: string): Promise<ContentDefinition | void> {
+        const contentDefinitionPersistency = factory.getContentDefinitionPersistency();
+
         try {
-            const contentDefinitionPersistency = factory.getContentDefinitionPersistency();
-            const contentDefinitionData = await contentDefinitionPersistency.readContentDefinitionExpandingFields(contentName);
-            const contentDefinitionResult = ContentDefinition.create(contentDefinitionData.id, contentDefinitionData.name);
-
-            if (contentDefinitionResult.getIsFailing()) {
-                logger.error("Failed to create content definition instance.");
-                logger.error(contentDefinitionResult.getMessage());
-
-                throw new Error("Failed to create content definition instance.")
-            }
-
+            const expandedContentDefinitionData = await contentDefinitionPersistency.readContentDefinitionExpandingFields(contentName);
+            
+            const contentDefinitionResult = ContentDefinition.create(expandedContentDefinitionData.id, expandedContentDefinitionData.name);
             const contentDefinition = contentDefinitionResult.getResult()!;
 
-            for (const contentFieldDefinitionAssignment of contentDefinitionData.fields) {
+            for (const contentFieldDefinitionAssignment of expandedContentDefinitionData.fields) {
                 const contentFieldDefinition = await this.convertFieldDataToEntity(contentFieldDefinitionAssignment.field);
                 const handlerProvider = this.getHandlerProvider(contentFieldDefinitionAssignment.field.path);
 
@@ -47,7 +51,7 @@ class ContentDefinitionRepository implements IContentDefinitionRepository {
         }
 
         catch {
-            return Promise.resolve();
+            return;
         }
     }
 
@@ -62,8 +66,10 @@ class ContentDefinitionRepository implements IContentDefinitionRepository {
         for (const contentField of contentDefinition.getContentFields()) {
             const field = await factory.getContentDefinitionPersistency().readContentFieldDefinitionByName(contentField.contentFieldDefinition.getName());
 
-            if (!field)
+            if (!field) {
+                this.logger.error(`Not existing field "%s".`, contentField.contentFieldDefinition.getName());
                 throw new Error(`Not existing field "${ contentField.contentFieldDefinition.getName() }".`);
+            }
 
             const fieldData = {
                 id: field.id,
@@ -91,6 +97,62 @@ class ContentDefinitionRepository implements IContentDefinitionRepository {
 
         return await factory.getContentDefinitionPersistency().createContentDefinition(contentDefinitionData);
     }
+
+    async createContentFieldDefinition(contentFieldDefinition: ContentFieldDefinition): Promise<string> {
+        const contentFieldDefinitionData: ContentFieldDefinitionData = {
+            id: "",
+            path: contentFieldDefinition.getPath(),
+            name: contentFieldDefinition.getName(),
+            type: contentFieldDefinition.getType()
+        };
+
+        if (contentFieldDefinition.getType() === ContentFieldType.Array) {
+            const arrayFieldDefinition = contentFieldDefinition as ArrayContentFieldDefinition;
+
+            const arrayElementDefinitionData = await factory.getContentDefinitionPersistency().readContentFieldDefinitionByName(
+                arrayFieldDefinition.getArrayElementType().getName());
+
+            if (!arrayElementDefinitionData) {
+                this.logger.error("Array element type not found.");
+                throw new Error("Array element type not found.")
+            }
+
+            contentFieldDefinitionData.arrayElementDefinitionId = arrayElementDefinitionData.id;
+        }
+
+        if (contentFieldDefinition.getType() === ContentFieldType.Group) {
+            contentFieldDefinitionData.groupElements = [];
+
+            const groupFieldDefinition = contentFieldDefinition as GroupContentFieldDefinition;
+            for (const groupElement of groupFieldDefinition.getContentFields()) {
+                const groupElementDefinitionData = await factory.getContentDefinitionPersistency().readContentFieldDefinitionByName(
+                    groupElement.contentFieldDefinition.getName());
+
+                if (!groupElementDefinitionData) {
+                    this.logger.error("Group element not found.");
+                    throw new Error("Group element not found.");
+                }
+
+                const groupElementData = {
+                    id: groupElementDefinitionData.id,
+                    name: groupElement.name,
+                    options: {
+                        isRequired: false
+                    }
+                };
+
+                if (groupElement.options.isRequired)
+                    groupElementData.options.isRequired = true;
+
+                contentFieldDefinitionData.groupElements.push(groupElementData);
+            }
+        }
+
+        const contentFieldDefinitionId = await factory.getContentDefinitionPersistency().createContentFieldDefinition(contentFieldDefinitionData);
+
+        return contentFieldDefinitionId;
+    }
+
 
     private async getContentSchemaElement(field: ContentFieldDefinitionData, fieldAssignment: any): Promise<ContentSchemaElement> {
         const contentSchemaElement: ContentSchemaElement = {
@@ -130,58 +192,6 @@ class ContentDefinitionRepository implements IContentDefinitionRepository {
         return contentSchemaElement;
     }
 
-    async createContentFieldDefinition(contentFieldDefinition: ContentFieldDefinition): Promise<string> {
-        const contentFieldDefinitionData: ContentFieldDefinitionData = {
-            id: "",
-            path: contentFieldDefinition.getPath(),
-            name: contentFieldDefinition.getName(),
-            type: contentFieldDefinition.getType()
-        };
-
-        if (contentFieldDefinition.getType() === ContentFieldType.Array) {
-            const arrayFieldDefinition = contentFieldDefinition as ArrayContentFieldDefinition;
-
-            const arrayElementDefinitionData = await factory.getContentDefinitionPersistency().readContentFieldDefinitionByName(
-                arrayFieldDefinition.getArrayElementType().getName());
-
-            if (!arrayElementDefinitionData)
-                throw new Error("Array element type not found.")
-
-            contentFieldDefinitionData.arrayElementDefinitionId = arrayElementDefinitionData.id;
-        }
-
-        if (contentFieldDefinition.getType() === ContentFieldType.Group) {
-            contentFieldDefinitionData.groupElements = [];
-
-            const groupFieldDefinition = contentFieldDefinition as GroupContentFieldDefinition;
-            for (const groupElement of groupFieldDefinition.getContentFields()) {
-                const groupElementDefinitionData = await factory.getContentDefinitionPersistency().readContentFieldDefinitionByName(
-                    groupElement.contentFieldDefinition.getName());
-
-                if (!groupElementDefinitionData)
-                    throw new Error("Group element not found.");
-
-                const groupElementData = {
-                    id: groupElementDefinitionData.id,
-                    name: groupElement.name,
-                    options: {
-                        isRequired: false
-                    }
-                };
-
-                if (groupElement.options.isRequired)
-                    groupElementData.options.isRequired = true;
-
-                contentFieldDefinitionData.groupElements.push(groupElementData);
-            }
-        }
-
-        const contentFieldDefinitionId = await factory.getContentDefinitionPersistency().createContentFieldDefinition(contentFieldDefinitionData);
-
-        return contentFieldDefinitionId;
-    }
-
-
     private getHandlerProvider(path: string): IContentFieldHandlerProvider | undefined {
         if (!path || path.trim() === "")
             return undefined;
@@ -198,8 +208,10 @@ class ContentDefinitionRepository implements IContentDefinitionRepository {
                 const arrayElementDefinitionData = await factory.getContentDefinitionPersistency().readContentFieldDefinitionById(
                     contentFieldDefinitionData.arrayElementDefinitionId!);
 
-                if (!arrayElementDefinitionData) 
+                if (!arrayElementDefinitionData) {
+                    this.logger.error("Array field element type is not defined.");
                     throw new Error("Array field element type is not defined.");
+                }
 
                 const arrayElementDefinition = await this.convertFieldDataToEntity(arrayElementDefinitionData);
                 const createArrayFieldDefinitionResult = ArrayContentFieldDefinition.create(contentFieldDefinitionData.id, contentFieldDefinitionData.name, arrayElementDefinition);
@@ -223,8 +235,10 @@ class ContentDefinitionRepository implements IContentDefinitionRepository {
                     for (const groupElement of contentFieldDefinitionData.groupElements) {
                         const groupElementDefinitionData = await factory.getContentDefinitionPersistency().readContentFieldDefinitionById(groupElement.id);
     
-                        if (!groupElementDefinitionData) 
+                        if (!groupElementDefinitionData) {
+                            this.logger.error("Unknown group element type.");
                             throw new Error("Unknown group element type.");
+                        }
     
                         groupContentField.addContentField(groupElement.name, await this.convertFieldDataToEntity(groupElementDefinitionData), groupElement.options);
                     }
@@ -250,6 +264,7 @@ class ContentDefinitionRepository implements IContentDefinitionRepository {
             }
 
             default: 
+                this.logger.error("Invalid field type.");
                 throw new Error("Invalid field type.");
         }
 

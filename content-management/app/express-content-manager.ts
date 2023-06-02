@@ -33,11 +33,7 @@ class ExpressContentManager {
             const contentName = expressHelper.getContentName(request);
             const id = request.params.id;
 
-            const readContentDefinitionResult = await readContentDefinition.execute(contentName);
-            if (readContentDefinitionResult.getIsFailing())
-                throw new Error(readContentDefinitionResult.getMessage());
-
-            const readContentResult = await readContent.byId(readContentDefinitionResult.getResult()!, id);
+            const readContentResult = await readContent.byId(contentName, id);
             if (readContentResult.getIsFailing())
                 throw new Error(readContentResult.getMessage());
 
@@ -87,7 +83,7 @@ class ExpressContentManager {
             if (readContentDefinitionResult.getIsFailing())
                 throw new Error(readContentDefinitionResult.getMessage());
 
-            const deleteContentResult = await deleteContent.execute(readContentDefinitionResult.getResult()!, id);
+            const deleteContentResult = await deleteContent.execute(readContentDefinitionResult.getResult()!.getName(), id);
             if (deleteContentResult.getIsFailing())
                 throw new Error(deleteContentResult.getMessage());
 

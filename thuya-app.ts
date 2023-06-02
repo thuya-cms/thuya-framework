@@ -2,7 +2,6 @@ import express from 'express';
 import cors from "cors";
 import bodyParser from 'body-parser';
 import http from 'http';
-import logger from './common/utility/logger';
 import ContentProvider from './content-management/app/content-provider';
 import expressContentManager from './content-management/app/express-content-manager';
 import contentDefinitionManager from './content-management/app/content-definition-manager';
@@ -15,18 +14,25 @@ import correlator from 'express-correlation-id';
 import frameworkSettingsContentDefinition from './content/framework-settings-content-definition';
 import frameworkSettingsContentProvider from './content/framework-settings-content-provider';
 import { IContentPersistency } from './content-management/persistency';
+import Logger from './common/utility/logger';
 
+/**
+ * Main entry point for a Thuya CMS application.
+ */
 class ThuyaApp {
     private _expressApp: express.Application;
     private _port: string = process.env.PORT || "8080";
     private _expressServer?: http.Server;
     private _frameworkSettings: any;
+    private logger: Logger;
     
+
 
     constructor() {
         dotenv.config();
 
-        logger.initializeLogLevel();
+        this.logger = Logger.for(ThuyaApp.toString());
+        this.logger.initializeLogLevel();
 
         this._expressApp = express();
         this._expressApp.use(cors());
@@ -38,20 +44,23 @@ class ThuyaApp {
     }
 
 
+    /**
+     * Initialize the Thuya CMS application.
+     */
     public async initialize() {
-        logger.debug("Initializing framework...");
+        this.logger.debug("Initializing framework...");
 
         const frameworkSettingsContentDefinitionResult = await contentDefinitionManager.readContentDefinitionByName(frameworkSettingsContentDefinition.getName());
         if (frameworkSettingsContentDefinitionResult.getIsFailing()) {
-            logger.debug("Framework not yet initialized. Starting initialization.");
+            this.logger.debug("Framework not yet initialized. Starting initialization.");
             await this.useContentProvider(frameworkSettingsContentProvider);
         }
         else{
-            logger.debug(`Framework is already initialized.`);
+            this.logger.debug(`Framework is already initialized.`);
             this._frameworkSettings = frameworkSettingsContentDefinitionResult.getResult()!; // TODO: Should read settings content.
         }
 
-        logger.debug("...Framework initialization complete.");
+        this.logger.debug("...Framework initialization complete.");
     }
 
     /**
@@ -60,13 +69,13 @@ class ThuyaApp {
      * @throws will throw an exception if the app is already running
      */
     public start(): void {
-        logger.debug(`Starting Thuya application...`);
+        this.logger.debug(`Starting Thuya application...`);
 
         if (this._expressServer)
             throw new Error("App is already running.");
 
         this._expressServer = this._expressApp.listen(this._port, () => {
-            logger.debug(`...Thuya application started on port ${this._port}.`);
+            this.logger.debug(`...Thuya application started on port ${this._port}.`);
         });
     }
 
@@ -76,34 +85,48 @@ class ThuyaApp {
      * @throws will throw an exception if the app is not running
      */
     public stop(): void {
-        logger.debug(`Stopping Thuya application...`);
+        this.logger.debug(`Stopping Thuya application...`);
 
         if (!this._expressServer) 
             throw new Error("App is not running.");
 
         this._expressServer.close();
 
-        logger.debug(`...Thuya application stopped.`);
+        this.logger.debug(`...Thuya application stopped.`);
     }
 
+    /**
+     * Use a module in the Thuya CMS application.
+     * @param module the module to use
+     */
     public async useModule(module: Module): Promise<void> {
-        logger.debug(`Using module "%s"...`, module.getMetadata().name);
+        this.logger.debug(`Using module "%s"...`, module.getMetadata().name);
         
-        logger.debug(`Using controllers of module "%s".`, module.getMetadata().name);
+        this.logger.debug(`Using controllers of module "%s".`, module.getMetadata().name);
         for (const controller of module.getControllers()) 
             this._expressApp.use(controller.getRouter())
 
-        logger.debug(`Using content providers of module "%s".`, module.getMetadata().name);
+        this.logger.debug(`Using content providers of module "%s".`, module.getMetadata().name);
         for (const contentProvider of module.getContentProviders()) 
             await this.useContentProvider(contentProvider);
 
-        logger.debug(`...Module "%s" is successfully used.`, module.getMetadata().name);
+        this.logger.debug(`...Module "%s" is successfully used.`, module.getMetadata().name);
     }
 
+    /**
+     * Use a content definition persistency.
+     * 
+     * @param persistency the persistency to use
+     */
     public useContentDefinitionPersistency(persistency: IContentDefinitionPersistency) {
         factory.setContentDefinitionPersistency(persistency);
     }
     
+    /**
+     * Use a content persistency.
+     * 
+     * @param persistency the persistency to use
+     */
     public useContentPersistency(persistency: IContentPersistency) {
         factory.setContentPersistency(persistency);
     }
@@ -111,21 +134,21 @@ class ThuyaApp {
 
     private async useContentProvider(contentProvider: ContentProvider) {
         if (!this._frameworkSettings) {
-            logger.debug(`Creating content field definitions.`);
+            this.logger.debug(`Creating content field definitions.`);
             for (const contentFieldDefinition of contentProvider.getContentFieldDefinitions()) {
                 await contentDefinitionManager.createContentFieldDefinition(contentFieldDefinition);
             }
             
-            logger.debug(`Creating content definitions.`);
+            this.logger.debug(`Creating content definitions.`);
             for (const contentDefinition of contentProvider.getContentDefinitions()) {
                 await contentDefinitionManager.createContentDefinition(contentDefinition);
             }
             
-            logger.debug(`Creating content.`);
+            this.logger.debug(`Creating content.`);
             await contentProvider.createContent();
         }   
         
-        logger.debug(`Registering content definitions.`);
+        this.logger.debug(`Registering content definitions.`);
         for (const contentDefinition of contentProvider.getContentDefinitions()) {
             this.registerContentDefinition(contentDefinition);
         }

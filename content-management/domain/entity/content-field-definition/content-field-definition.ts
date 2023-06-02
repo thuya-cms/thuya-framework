@@ -1,4 +1,4 @@
-import { Result, logger } from "../../../../common";
+import { Result, Logger } from "../../../../common";
 import Entity from "../../../../common/entity";
 import IContentFieldHandlerProvider, { ContentFieldDetermination, ContentFieldValidator } from "./content-field-handler-provider.interface";
 
@@ -13,6 +13,8 @@ enum ContentFieldType {
 abstract class ContentFieldDefinition<T = any> extends Entity implements IContentFieldHandlerProvider<T> {
     private validators: ContentFieldValidator<T>[] = [];
     private determinations: ContentFieldDetermination<T>[] = [];
+    
+    protected logger: Logger;
 
     
     
@@ -23,13 +25,15 @@ abstract class ContentFieldDefinition<T = any> extends Entity implements IConten
             private filePath?: string) {
         super(id);
         
+        this.logger = Logger.for(ContentFieldDefinition.toString());
+
         if (!name) {
-            logger.error(`Content field definition name is required.`);
+            this.logger.error(`Content field definition name is required.`);
             throw new Error("Content field definition name is required.");
         }
 
         if (!Object.values(ContentFieldType).includes(type)) {
-            logger.error(`Content field definition type is invalid.`);
+            this.logger.error(`Content field definition type is invalid.`);
             throw new Error("Content field definition type is invalid.");
         }
     }
@@ -72,7 +76,7 @@ abstract class ContentFieldDefinition<T = any> extends Entity implements IConten
                 return result;
         }
 
-        logger.debug(`Content for "%s" field is valid.`, this.getName());
+        this.logger.debug(`Content for "%s" field is valid.`, this.getName());
 
         return Result.success();
     }

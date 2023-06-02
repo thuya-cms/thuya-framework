@@ -1,25 +1,73 @@
-import { Result } from "../../../../common";
-import { ContentDefinition } from "../../entity/content-definition";
+import { Result, Logger } from "../../../../common";
 import factory from "../../factory";
 
-class ReadContent<T extends { id: string }> {
-    async byId(contentDefinition: ContentDefinition<T>, id: string): Promise<Result<T>> {
+/**
+ * Use cases to read content.
+ */
+class ReadContent<T extends { id: string } = any> {
+    private logger: Logger;
+
+
+
+    constructor() {
+        this.logger = Logger.for(ReadContent.toString());
+    }
+
+
+    
+    /**
+     * Read content by id.
+     * 
+     * @param contentName name of the content definition
+     * @param id id of the content
+     * @returns result containing the content
+     */
+    async byId(contentName: string, id: string): Promise<Result<T>> {
+        this.logger.debug(`Reading content for "%s" by is "%s"...`, contentName, id);
+        
         try {
-            return Result.success(await factory.getContentPersistency().readContent(contentDefinition.getName(), id));
+            const content = await factory.getContentPersistency().readContent(contentName, id);
+
+            if (content) {
+                this.logger.debug(`...Successfully read content of type "%s".`, contentName);
+                return Result.success(content);
+            }
+
+            this.logger.debug(`...Content of type "%s" not found.`, contentName);
+            return Result.error("Content not found.");
         }
 
-        catch (error: any) {
-            return Result.error("Failed to read content.");
+        catch (error) {
+            this.logger.debug(`...Failed to read content of type "%s".`, contentName);
+            throw error;
         }
     }
 
-    async byFieldValue(contentDefinition: ContentDefinition<T>, fieldValue: { name: string, value: any }): Promise<Result<T[]>> {
+    /**
+     * Read a single content by field value.
+     * 
+     * @param contentName name of the content definition
+     * @param fieldValue field key and value
+     * @returns result containing the content
+     */
+    async byFieldValue(contentName: string, fieldValue: { name: string, value: any }): Promise<Result<T>> {
+        this.logger.debug(`Reading content for "%s" by field value "%s":"%s"...`, contentName, fieldValue.name, fieldValue.value);
+        
         try {
-            return Result.success(await factory.getContentPersistency().readContentByFieldValue(fieldValue, contentDefinition.getName()));
-        }
+            const content = await factory.getContentPersistency().readContentByFieldValue(fieldValue, contentName);
 
+            if (content) {
+                this.logger.debug(`...Successfully read content for "%s" by field value "%s":"%s".`, contentName, fieldValue.name, fieldValue.value);
+                return Result.success(content);
+            }
+            
+            this.logger.debug(`...Content not found for "%s" by field value "%s":"%s".`, contentName, fieldValue.name, fieldValue.value);
+            return Result.error("Content not found.");
+        }
+        
         catch (error: any) {
-            return Result.error("Failed to read content.");
+            this.logger.error(`...Failed to read content for "%s" by field value "%s":"%s".`, contentName, fieldValue.name, fieldValue.value);
+            throw error;
         }
     }
 }

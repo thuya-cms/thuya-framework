@@ -1,4 +1,4 @@
-import { Result, logger } from "../../../../common";
+import { Result, Logger } from "../../../../common";
 import contentHelper from "../../../../common/utility/content-helper";
 import expressHelper from "../../../../common/utility/express-helper";
 import { ContentFieldDefinition, ContentFieldType } from "./content-field-definition";
@@ -14,6 +14,8 @@ class GroupContentFieldDefinition<T = any> extends ContentFieldDefinition<T> {
     
     protected constructor(id: string, name: string, filePath?: string) {
         super(id, name, ContentFieldType.Group, filePath);
+
+        this.logger = Logger.for(GroupContentFieldDefinition.toString());
     }
 
 
@@ -32,7 +34,7 @@ class GroupContentFieldDefinition<T = any> extends ContentFieldDefinition<T> {
 
     addContentField(name: string, contentField: ContentFieldDefinition, options?: ContentFieldOptions): Result {
         if (this.contentFields.find(existingContentField => existingContentField.name === name)) {
-            logger.error(`Field with name "%s" is already added to group "%s".`, name, this.getName());
+            this.logger.error(`Field with name "%s" is already added to group "%s".`, name, this.getName());
             return Result.error(`Field with name "${ name }" is already added to group "${ this.getName() }".`);
         }
 
@@ -42,7 +44,7 @@ class GroupContentFieldDefinition<T = any> extends ContentFieldDefinition<T> {
             options: options || {}
         });
 
-        logger.debug(`Field "%s" is added to group "%s".`, name, this.getName());
+        this.logger.debug(`Field "%s" is added to group "%s".`, name, this.getName());
 
         return Result.success();
     }
@@ -56,7 +58,7 @@ class GroupContentFieldDefinition<T = any> extends ContentFieldDefinition<T> {
             const singleFieldValue = contentHelper.getFieldValue(contentField.name, fieldValue);
 
             if (contentField.options.isRequired && !singleFieldValue) {
-                logger.debug(`Value for field "%s" is required.`, contentField.name);
+                this.logger.debug(`Value for field "%s" is required.`, contentField.name);
                 return Result.error(`Value for field "${ contentField.name }" is required.`);
             }
 
