@@ -18,7 +18,7 @@ class ContentDefinitionRepository implements IContentDefinitionRepository {
 
 
     constructor() {
-        this.logger = Logger.for(ContentDefinitionRepository.toString());
+        this.logger = Logger.for(ContentDefinitionRepository.name);
     }
 
 

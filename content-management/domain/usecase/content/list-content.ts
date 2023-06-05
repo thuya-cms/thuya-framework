@@ -10,7 +10,7 @@ class ListContent<T extends { id: string } = any> {
 
 
     constructor() {
-        this.logger = Logger.for(ListContent.toString());
+        this.logger = Logger.for(ListContent.name);
     }
 
 

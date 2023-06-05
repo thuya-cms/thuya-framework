@@ -12,7 +12,7 @@ class UpdateContent<T extends { id: string }> {
 
 
     constructor() {
-        this.logger = Logger.for(UpdateContent.toString());
+        this.logger = Logger.for(UpdateContent.name);
     }
 
 

@@ -12,7 +12,7 @@ class ModifyHelper<T> {
 
 
     constructor() {
-        this.logger = Logger.for(ModifyHelper.toString());
+        this.logger = Logger.for(ModifyHelper.name);
     }
 
 

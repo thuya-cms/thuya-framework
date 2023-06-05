@@ -10,7 +10,7 @@ class DeleteContent {
 
 
     constructor() {
-        this.logger = Logger.for(DeleteContent.toString());
+        this.logger = Logger.for(DeleteContent.name);
     }
 
 

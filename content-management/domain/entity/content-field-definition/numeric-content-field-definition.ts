@@ -5,7 +5,7 @@ class NumericContentFieldDefinition extends ContentFieldDefinition<number> {
     protected constructor(id: string, name: string, filePath?: string) {
         super(id, name, ContentFieldType.Numeric, filePath);
 
-        this.logger = Logger.for(NumericContentFieldDefinition.toString());
+        this.logger = Logger.for(NumericContentFieldDefinition.name);
     }
 
 

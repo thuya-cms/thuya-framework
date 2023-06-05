@@ -12,7 +12,7 @@ class ReadContentDefinition {
 
 
     constructor() {
-        this.logger = Logger.for(ReadContentDefinition.toString());
+        this.logger = Logger.for(ReadContentDefinition.name);
     }
 
 

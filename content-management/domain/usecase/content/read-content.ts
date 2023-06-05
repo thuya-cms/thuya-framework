@@ -10,7 +10,7 @@ class ReadContent<T extends { id: string } = any> {
 
 
     constructor() {
-        this.logger = Logger.for(ReadContent.toString());
+        this.logger = Logger.for(ReadContent.name);
     }
 
 
@@ -37,9 +37,9 @@ class ReadContent<T extends { id: string } = any> {
             return Result.error("Content not found.");
         }
 
-        catch (error) {
+        catch (error: any) {
             this.logger.debug(`...Failed to read content of type "%s".`, contentName);
-            throw error;
+            return Result.error(error.message);
         }
     }
 
@@ -67,7 +67,7 @@ class ReadContent<T extends { id: string } = any> {
         
         catch (error: any) {
             this.logger.error(`...Failed to read content for "%s" by field value "%s":"%s".`, contentName, fieldValue.name, fieldValue.value);
-            throw error;
+            return Result.error(error.message);
         }
     }
 }

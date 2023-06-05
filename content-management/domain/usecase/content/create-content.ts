@@ -12,7 +12,7 @@ class CreateContent<T> {
 
 
     constructor() {
-        this.logger = Logger.for(CreateContent.toString());
+        this.logger = Logger.for(CreateContent.name);
     }
 
 

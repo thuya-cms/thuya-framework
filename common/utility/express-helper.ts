@@ -7,7 +7,7 @@ class ExpressHelper {
 
 
     constructor() {
-        this.logger = Logger.for(ExpressHelper.toString());
+        this.logger = Logger.for(ExpressHelper.name);
     }
 
 

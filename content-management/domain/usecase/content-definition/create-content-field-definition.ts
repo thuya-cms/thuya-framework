@@ -12,7 +12,7 @@ class CreateContentFieldDefinition {
 
 
     constructor() {
-        this.logger = Logger.for(CreateContentFieldDefinition.toString());
+        this.logger = Logger.for(CreateContentFieldDefinition.name);
     }
 
 

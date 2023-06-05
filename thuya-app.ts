@@ -31,8 +31,8 @@ class ThuyaApp {
     constructor() {
         dotenv.config();
 
-        this.logger = Logger.for(ThuyaApp.toString());
-        this.logger.initializeLogLevel();
+        Logger.initializeLogLevel();
+        this.logger = Logger.for(ThuyaApp.name);
 
         this._expressApp = express();
         this._expressApp.use(cors());

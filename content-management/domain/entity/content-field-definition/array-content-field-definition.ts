@@ -4,7 +4,7 @@ import { ContentFieldDefinition, ContentFieldType } from "./content-field-defini
 class ArrayContentFieldDefinition<T = any> extends ContentFieldDefinition<T[]> {    
     protected constructor(id: string, name: string, private arrayElementType: ContentFieldDefinition, filePath?: string) {
         super(id, name, ContentFieldType.Array, filePath);
-        this.logger = Logger.for(ArrayContentFieldDefinition.toString());
+        this.logger = Logger.for(ArrayContentFieldDefinition.name);
     }
 
 

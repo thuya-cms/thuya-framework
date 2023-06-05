@@ -25,7 +25,7 @@ abstract class ContentFieldDefinition<T = any> extends Entity implements IConten
             private filePath?: string) {
         super(id);
         
-        this.logger = Logger.for(ContentFieldDefinition.toString());
+        this.logger = Logger.for(ContentFieldDefinition.name);
 
         if (!name) {
             this.logger.error(`Content field definition name is required.`);

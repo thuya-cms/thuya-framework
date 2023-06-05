@@ -19,7 +19,7 @@ class ContentDefinition<T = any> extends Entity {
     protected constructor(id: string, private name: string) {
         super(id);
         
-        this.logger = Logger.for(ContentDefinition.toString());
+        this.logger = Logger.for(ContentDefinition.name);
 
         if (!name) {
             this.logger.error(`Content definition name is required.`);

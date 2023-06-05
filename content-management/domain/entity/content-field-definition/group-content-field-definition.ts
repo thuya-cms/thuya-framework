@@ -15,7 +15,7 @@ class GroupContentFieldDefinition<T = any> extends ContentFieldDefinition<T> {
     protected constructor(id: string, name: string, filePath?: string) {
         super(id, name, ContentFieldType.Group, filePath);
 
-        this.logger = Logger.for(GroupContentFieldDefinition.toString());
+        this.logger = Logger.for(GroupContentFieldDefinition.name);
     }
 
 

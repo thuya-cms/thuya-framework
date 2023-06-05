@@ -6,7 +6,7 @@ class DateContentFieldDefinition extends ContentFieldDefinition<Date> {
     protected constructor(id: string, name: string, filePath?: string) {
         super(id, name, ContentFieldType.Date, filePath);
 
-        this.logger = Logger.for(DateContentFieldDefinition.toString());
+        this.logger = Logger.for(DateContentFieldDefinition.name);
     }
 
 
