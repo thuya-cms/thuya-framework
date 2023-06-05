@@ -48,7 +48,6 @@
   "scripts": {
     "eslint": "eslint .",
     "test": "mocha -r ts-node/register test/**/*.spec.ts",
-    "prepare": "npm run build",
     "publish:dev": "npm publish --tag development",
     "build": "npx tsc",
     "build:dev": "npx tsc -p tsconfig-dev.json",

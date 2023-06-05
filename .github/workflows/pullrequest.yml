@@ -1,0 +1,32 @@
+name: Validate
+
+on:
+  pull_request:
+    types: [opened, reopened]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Node.js version
+        uses: actions/setup-node@v1
+        with:
+          node-version: '18.x'
+
+      - name: Authenticate with private NPM package
+        run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+
+      - name: npm install, build
+        run: |
+          npm i
+      
+      - name: Run eslint
+        run: |
+          npm run eslint
+      
+      - name: Run tests
+        run: |
+          npm run test
