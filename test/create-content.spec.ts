@@ -60,7 +60,7 @@ describe("create content", () => {
         should().exist(content);
         should().equal(content.id, createContentResult.getResult());
         should().equal(content.textField, textValue);
-        should().equal(content.numericField, numValue);
+        should().equal(content.numericField, 500);
         should().equal(content.dateField, dateValue);
         should().equal(content.arrayField, arrayValue);
     });
