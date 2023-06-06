@@ -23,7 +23,7 @@ class ReadContentDefinition {
      * @param contentName name of the content definition to read
      * @returns result containing the content definition
      */
-    async execute(contentName: string): Promise<Result<ContentDefinition>> {
+    async execute(contentName: string): Promise<Result<ContentDefinition | undefined>> {
         this.logger.debug(`Start reading content definition "%s"...`, contentName);
 
         try {
@@ -40,7 +40,7 @@ class ReadContentDefinition {
 
         catch (error) {
             this.logger.debug(`...Failed to read content definition "%s".`, contentName);
-            throw error;
+            return Result.error(`Content definition "${ contentName }" not found.`);
         }
     }
 }
