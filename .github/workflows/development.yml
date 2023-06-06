@@ -1,8 +1,7 @@
-name: Validate
+name: Publish development version
 
 on:
-  pull_request:
-    types: [opened, reopened]
+  workflow_dispatch:
 
 jobs:
   validate:
@@ -19,14 +18,11 @@ jobs:
       - name: Authenticate with private NPM package
         run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
 
-      - name: npm install
+      - name: npm install, build
         run: |
-          npm ci
+          npm i
+          npm run build
       
-      - name: Run eslint
+      - name: npm publish development
         run: |
-          npm run eslint
-      
-      - name: Run tests
-        run: |
-          npm run test
+          npm run publish:dev
