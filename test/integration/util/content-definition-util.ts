@@ -1,7 +1,7 @@
 import { should } from "chai";
-import contentDefinitionManager from "../../content-management/app/content-definition-manager";
-import { ContentFieldDefinitionDTO } from "../../content-management/app/dto/content-field-definition/content-field-definition";
-import ContentDefinitionDTO from "../../content-management/app/dto/content-definition";
+import contentDefinitionManager from "../../../content-management/app/content-definition-manager";
+import { ContentFieldDefinitionDTO } from "../../../content-management/app/dto/content-field-definition/content-field-definition";
+import ContentDefinitionDTO from "../../../content-management/app/dto/content-definition";
 
 class ContentDefinitionUtility {
     async defineContentField(contentFieldDefinition: ContentFieldDefinitionDTO): Promise<ContentFieldDefinitionDTO> {
