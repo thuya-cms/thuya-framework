@@ -1,11 +1,11 @@
 import { should } from "chai";
-import contentDefinitionManager from "../content-management/app/content-definition-manager";
-import contentManager from "../content-management/app/content-manager";
-import ContentDefinitionDTO from "../content-management/app/dto/content-definition";
-import GroupContentFieldDefinitionDTO from "../content-management/app/dto/content-field-definition/group-content-field-definition";
-import NumericContentFieldDefinitionDTO from "../content-management/app/dto/content-field-definition/numeric-content-field-definition";
-import TextContentFieldDefinitionDTO from "../content-management/app/dto/content-field-definition/text-content-field-definition";
-import localContentManagementPersistency from "../content-management/persistency/local-content-management-persistency";
+import contentDefinitionManager from "../../content-management/app/content-definition-manager";
+import contentManager from "../../content-management/app/content-manager";
+import ContentDefinitionDTO from "../../content-management/app/dto/content-definition";
+import GroupContentFieldDefinitionDTO from "../../content-management/app/dto/content-field-definition/group-content-field-definition";
+import NumericContentFieldDefinitionDTO from "../../content-management/app/dto/content-field-definition/numeric-content-field-definition";
+import TextContentFieldDefinitionDTO from "../../content-management/app/dto/content-field-definition/text-content-field-definition";
+import localContentManagementPersistency from "../../content-management/persistency/local-content-management-persistency";
 import contentDefinitionUtil from "./util/content-definition-util";
 
 describe("create content with group", () => {

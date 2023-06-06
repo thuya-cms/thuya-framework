@@ -1,8 +1,8 @@
 import { should } from "chai";
-import contentManager from "../content-management/app/content-manager";
-import ContentDefinitionDTO from "../content-management/app/dto/content-definition";
-import TextContentFieldDefinitionDTO from "../content-management/app/dto/content-field-definition/text-content-field-definition";
-import localContentManagementPersistency from "../content-management/persistency/local-content-management-persistency";
+import contentManager from "../../content-management/app/content-manager";
+import ContentDefinitionDTO from "../../content-management/app/dto/content-definition";
+import TextContentFieldDefinitionDTO from "../../content-management/app/dto/content-field-definition/text-content-field-definition";
+import localContentManagementPersistency from "../../content-management/persistency/local-content-management-persistency";
 import contentDefinitionUtil from "./util/content-definition-util";
 import fieldWithDetermination from "./content/field-with-determination";
 
