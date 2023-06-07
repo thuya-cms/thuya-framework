@@ -196,8 +196,15 @@ class ContentDefinitionRepository implements IContentDefinitionRepository {
         if (!path || path.trim() === "")
             return undefined;
 
-        // eslint-disable-next-line @typescript-eslint/no-var-requires
-        return require(path).default as IContentFieldHandlerProvider;
+        try {
+            // eslint-disable-next-line @typescript-eslint/no-var-requires
+            return require(path).default as IContentFieldHandlerProvider;
+        }
+
+        catch (error) {
+            this.logger.error(`Handler not found on path "%s".`, path);
+            throw error;
+        }
     }
 
     private async convertFieldDataToEntity(contentFieldDefinitionData: ContentFieldDefinitionData): Promise<ContentFieldDefinition> {
