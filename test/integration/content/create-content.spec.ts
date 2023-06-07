@@ -1,12 +1,12 @@
 import { should } from "chai";
-import contentManager from "../../content-management/app/content-manager";
-import ContentDefinitionDTO from "../../content-management/app/dto/content-definition";
-import TextContentFieldDefinitionDTO from "../../content-management/app/dto/content-field-definition/text-content-field-definition";
-import NumericContentFieldDefinitionDTO from "../../content-management/app/dto/content-field-definition/numeric-content-field-definition";
-import DateContentFieldDefinitionDTO from "../../content-management/app/dto/content-field-definition/date-content-field-definition";
-import ArrayContentFieldDefinitionDTO from "../../content-management/app/dto/content-field-definition/array-content-field-definition";
-import localContentManagementPersistency from "../../content-management/persistency/local-content-management-persistency";
-import contentDefinitionUtil from "./util/content-definition-util";
+import contentManager from "../../../content-management/app/content-manager";
+import ContentDefinitionDTO from "../../../content-management/app/dto/content-definition";
+import TextContentFieldDefinitionDTO from "../../../content-management/app/dto/content-field-definition/text-content-field-definition";
+import NumericContentFieldDefinitionDTO from "../../../content-management/app/dto/content-field-definition/numeric-content-field-definition";
+import DateContentFieldDefinitionDTO from "../../../content-management/app/dto/content-field-definition/date-content-field-definition";
+import ArrayContentFieldDefinitionDTO from "../../../content-management/app/dto/content-field-definition/array-content-field-definition";
+import localContentManagementPersistency from "../../../content-management/persistency/local-content-management-persistency";
+import contentDefinitionUtil from "../helper/content-definition-util";
 
 describe("create content", () => {    
     let contentDefinition: ContentDefinitionDTO;

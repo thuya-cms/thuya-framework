@@ -1,4 +1,4 @@
-import TextContentFieldDefinitionDTO from "../../../content-management/app/dto/content-field-definition/text-content-field-definition";
+import TextContentFieldDefinitionDTO from "../../../../content-management/app/dto/content-field-definition/text-content-field-definition";
 
 class FieldWithDetermination extends TextContentFieldDefinitionDTO {
     protected filePath: string = __filename;
