@@ -37,9 +37,9 @@ class ReadContent<T extends { id: string } = any> {
             return Result.error("Content not found.");
         }
 
-        catch (error: any) {
+        catch (error) {
             this.logger.debug(`...Failed to read content of type "%s".`, contentName);
-            return Result.error(error.message);
+            throw error;
         }
     }
 
@@ -65,9 +65,9 @@ class ReadContent<T extends { id: string } = any> {
             return Result.error("Content not found.");
         }
         
-        catch (error: any) {
+        catch (error) {
             this.logger.error(`...Failed to read content for "%s" by field value "%s":"%s".`, contentName, fieldValue.name, fieldValue.value);
-            return Result.error(error.message);
+            throw error;
         }
     }
 }

@@ -25,12 +25,17 @@ describe("unit tests for reading content definition use case", () => {
         expect(readContentDefinitionResult.getResult()).to.equal(contentDefinition);
     });
     
-    it("should return undefined if repository throws error", async () => {
-        sinon.stub(contentDefinitionRepository, "readContentDefinition").throws(new Error("Failed to read."));
+    it("should throw an error if repository throws error", async () => {
+        try {
+            sinon.stub(contentDefinitionRepository, "readContentDefinition").throws(new Error("Failed to read."));
+    
+            await readContentDefinition.execute("test");
+            expect.fail();
+        }
 
-        const readContentDefinitionResult = await readContentDefinition.execute("test");
-        expect(readContentDefinitionResult.getIsFailing()).to.be.true;
-        expect(readContentDefinitionResult.getResult()).not.to.exist;
+        catch (error: any) {
+            expect(error.message).to.equal("Failed to read.");
+        }
     });
     
     it("should return undefined if repository returns undefined", async () => {
