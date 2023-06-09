@@ -1,4 +1,4 @@
-import { expect, should } from "chai";
+import { expect } from "chai";
 import { contentManager } from "../../../content-management/app";
 import ContentDefinitionDTO from "../../../content-management/app/dto/content-definition";
 import ArrayContentFieldDefinitionDTO from "../../../content-management/app/dto/content-field-definition/array-content-field-definition";
