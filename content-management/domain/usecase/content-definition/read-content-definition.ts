@@ -40,7 +40,7 @@ class ReadContentDefinition {
 
         catch (error) {
             this.logger.debug(`...Failed to read content definition "%s".`, contentName);
-            return Result.error(`Content definition "${ contentName }" not found.`);
+            throw error;
         }
     }
 }
