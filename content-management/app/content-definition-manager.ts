@@ -8,6 +8,7 @@ import NumericContentFieldDefinition from "../domain/entity/content-field-defini
 import TextContentFieldDefinition from "../domain/entity/content-field-definition/text-content-field-definition";
 import createContentDefinition from "../domain/usecase/content-definition/create-content-definition";
 import createContentFieldDefinition from "../domain/usecase/content-definition/create-content-field-definition";
+import deleteContentDefinition from "../domain/usecase/content-definition/delete-content-definition";
 import readContentDefinition from "../domain/usecase/content-definition/read-content-definition";
 import ContentDefinitionDTO from "./dto/content-definition";
 import ArrayContentFieldDefinitionDTO from "./dto/content-field-definition/array-content-field-definition";
@@ -63,6 +64,16 @@ class ContentDefinitionManager {
         const contentDefinitionDTO = this.convertEntityToDto(contentDefinitionResult.getResult()!);
 
         return Result.success(contentDefinitionDTO);
+    }
+
+    /**
+     * Delete a content definition.
+     * 
+     * @param contentName content definition name
+     * @returns result
+     */
+    async deleteContentDefinitionByName(contentName: string): Promise<Result> {
+        return await deleteContentDefinition.byName(contentName);
     }
 
 

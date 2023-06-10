@@ -22,6 +22,13 @@ interface IContentDefinitionRepository {
     createContentDefinition(contentDefinition: ContentDefinition): Promise<string>;
 
     /**
+     * Delete a content definition by name.
+     * 
+     * @param contentName name of the content definition
+     */
+    deleteContentDefinitionByName(contentName: string): Promise<void>;
+
+    /**
      * Create a content field definition.
      * 
      * @param contentFieldDefinition the content field to create
