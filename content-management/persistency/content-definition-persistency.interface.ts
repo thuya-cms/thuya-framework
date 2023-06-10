@@ -86,6 +86,13 @@ interface IContentDefinitionPersistency {
     createContentDefinition(contentDefinitionData: ContentDefinitionData): Promise<string>;
 
     /**
+     * Delete a content definition by name.
+     * 
+     * @param contentName the name of the content definition
+     */
+    deleteContentDefinitionByName(contentName: string): Promise<void>;
+
+    /**
      * Create a content field definition.
      * 
      * @param contentFieldDefinitionData the data of the content field definition to create
