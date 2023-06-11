@@ -51,7 +51,7 @@ interface IContentDefinitionPersistency {
      * @param contentName the name of the content definition to read
      * @returns the data of the content definition
      */
-    readContentDefinition(contentName: string): Promise<ContentDefinitionData>;
+    readContentDefinition(contentName: string): Promise<ContentDefinitionData | undefined>;
 
     /**
      * Read a content definition by name expanding the content fields.
@@ -59,7 +59,14 @@ interface IContentDefinitionPersistency {
      * @param contentName the name of the content definition to read
      * @returns the data of the expanded content definition
      */
-    readContentDefinitionExpandingFields(contentName: string): Promise<ExpandedContentDefinitionData>;
+    readContentDefinitionExpandingFields(contentName: string): Promise<ExpandedContentDefinitionData | undefined>;
+
+    /**
+     * List content definitions.
+     * 
+     * @returns the list of content definitions data
+     */
+    listContentDefinitions(): Promise<ExpandedContentDefinitionData[]>;
 
     /**
      * Read a content definition by id.

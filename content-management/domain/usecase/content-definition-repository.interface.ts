@@ -12,6 +12,13 @@ interface IContentDefinitionRepository {
      * @returns the content definition or undefined
      */
     readContentDefinition(contentName: string): Promise<ContentDefinition | void>;
+
+    /**
+     * List content definitions.
+     * 
+     * @returns the list of content definitions
+     */
+    listContentDefinitions(): Promise<ContentDefinition[]>;
     
     /**
      * Create a content definition.

@@ -9,6 +9,7 @@ import TextContentFieldDefinition from "../domain/entity/content-field-definitio
 import createContentDefinition from "../domain/usecase/content-definition/create-content-definition";
 import createContentFieldDefinition from "../domain/usecase/content-definition/create-content-field-definition";
 import deleteContentDefinition from "../domain/usecase/content-definition/delete-content-definition";
+import listContentDefinitions from "../domain/usecase/content-definition/list-content-definitions";
 import readContentDefinition from "../domain/usecase/content-definition/read-content-definition";
 import ContentDefinitionDTO from "./dto/content-definition";
 import ArrayContentFieldDefinitionDTO from "./dto/content-field-definition/array-content-field-definition";
@@ -65,6 +66,26 @@ class ContentDefinitionManager {
 
         return Result.success(contentDefinitionDTO);
     }
+
+    /**
+     * List content definitions.
+     * 
+     * @returns result containing the list of content definitions
+     */
+    async listContentDefinitions(): Promise<Result<ContentDefinitionDTO[]>> {
+        const contentDefinitionDTOs: ContentDefinitionDTO[] = [];
+
+        const listContentDefinitionsResult = await listContentDefinitions.execute();
+        if (listContentDefinitionsResult.getIsFailing()) 
+            return Result.error(listContentDefinitionsResult.getMessage());
+
+        for (const contentDefinition of listContentDefinitionsResult.getResult()!) {
+            const contentDefinitionDTO = this.convertEntityToDto(contentDefinition);
+            contentDefinitionDTOs.push(contentDefinitionDTO);
+        }
+
+        return Result.success(contentDefinitionDTOs);
+    } 
 
     /**
      * Delete a content definition.

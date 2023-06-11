@@ -24,27 +24,56 @@ class LocalContentManagementPersistency implements IContentDefinitionPersistency
         const index = this.contentDefinitions.findIndex(contentDefinition => contentDefinition.name === contentName);
 
         if (index === -1) 
-            throw new Error("Not found.");
+            throw new Error("Content definition not found.");
 
         this.contentDefinitions.splice(index, 1);
 
         return;
     }
 
-    readContentDefinition(contentName: string): Promise<ContentDefinitionData> {
+    async readContentDefinition(contentName: string): Promise<ContentDefinitionData | undefined> {
         const contentDefinitionData = this.contentDefinitions.find(contentDefinition => contentDefinition.name === contentName);
 
         if (!contentDefinitionData)
-            throw new Error("Content definition not found.");
+            return;
 
-        return Promise.resolve(contentDefinitionData);
+        return contentDefinitionData;
     }
 
-    readContentDefinitionExpandingFields(contentName: string): Promise<ExpandedContentDefinitionData> {
+    listContentDefinitions(): Promise<ExpandedContentDefinitionData[]> {
+        const expandedDataList: ExpandedContentDefinitionData[] = [];
+
+        for (const contentDefinitionData of this.contentDefinitions) {
+            const expandedData: ExpandedContentDefinitionData = {
+                id: contentDefinitionData.id,
+                name: contentDefinitionData.name,
+                fields: []
+            };
+
+            for (const fieldReference of contentDefinitionData.fields) {
+                const field = this.contentFieldDefinitions.find(field => field.id === fieldReference.id);
+    
+                if (!field)
+                    throw new Error("Not existing field.");
+    
+                expandedData.fields.push({
+                    name: fieldReference.name,
+                    options: fieldReference.options,
+                    field: field
+                });
+            }
+    
+            expandedDataList.push(expandedData);
+        }
+
+        return Promise.resolve(expandedDataList);
+    }
+
+    async readContentDefinitionExpandingFields(contentName: string): Promise<ExpandedContentDefinitionData | undefined> {
         const contentDefinitionData = this.contentDefinitions.find(contentDefinition => contentDefinition.name === contentName);
         
         if (!contentDefinitionData)
-            throw new Error("Content definition not found.");
+            return;
         
         const expandedData: ExpandedContentDefinitionData = {
             id: contentDefinitionData.id,
@@ -65,7 +94,7 @@ class LocalContentManagementPersistency implements IContentDefinitionPersistency
             });
         }
 
-        return Promise.resolve(expandedData);
+        return expandedData;
     }
     
     readContentFieldDefinitionById(id: string): Promise<ContentFieldDefinitionData> {

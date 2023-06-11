@@ -32,7 +32,7 @@ describe("delete content definition", () => {
         }
 
         catch (error: any) {
-            expect(error.message).to.equal("Not found.");
+            expect(error.message).to.equal("Content definition not found.");
         }
     });
 });
