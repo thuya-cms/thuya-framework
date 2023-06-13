@@ -20,6 +20,17 @@ class LocalContentManagementPersistency implements IContentDefinitionPersistency
         return Promise.resolve(contentDefinitionData.id);
     }
 
+    async updateContentDefinition(contentDefinitionData: ContentDefinitionData): Promise<void> {
+        const index = this.contentDefinitions.findIndex(contentDefinition => contentDefinition.id === contentDefinitionData.id);
+
+        if (index === -1) 
+            throw new Error(`Content definition with id "${ contentDefinitionData.id }" not found.`);
+
+        this.contentDefinitions[index] = contentDefinitionData;
+
+        return;
+    }
+
     async deleteContentDefinitionByName(contentName: string): Promise<void> {
         const index = this.contentDefinitions.findIndex(contentDefinition => contentDefinition.name === contentName);
 

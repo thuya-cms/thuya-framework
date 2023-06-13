@@ -35,6 +35,18 @@ class ContentDefinitionDTO<T = any> {
     getContentFields(): { name: string, contentFieldDefinition: ContentFieldDefinitionDTO, options: ContentFieldOptions }[] {
         return this.contentFields;
     }
+
+    clone(id?: string): ContentDefinitionDTO<T> {
+        const newId = id || this.getId();
+
+        const contentDefinition = new ContentDefinitionDTO(newId, this.getName());
+
+        for (const contentField of this.getContentFields()) {
+            contentDefinition.addContentField(contentField.name, contentField.contentFieldDefinition, contentField.options); // TODO: Clone fields.
+        }
+
+        return contentDefinition;
+    }
 }
 
 export default ContentDefinitionDTO;

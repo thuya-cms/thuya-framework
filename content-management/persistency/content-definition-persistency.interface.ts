@@ -91,6 +91,13 @@ interface IContentDefinitionPersistency {
      * @returns the id of the created content definition
      */
     createContentDefinition(contentDefinitionData: ContentDefinitionData): Promise<string>;
+    
+    /**
+     * Update a content definition.
+     * 
+     * @param contentDefinitionData the data of content definition to update 
+     */
+    updateContentDefinition(contentDefinitionData: ContentDefinitionData): Promise<void>;
 
     /**
      * Delete a content definition by name.

@@ -91,6 +91,43 @@ class ContentDefinitionRepository implements IContentDefinitionRepository {
         return await factory.getContentDefinitionPersistency().createContentDefinition(contentDefinitionData);
     }
 
+    async updateContentDefinition(contentDefinition: ContentDefinition): Promise<void> {
+        const contentDefinitionData: ContentDefinitionData = {
+            id: contentDefinition.getId(),
+            name: contentDefinition.getName(),
+            fields: []
+        };
+
+        for (const contentField of contentDefinition.getContentFields()) {
+            const field = await factory.getContentDefinitionPersistency().readContentFieldDefinitionByName(contentField.contentFieldDefinition.getName());
+
+            if (!field) {
+                this.logger.error(`Not existing field "%s".`, contentField.contentFieldDefinition.getName());
+                throw new Error(`Not existing field "${ contentField.contentFieldDefinition.getName() }".`);
+            }
+
+            const fieldData = {
+                id: field.id,
+                name: contentField.name,
+                options: {
+                    isRequired: false,
+                    isUnique: false,
+                    isIndexed: false
+                }
+            };
+
+            if (contentField.options) {
+                fieldData.options.isRequired = contentField.options.isRequired || false;
+                fieldData.options.isUnique = contentField.options.isUnique || false;
+                fieldData.options.isIndexed = contentField.options.isIndexed || false;
+            }
+
+            contentDefinitionData.fields.push(fieldData);
+        }
+
+        await factory.getContentDefinitionPersistency().updateContentDefinition(contentDefinitionData);
+    }
+
     async deleteContentDefinitionByName(contentName: string): Promise<void> {
         return await factory.getContentDefinitionPersistency().deleteContentDefinitionByName(contentName);
     }
