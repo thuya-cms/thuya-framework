@@ -27,6 +27,13 @@ interface IContentDefinitionRepository {
      * @returns the id of the created content definition
      */
     createContentDefinition(contentDefinition: ContentDefinition): Promise<string>;
+    
+    /**
+     * Update a content definition.
+     * 
+     * @param contentDefinition the content definition to update
+     */
+    updateContentDefinition(contentDefinition: ContentDefinition): Promise<void>;
 
     /**
      * Delete a content definition by name.

@@ -1,4 +1,4 @@
-import { should } from "chai";
+import { expect } from "chai";
 import contentDefinitionManager from "../../../content-management/app/content-definition-manager";
 import { ContentFieldDefinitionDTO } from "../../../content-management/app/dto/content-field-definition/content-field-definition";
 import ContentDefinitionDTO from "../../../content-management/app/dto/content-definition";
@@ -6,16 +6,16 @@ import ContentDefinitionDTO from "../../../content-management/app/dto/content-de
 class ContentDefinitionUtility {
     async defineContentField(contentFieldDefinition: ContentFieldDefinitionDTO): Promise<ContentFieldDefinitionDTO> {
         const createContentFieldDefinitionResult = await contentDefinitionManager.createContentFieldDefinition(contentFieldDefinition);
-        should().equal(createContentFieldDefinitionResult.getIsSuccessful(), true, createContentFieldDefinitionResult.getMessage());
+        expect(createContentFieldDefinitionResult.getIsSuccessful(), createContentFieldDefinitionResult.getMessage()).to.be.true;
 
         return contentFieldDefinition;
     }
 
     async defineContent(contentDefinition: ContentDefinitionDTO): Promise<ContentDefinitionDTO> {
         const createContentDefinitionResult = await contentDefinitionManager.createContentDefinition(contentDefinition);
-        should().equal(createContentDefinitionResult.getIsSuccessful(), true, createContentDefinitionResult.getMessage());
+        expect(createContentDefinitionResult.getIsSuccessful(), createContentDefinitionResult.getMessage()).to.be.true;
 
-        return contentDefinition;
+        return contentDefinition.clone(createContentDefinitionResult.getResult()!);
     }
 }
 

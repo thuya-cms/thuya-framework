@@ -11,6 +11,7 @@ import createContentFieldDefinition from "../domain/usecase/content-definition/c
 import deleteContentDefinition from "../domain/usecase/content-definition/delete-content-definition";
 import listContentDefinitions from "../domain/usecase/content-definition/list-content-definitions";
 import readContentDefinition from "../domain/usecase/content-definition/read-content-definition";
+import updateContentDefinition from "../domain/usecase/content-definition/update-content-definition";
 import ContentDefinitionDTO from "./dto/content-definition";
 import ArrayContentFieldDefinitionDTO from "./dto/content-field-definition/array-content-field-definition";
 import { ContentFieldDefinitionDTO, ContentFieldType } from "./dto/content-field-definition/content-field-definition";
@@ -35,6 +36,20 @@ class ContentDefinitionManager {
             return Result.error(contentDefinitionEntityResult.getMessage());
 
         return await createContentDefinition.execute(contentDefinitionEntityResult.getResult()!);
+    }
+    
+    /**
+     * Update a content definition.
+     * 
+     * @param contentDefinition the content definition
+     * @returns result
+     */
+    async updateContentDefinition(contentDefinition: ContentDefinitionDTO): Promise<Result> {
+        const contentDefinitionEntityResult = this.convertDtoToEntity(contentDefinition);
+        if (contentDefinitionEntityResult.getIsFailing())
+            return Result.error(contentDefinitionEntityResult.getMessage());
+
+        return await updateContentDefinition.execute(contentDefinitionEntityResult.getResult()!);
     }
 
     /**
