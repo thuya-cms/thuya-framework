@@ -1,4 +1,4 @@
-import { should } from "chai";
+import { expect, should } from "chai";
 import contentDefinitionManager from "../../../content-management/app/content-definition-manager";
 import ContentDefinitionDTO from "../../../content-management/app/dto/content-definition";
 import TextContentFieldDefinitionDTO from "../../../content-management/app/dto/content-field-definition/text-content-field-definition";
@@ -17,6 +17,13 @@ describe("create content definition", () => {
 
     it("should be created wo fields", async () => {
         await contentDefinitionUtil.defineContent(new ContentDefinitionDTO("", "test-definition"));
+    });
+    
+    it("should fail with existing name", async () => {
+        await contentDefinitionUtil.defineContent(new ContentDefinitionDTO("", "test-definition"));
+        
+        const createContentDefinitionResult = await contentDefinitionManager.createContentDefinition(new ContentDefinitionDTO("", "test-definition"));
+        expect(createContentDefinitionResult.getIsFailing()).to.be.true;
     });
     
     it("should fail for empty name", async () => {

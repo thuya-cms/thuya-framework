@@ -108,20 +108,14 @@ class LocalContentManagementPersistency implements IContentDefinitionPersistency
         return expandedData;
     }
     
-    readContentFieldDefinitionById(id: string): Promise<ContentFieldDefinitionData> {
+    async readContentFieldDefinitionById(id: string): Promise<ContentFieldDefinitionData | undefined> {
         const contentFieldDefinitionData = this.contentFieldDefinitions.find(contentFieldDefinition => contentFieldDefinition.id === id);
-        if (!contentFieldDefinitionData)
-            throw new Error("Content field definition not found.");
-
-        return Promise.resolve(contentFieldDefinitionData);
+        return contentFieldDefinitionData;
     }
     
-    readContentFieldDefinitionByName(name: string): Promise<ContentFieldDefinitionData> {
+    async readContentFieldDefinitionByName(name: string): Promise<ContentFieldDefinitionData | undefined> {
         const contentFieldDefinitionData = this.contentFieldDefinitions.find(contentFieldDefinition => contentFieldDefinition.name === name);
-        if (!contentFieldDefinitionData)
-            throw new Error("Content field definition not found.");
-
-        return Promise.resolve(contentFieldDefinitionData);
+        return contentFieldDefinitionData;
     }
 
     createContentFieldDefinition(contentFieldDefinitionData: ContentFieldDefinitionData): Promise<string> {

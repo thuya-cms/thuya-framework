@@ -1,7 +1,7 @@
 import sinon from "sinon";
 import sinonChai from "sinon-chai";
 import chai, { expect } from 'chai';
-import createContentFieldDefinition from '../../../../../../content-management/domain/usecase/content-definition/create-content-field-definition'
+import createContentFieldDefinition from '../../../../../../content-management/domain/usecase/content-field-definition/create-content-field-definition'
 import contentDefinitionRepository from "../../../../../../content-management/repository/content-definition-repository";
 import TextContentFieldDefinition from "../../../../../../content-management/domain/entity/content-field-definition/text-content-field-definition";
 
