@@ -49,6 +49,14 @@ interface IContentDefinitionRepository {
      * @returns the id of the created content field definition
      */
     createContentFieldDefinition(contentFieldDefinition: ContentFieldDefinition): Promise<string>;
+
+    /**
+     * Read a content field definition by name.
+     * 
+     * @param contentFieldName name of the content field
+     * @returns the content field definition or undefined
+     */
+    readContentFieldDefinitionByName(contentFieldName: string): Promise<ContentFieldDefinition | void>;
 }
 
 export default IContentDefinitionRepository;

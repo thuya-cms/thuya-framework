@@ -27,6 +27,12 @@ class CreateContentFieldDefinition {
         this.logger.debug(`Start creating content field definition "%s"...`, contentFieldDefinition.getName());
         
         try {
+            const existingContentFieldDefinition = await contentDefinitionRepository.readContentFieldDefinitionByName(contentFieldDefinition.getName());
+            if (existingContentFieldDefinition) {
+                this.logger.debug(`...Content field definition "%s" already exists.`, contentFieldDefinition.getName());
+                return Result.error(`Content field definition "${ contentFieldDefinition.getName() }" already exists.`);
+            }
+
             const id = await contentDefinitionRepository.createContentFieldDefinition(contentFieldDefinition);
     
             this.logger.debug(`...Content field definition "%s" created successfully.`, contentFieldDefinition.getName());

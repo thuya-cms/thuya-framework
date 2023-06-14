@@ -7,7 +7,7 @@ import GroupContentFieldDefinition from "../domain/entity/content-field-definiti
 import NumericContentFieldDefinition from "../domain/entity/content-field-definition/numeric-content-field-definition";
 import TextContentFieldDefinition from "../domain/entity/content-field-definition/text-content-field-definition";
 import createContentDefinition from "../domain/usecase/content-definition/create-content-definition";
-import createContentFieldDefinition from "../domain/usecase/content-definition/create-content-field-definition";
+import createContentFieldDefinition from "../domain/usecase/content-field-definition/create-content-field-definition";
 import deleteContentDefinition from "../domain/usecase/content-definition/delete-content-definition";
 import listContentDefinitions from "../domain/usecase/content-definition/list-content-definitions";
 import readContentDefinition from "../domain/usecase/content-definition/read-content-definition";

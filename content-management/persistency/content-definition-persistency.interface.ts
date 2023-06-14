@@ -74,7 +74,7 @@ interface IContentDefinitionPersistency {
      * @param id the id of the content definition to read
      * @returns the data of the content field definition
      */
-    readContentFieldDefinitionById(id: string): Promise<ContentFieldDefinitionData>;
+    readContentFieldDefinitionById(id: string): Promise<ContentFieldDefinitionData | undefined>;
 
     /**
      * Read a content field definition by name.
@@ -82,7 +82,7 @@ interface IContentDefinitionPersistency {
      * @param name the name of the content field definition to read
      * @returns the data of the content field definition
      */
-    readContentFieldDefinitionByName(name: string): Promise<ContentFieldDefinitionData>;
+    readContentFieldDefinitionByName(name: string): Promise<ContentFieldDefinitionData| undefined>;
 
     /**
      * Create a content definition.
