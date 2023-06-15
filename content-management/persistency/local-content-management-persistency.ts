@@ -13,11 +13,11 @@ class LocalContentManagementPersistency implements IContentDefinitionPersistency
         return Promise.resolve();
     }
 
-    createContentDefinition(contentDefinitionData: ContentDefinitionData): Promise<string> {
+    async createContentDefinition(contentDefinitionData: ContentDefinitionData): Promise<string> {
         contentDefinitionData.id = uuid();
         this.contentDefinitions.push(contentDefinitionData);
 
-        return Promise.resolve(contentDefinitionData.id);
+        return contentDefinitionData.id;
     }
 
     async updateContentDefinition(contentDefinitionData: ContentDefinitionData): Promise<void> {
@@ -27,8 +27,6 @@ class LocalContentManagementPersistency implements IContentDefinitionPersistency
             throw new Error(`Content definition with id "${ contentDefinitionData.id }" not found.`);
 
         this.contentDefinitions[index] = contentDefinitionData;
-
-        return;
     }
 
     async deleteContentDefinitionByName(contentName: string): Promise<void> {
@@ -38,20 +36,15 @@ class LocalContentManagementPersistency implements IContentDefinitionPersistency
             throw new Error("Content definition not found.");
 
         this.contentDefinitions.splice(index, 1);
-
-        return;
     }
 
     async readContentDefinition(contentName: string): Promise<ContentDefinitionData | undefined> {
         const contentDefinitionData = this.contentDefinitions.find(contentDefinition => contentDefinition.name === contentName);
 
-        if (!contentDefinitionData)
-            return;
-
         return contentDefinitionData;
     }
 
-    listContentDefinitions(): Promise<ExpandedContentDefinitionData[]> {
+    async listContentDefinitions(): Promise<ExpandedContentDefinitionData[]> {
         const expandedDataList: ExpandedContentDefinitionData[] = [];
 
         for (const contentDefinitionData of this.contentDefinitions) {
@@ -77,7 +70,7 @@ class LocalContentManagementPersistency implements IContentDefinitionPersistency
             expandedDataList.push(expandedData);
         }
 
-        return Promise.resolve(expandedDataList);
+        return expandedDataList;
     }
 
     async readContentDefinitionExpandingFields(contentName: string): Promise<ExpandedContentDefinitionData | undefined> {
@@ -118,11 +111,20 @@ class LocalContentManagementPersistency implements IContentDefinitionPersistency
         return contentFieldDefinitionData;
     }
 
-    createContentFieldDefinition(contentFieldDefinitionData: ContentFieldDefinitionData): Promise<string> {
+    async createContentFieldDefinition(contentFieldDefinitionData: ContentFieldDefinitionData): Promise<string> {
         contentFieldDefinitionData.id = uuid();
         this.contentFieldDefinitions.push(contentFieldDefinitionData);
 
-        return Promise.resolve(contentFieldDefinitionData.id);
+        return contentFieldDefinitionData.id;
+    }
+
+    async deleteContentFieldDefinitionByName(contentFieldDefinitionName: string): Promise<void> {
+        const contentFieldDefinitionIndex = this.contentFieldDefinitions.findIndex(contentFieldDefinition => contentFieldDefinition.name === contentFieldDefinitionName);
+
+        if (contentFieldDefinitionIndex === -1) 
+            throw new Error("Content field definition not found in the database.");
+
+        this.contentFieldDefinitions.splice(contentFieldDefinitionIndex, 1);
     }
 
     

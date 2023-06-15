@@ -53,10 +53,17 @@ interface IContentDefinitionRepository {
     /**
      * Read a content field definition by name.
      * 
-     * @param contentFieldName name of the content field
+     * @param contentFieldName name of the content field definition
      * @returns the content field definition or undefined
      */
     readContentFieldDefinitionByName(contentFieldName: string): Promise<ContentFieldDefinition | void>;
+
+    /**
+     * Delete a content field definition by name.
+     * 
+     * @param contentFieldName name of the content field definition
+     */
+    deleteContentFieldDefinitionByName(contentFieldName: string): Promise<void>;
 }
 
 export default IContentDefinitionRepository;

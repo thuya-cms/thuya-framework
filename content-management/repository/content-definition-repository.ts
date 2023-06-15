@@ -198,6 +198,10 @@ class ContentDefinitionRepository implements IContentDefinitionRepository {
         return contentField;
     }
 
+    async deleteContentFieldDefinitionByName(contentFieldName: string): Promise<void> {
+        return await factory.getContentDefinitionPersistency().deleteContentFieldDefinitionByName(contentFieldName);
+    }
+
 
     private async convertContentDefinitionDataToEntity(contentDefinitionData: ExpandedContentDefinitionData): Promise<ContentDefinition> {
         const contentDefinitionResult = ContentDefinition.create(contentDefinitionData.id, contentDefinitionData.name);
