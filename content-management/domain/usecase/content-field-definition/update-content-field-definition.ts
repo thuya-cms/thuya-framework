@@ -2,6 +2,9 @@ import { Logger, Result } from "../../../../common";
 import contentDefinitionRepository from "../../../repository/content-definition-repository";
 import { ContentFieldDefinition } from "../../entity/content-field-definition/content-field-definition";
 
+/**
+ * Use case to update a content field definition.
+ */
 class UpdateContentFieldDefinition {    
     private logger: Logger;
 
@@ -13,6 +16,13 @@ class UpdateContentFieldDefinition {
 
 
 
+    /**
+     * Execute update of a content field definition.
+     * 
+     * @param contentFieldDefinition the content field definition
+     * @returns result
+     * @async
+     */
     async execute(contentFieldDefinition: ContentFieldDefinition): Promise<Result> {
         this.logger.debug(`Start updating content field definition "%s"...`, contentFieldDefinition.getName());
         

@@ -1,6 +1,9 @@
 import { Logger, Result } from "../../../../common";
 import contentDefinitionRepository from "../../../repository/content-definition-repository";
 
+/**
+ * Use case to delete a content field definition.
+ */
 class DeleteContentFieldDefinition {
     private logger: Logger;
 
@@ -12,6 +15,13 @@ class DeleteContentFieldDefinition {
 
     
     
+    /**
+     * Execute delete a content field definition by name.
+     * 
+     * @param contentFieldDefinitionName name of the content field definition
+     * @returns result
+     * @async
+     */
     async byName(contentFieldDefinitionName: string): Promise<Result> {
         this.logger.debug(`Deleting content field definition "%s"...`, contentFieldDefinitionName);
         
