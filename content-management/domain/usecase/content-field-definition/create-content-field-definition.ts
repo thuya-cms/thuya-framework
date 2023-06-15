@@ -40,7 +40,7 @@ class CreateContentFieldDefinition {
         }
 
         catch (error) {
-            this.logger.error(`...Failed to create content field "%s".`, contentFieldDefinition.getName());
+            this.logger.debug(`...Failed to create content field "%s".`, contentFieldDefinition.getName());
             throw error;
         }
     }

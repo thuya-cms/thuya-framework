@@ -20,6 +20,7 @@ import GroupContentFieldDefinitionDTO from "./dto/content-field-definition/group
 import NumericContentFieldDefinitionDTO from "./dto/content-field-definition/numeric-content-field-definition";
 import TextContentFieldDefinitionDTO from "./dto/content-field-definition/text-content-field-definition";
 import deleteContentFieldDefinition from "../domain/usecase/content-field-definition/delete-content-field-definition";
+import updateContentFieldDefinition from "../domain/usecase/content-field-definition/update-content-field-definition";
 
 /**
  * Manager for content definition and content field definition.
@@ -30,6 +31,7 @@ class ContentDefinitionManager {
      * 
      * @param contentDefinition the content definition
      * @returns result containing the id of the created content definition
+     * @async
      */
     async createContentDefinition(contentDefinition: ContentDefinitionDTO): Promise<Result<string>> {
         const contentDefinitionEntityResult = this.convertDtoToEntity(contentDefinition);
@@ -44,6 +46,7 @@ class ContentDefinitionManager {
      * 
      * @param contentDefinition the content definition
      * @returns result
+     * @async
      */
     async updateContentDefinition(contentDefinition: ContentDefinitionDTO): Promise<Result> {
         const contentDefinitionEntityResult = this.convertDtoToEntity(contentDefinition);
@@ -58,6 +61,7 @@ class ContentDefinitionManager {
      * 
      * @param contentFieldDefinition the content field definition
      * @returns result containing the id of the created content field definition
+     * @async
      */
     async createContentFieldDefinition(contentFieldDefinition: ContentFieldDefinitionDTO): Promise<Result<string>> {
         const contentFieldDefinitionEntityResult = this.convertFieldDefinitionDtoToEntity(contentFieldDefinition);
@@ -72,6 +76,7 @@ class ContentDefinitionManager {
      * 
      * @param contentDefinitionName name of the content definition
      * @returns result containing the content definition
+     * @async
      */
     async readContentDefinitionByName(contentDefinitionName: string): Promise<Result<ContentDefinitionDTO>> {
         const contentDefinitionResult = await readContentDefinition.execute(contentDefinitionName);
@@ -87,6 +92,7 @@ class ContentDefinitionManager {
      * List content definitions.
      * 
      * @returns result containing the list of content definitions
+     * @async
      */
     async listContentDefinitions(): Promise<Result<ContentDefinitionDTO[]>> {
         const contentDefinitionDTOs: ContentDefinitionDTO[] = [];
@@ -108,6 +114,7 @@ class ContentDefinitionManager {
      * 
      * @param contentName content definition name
      * @returns result
+     * @async
      */
     async deleteContentDefinitionByName(contentName: string): Promise<Result> {
         return await deleteContentDefinition.byName(contentName);
@@ -118,6 +125,7 @@ class ContentDefinitionManager {
      * 
      * @param contentFieldDefinitionName content field definition name
      * @returns result
+     * @async
      */
     async deleteContentFieldDefinitionByName(contentFieldDefinitionName: string): Promise<Result> {
         return await deleteContentFieldDefinition.byName(contentFieldDefinitionName);
