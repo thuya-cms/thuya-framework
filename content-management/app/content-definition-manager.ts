@@ -19,6 +19,7 @@ import DateContentFieldDefinitionDTO from "./dto/content-field-definition/date-c
 import GroupContentFieldDefinitionDTO from "./dto/content-field-definition/group-content-field-definition";
 import NumericContentFieldDefinitionDTO from "./dto/content-field-definition/numeric-content-field-definition";
 import TextContentFieldDefinitionDTO from "./dto/content-field-definition/text-content-field-definition";
+import deleteContentFieldDefinition from "../domain/usecase/content-field-definition/delete-content-field-definition";
 
 /**
  * Manager for content definition and content field definition.
@@ -103,13 +104,23 @@ class ContentDefinitionManager {
     } 
 
     /**
-     * Delete a content definition.
+     * Delete a content definition by name.
      * 
      * @param contentName content definition name
      * @returns result
      */
     async deleteContentDefinitionByName(contentName: string): Promise<Result> {
         return await deleteContentDefinition.byName(contentName);
+    }
+
+    /**
+     * Delete a content field definition by name.
+     * 
+     * @param contentFieldDefinitionName content field definition name
+     * @returns result
+     */
+    async deleteContentFieldDefinitionByName(contentFieldDefinitionName: string): Promise<Result> {
+        return await deleteContentFieldDefinition.byName(contentFieldDefinitionName);
     }
 
 

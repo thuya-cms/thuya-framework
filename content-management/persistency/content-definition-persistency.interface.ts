@@ -113,6 +113,13 @@ interface IContentDefinitionPersistency {
      * @returns the id of the created content field definition
      */
     createContentFieldDefinition(contentFieldDefinitionData: ContentFieldDefinitionData): Promise<string>;
+
+    /**
+     * Delete a content field definition by name.
+     * 
+     * @param contentFieldDefinitionName the name of the content field definition
+     */
+    deleteContentFieldDefinitionByName(contentFieldDefinitionName: string): Promise<void>;
 }
 
 export default IContentDefinitionPersistency;
