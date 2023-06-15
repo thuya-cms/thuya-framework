@@ -21,6 +21,7 @@ import NumericContentFieldDefinitionDTO from "./dto/content-field-definition/num
 import TextContentFieldDefinitionDTO from "./dto/content-field-definition/text-content-field-definition";
 import deleteContentFieldDefinition from "../domain/usecase/content-field-definition/delete-content-field-definition";
 import updateContentFieldDefinition from "../domain/usecase/content-field-definition/update-content-field-definition";
+import readContentFieldDefinition from "../domain/usecase/content-field-definition/read-content-field-definition";
 
 /**
  * Manager for content definition and content field definition.
@@ -129,6 +130,23 @@ class ContentDefinitionManager {
      */
     async deleteContentFieldDefinitionByName(contentFieldDefinitionName: string): Promise<Result> {
         return await deleteContentFieldDefinition.byName(contentFieldDefinitionName);
+    }
+
+    /**
+     * read a content field definition by name.
+     * 
+     * @param contentFieldDefinitionName the content field definition name
+     * @returns the content field definition or undefined
+     * @async
+     */
+    async readContentFieldDefinitionByName(contentFieldDefinitionName: string): Promise<Result<ContentFieldDefinitionDTO | undefined>> {
+        const readResult = await readContentFieldDefinition.byName(contentFieldDefinitionName);
+        if (readResult.getIsFailing())
+            return Result.error(readResult.getMessage());
+
+        const contentFieldDefinitionDTO = this.convertFieldDefinitionEntityToDto(readResult.getResult()!);
+
+        return Result.success(contentFieldDefinitionDTO);
     }
 
 
