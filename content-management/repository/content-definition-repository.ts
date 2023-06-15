@@ -202,6 +202,59 @@ class ContentDefinitionRepository implements IContentDefinitionRepository {
         return await factory.getContentDefinitionPersistency().deleteContentFieldDefinitionByName(contentFieldName);
     }
 
+    async updateContentFieldDefinition(contentFieldDefinition: ContentFieldDefinition): Promise<void> {
+        const contentFieldDefinitionData: ContentFieldDefinitionData = {
+            id: "",
+            path: contentFieldDefinition.getPath(),
+            name: contentFieldDefinition.getName(),
+            type: contentFieldDefinition.getType()
+        };
+
+        if (contentFieldDefinition.getType() === ContentFieldType.Array) {
+            const arrayFieldDefinition = contentFieldDefinition as ArrayContentFieldDefinition;
+
+            const arrayElementDefinitionData = await factory.getContentDefinitionPersistency().readContentFieldDefinitionByName(
+                arrayFieldDefinition.getArrayElementType().getName());
+
+            if (!arrayElementDefinitionData) {
+                this.logger.error("Array element type not found.");
+                throw new Error("Array element type not found.")
+            }
+
+            contentFieldDefinitionData.arrayElementDefinitionId = arrayElementDefinitionData.id;
+        }
+
+        if (contentFieldDefinition.getType() === ContentFieldType.Group) {
+            contentFieldDefinitionData.groupElements = [];
+
+            const groupFieldDefinition = contentFieldDefinition as GroupContentFieldDefinition;
+            for (const groupElement of groupFieldDefinition.getContentFields()) {
+                const groupElementDefinitionData = await factory.getContentDefinitionPersistency().readContentFieldDefinitionByName(
+                    groupElement.contentFieldDefinition.getName());
+
+                if (!groupElementDefinitionData) {
+                    this.logger.error("Group element not found.");
+                    throw new Error("Group element not found.");
+                }
+
+                const groupElementData = {
+                    id: groupElementDefinitionData.id,
+                    name: groupElement.name,
+                    options: {
+                        isRequired: false
+                    }
+                };
+
+                if (groupElement.options.isRequired)
+                    groupElementData.options.isRequired = true;
+
+                contentFieldDefinitionData.groupElements.push(groupElementData);
+            }
+        }
+
+        await factory.getContentDefinitionPersistency().updateContentFieldDefinition(contentFieldDefinitionData);
+    }
+
 
     private async convertContentDefinitionDataToEntity(contentDefinitionData: ExpandedContentDefinitionData): Promise<ContentDefinition> {
         const contentDefinitionResult = ContentDefinition.create(contentDefinitionData.id, contentDefinitionData.name);

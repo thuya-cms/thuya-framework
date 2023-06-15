@@ -120,6 +120,14 @@ interface IContentDefinitionPersistency {
      * @param contentFieldDefinitionName the name of the content field definition
      */
     deleteContentFieldDefinitionByName(contentFieldDefinitionName: string): Promise<void>;
+
+    /**
+     * Update a content field definition.
+     * 
+     * @param contentFieldDefinitionData the data of the content field definition
+     * @async
+     */
+    updateContentFieldDefinition(contentFieldDefinitionData: ContentFieldDefinitionData): Promise<void>;
 }
 
 export default IContentDefinitionPersistency;
