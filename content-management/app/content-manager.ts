@@ -27,6 +27,8 @@ class ContentManager {
      * 
      * @param contentDefinitionName name of the content definition 
      * @param fieldValue key and value of the field that is used as a filter
+     * @param fieldValue.name key of the field that is used as a filter
+     * @param fieldValue.value value of the field that is used as a filter
      * @returns result containing the data of the content
      */
     async readContentByFieldValue<T = UnknownContent>(contentDefinitionName: string, fieldValue: { name: string, value: any }): Promise<Result<T>> {

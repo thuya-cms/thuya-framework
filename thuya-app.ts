@@ -97,6 +97,7 @@ class ThuyaApp {
 
     /**
      * Use a module in the Thuya CMS application.
+     * 
      * @param module the module to use
      */
     public async useModule(module: Module): Promise<void> {
