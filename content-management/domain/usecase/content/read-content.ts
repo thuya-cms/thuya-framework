@@ -48,6 +48,8 @@ class ReadContent<T extends { id: string } = any> {
      * 
      * @param contentName name of the content definition
      * @param fieldValue field key and value
+     * @param fieldValue.name field key
+     * @param fieldValue.value field value
      * @returns result containing the content
      */
     async byFieldValue(contentName: string, fieldValue: { name: string, value: any }): Promise<Result<T>> {
