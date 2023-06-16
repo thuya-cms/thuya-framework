@@ -6,7 +6,7 @@ import ContentProvider from './content-management/app/content-provider';
 import expressContentManager from './content-management/app/express-content-manager';
 import contentDefinitionManager from './content-management/app/content-definition-manager';
 import Module from './module';
-import ContentDefinitionDTO from './content-management/app/dto/content-definition';
+import ContentDefinitionDTO from './content-management/app/dto/content-definition/content-definition';
 import dotenv from "dotenv";
 import IContentDefinitionPersistency from './content-management/persistency/content-definition-persistency.interface';
 import factory from './content-management/domain/factory';

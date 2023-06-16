@@ -12,7 +12,7 @@ import deleteContentDefinition from "../domain/usecase/content-definition/delete
 import listContentDefinitions from "../domain/usecase/content-definition/list-content-definitions";
 import readContentDefinition from "../domain/usecase/content-definition/read-content-definition";
 import updateContentDefinition from "../domain/usecase/content-definition/update-content-definition";
-import ContentDefinitionDTO from "./dto/content-definition";
+import ContentDefinitionDTO from "./dto/content-definition/content-definition";
 import ArrayContentFieldDefinitionDTO from "./dto/content-field-definition/array-content-field-definition";
 import { ContentFieldDefinitionDTO, ContentFieldType } from "./dto/content-field-definition/content-field-definition";
 import DateContentFieldDefinitionDTO from "./dto/content-field-definition/date-content-field-definition";
@@ -35,11 +35,11 @@ class ContentDefinitionManager {
      * @async
      */
     async createContentDefinition(contentDefinition: ContentDefinitionDTO): Promise<Result<string>> {
-        const contentDefinitionEntityResult = this.convertDtoToEntity(contentDefinition);
-        if (contentDefinitionEntityResult.getIsFailing())
-            return Result.error(contentDefinitionEntityResult.getMessage());
+        const convertContentDefinitionResult = this.convertDtoToEntity(contentDefinition);
+        if (convertContentDefinitionResult.getIsFailing())
+            return Result.error(convertContentDefinitionResult.getMessage());
 
-        return await createContentDefinition.execute(contentDefinitionEntityResult.getResult()!);
+        return await createContentDefinition.execute(convertContentDefinitionResult.getResult()!);
     }
     
     /**
@@ -50,26 +50,22 @@ class ContentDefinitionManager {
      * @async
      */
     async updateContentDefinition(contentDefinition: ContentDefinitionDTO): Promise<Result> {
-        const contentDefinitionEntityResult = this.convertDtoToEntity(contentDefinition);
-        if (contentDefinitionEntityResult.getIsFailing())
-            return Result.error(contentDefinitionEntityResult.getMessage());
+        const convertContentDefinitionResult = this.convertDtoToEntity(contentDefinition);
+        if (convertContentDefinitionResult.getIsFailing())
+            return Result.error(convertContentDefinitionResult.getMessage());
 
-        return await updateContentDefinition.execute(contentDefinitionEntityResult.getResult()!);
+        return await updateContentDefinition.execute(convertContentDefinitionResult.getResult()!);
     }
 
     /**
-     * Create a content field definition.
+     * Delete a content definition by name.
      * 
-     * @param contentFieldDefinition the content field definition
-     * @returns result containing the id of the created content field definition
+     * @param contentName content definition name
+     * @returns result
      * @async
      */
-    async createContentFieldDefinition(contentFieldDefinition: ContentFieldDefinitionDTO): Promise<Result<string>> {
-        const contentFieldDefinitionEntityResult = this.convertFieldDefinitionDtoToEntity(contentFieldDefinition);
-        if (contentFieldDefinitionEntityResult.getIsFailing())
-            return Result.error(contentFieldDefinitionEntityResult.getMessage());
-
-        return await createContentFieldDefinition.execute(contentFieldDefinitionEntityResult.getResult()!);
+    async deleteContentDefinitionByName(contentName: string): Promise<Result> {
+        return await deleteContentDefinition.byName(contentName);
     }
 
     /**
@@ -80,15 +76,14 @@ class ContentDefinitionManager {
      * @async
      */
     async readContentDefinitionByName(contentDefinitionName: string): Promise<Result<ContentDefinitionDTO>> {
-        const contentDefinitionResult = await readContentDefinition.execute(contentDefinitionName);
-        if (contentDefinitionResult.getIsFailing())
-            return Result.error(contentDefinitionResult.getMessage());
+        const readContentDefinitionResult = await readContentDefinition.byName(contentDefinitionName);
+        if (readContentDefinitionResult.getIsFailing())
+            return Result.error(readContentDefinitionResult.getMessage());
 
-        const contentDefinitionDTO = this.convertEntityToDto(contentDefinitionResult.getResult()!);
-
+        const contentDefinitionDTO = this.convertEntityToDto(readContentDefinitionResult.getResult()!);
         return Result.success(contentDefinitionDTO);
     }
-
+    
     /**
      * List content definitions.
      * 
@@ -111,14 +106,18 @@ class ContentDefinitionManager {
     } 
 
     /**
-     * Delete a content definition by name.
+     * Create a content field definition.
      * 
-     * @param contentName content definition name
-     * @returns result
+     * @param contentFieldDefinition the content field definition
+     * @returns result containing the id of the created content field definition
      * @async
      */
-    async deleteContentDefinitionByName(contentName: string): Promise<Result> {
-        return await deleteContentDefinition.byName(contentName);
+    async createContentFieldDefinition(contentFieldDefinition: ContentFieldDefinitionDTO): Promise<Result<string>> {
+        const convertContentFieldDefinitionResult = this.convertFieldDefinitionDtoToEntity(contentFieldDefinition);
+        if (convertContentFieldDefinitionResult.getIsFailing())
+            return Result.error(convertContentFieldDefinitionResult.getMessage());
+
+        return await createContentFieldDefinition.execute(convertContentFieldDefinitionResult.getResult()!);
     }
 
     /**
@@ -133,19 +132,18 @@ class ContentDefinitionManager {
     }
 
     /**
-     * read a content field definition by name.
+     * Read a content field definition by name.
      * 
      * @param contentFieldDefinitionName the content field definition name
      * @returns result containing the content field definition or undefined
      * @async
      */
     async readContentFieldDefinitionByName(contentFieldDefinitionName: string): Promise<Result<ContentFieldDefinitionDTO | undefined>> {
-        const readResult = await readContentFieldDefinition.byName(contentFieldDefinitionName);
-        if (readResult.getIsFailing())
-            return Result.error(readResult.getMessage());
+        const readContentFieldDefinitionResult = await readContentFieldDefinition.byName(contentFieldDefinitionName);
+        if (readContentFieldDefinitionResult.getIsFailing())
+            return Result.error(readContentFieldDefinitionResult.getMessage());
 
-        const contentFieldDefinitionDTO = this.convertFieldDefinitionEntityToDto(readResult.getResult()!);
-
+        const contentFieldDefinitionDTO = this.convertFieldDefinitionEntityToDto(readContentFieldDefinitionResult.getResult()!);
         return Result.success(contentFieldDefinitionDTO);
     }
 
@@ -158,11 +156,11 @@ class ContentDefinitionManager {
     async listContentFieldDefinitions(): Promise<Result<ContentFieldDefinitionDTO[]>> {
         const contentFieldDefinitionDTOs: ContentFieldDefinitionDTO[] = [];
         
-        const listResult = await listContentFieldDefinitions.execute();
-        if (listResult.getIsFailing())
-            return Result.error(listResult.getMessage());
+        const listContentFieldDefinitionsResult = await listContentFieldDefinitions.execute();
+        if (listContentFieldDefinitionsResult.getIsFailing())
+            return Result.error(listContentFieldDefinitionsResult.getMessage());
 
-        for (const contentFieldDefinition of listResult.getResult()!) {
+        for (const contentFieldDefinition of listContentFieldDefinitionsResult.getResult()!) {
             const contentDefinitionDTO = this.convertFieldDefinitionEntityToDto(contentFieldDefinition);
             contentFieldDefinitionDTOs.push(contentDefinitionDTO);
         }
@@ -171,104 +169,95 @@ class ContentDefinitionManager {
     }
 
 
-    private convertDtoToEntity(contentDefinition: ContentDefinitionDTO<any>): Result<ContentDefinition> {
-        const contentDefinitionResult = ContentDefinition.create(contentDefinition.getId(), contentDefinition.getName());
-        if (contentDefinitionResult.getIsFailing())
-            return contentDefinitionResult;
+    private convertDtoToEntity(contentDefinitionDTO: ContentDefinitionDTO<any>): Result<ContentDefinition> {
+        const instantiateContentDefinitionResult = ContentDefinition.create(contentDefinitionDTO.getId(), contentDefinitionDTO.getName());
+        if (instantiateContentDefinitionResult.getIsFailing())
+            return instantiateContentDefinitionResult;
 
-        const contentDefinitionEntity = contentDefinitionResult.getResult();
-        
-        for (const contentField of contentDefinition.getContentFields()) {
-            const fieldDefinitionEntityResult = this.convertFieldDefinitionDtoToEntity(contentField.contentFieldDefinition);
+        const contentDefinition = instantiateContentDefinitionResult.getResult()!;
+        for (const contentField of contentDefinitionDTO.getContentFields()) {
+            const convertFieldDefinitionResult = this.convertFieldDefinitionDtoToEntity(contentField.contentFieldDefinition);
+            if (convertFieldDefinitionResult.getIsFailing())
+                return Result.error(convertFieldDefinitionResult.getMessage());
 
-            if (fieldDefinitionEntityResult.getIsFailing())
-                return Result.error(fieldDefinitionEntityResult.getMessage());
-
-            const addFieldResult = contentDefinitionEntity!.addContentField(contentField.name, fieldDefinitionEntityResult.getResult()!, contentField.options);
-
-            if (addFieldResult.getIsFailing())
-                return Result.error(addFieldResult.getMessage());
+            const addContentFieldFieldResult = contentDefinition.addContentField(contentField.name, convertFieldDefinitionResult.getResult()!, contentField.options);
+            if (addContentFieldFieldResult.getIsFailing())
+                return Result.error(addContentFieldFieldResult.getMessage());
         }
 
-        return Result.success(contentDefinitionEntity);
+        return Result.success(contentDefinition);
     }
 
     private convertEntityToDto(contentDefinition: ContentDefinition): ContentDefinitionDTO {
         const contentDefinitionDTO = new ContentDefinitionDTO(contentDefinition.getId(), contentDefinition.getName());
         
         for (const contentField of contentDefinition.getContentFields()) {
-            const fieldDefinitionDTO = this.convertFieldDefinitionEntityToDto(contentField.contentFieldDefinition);
-
-            contentDefinitionDTO.addContentField(contentField.name, fieldDefinitionDTO, contentField.options);
+            const contentFieldDefinitionDTO = this.convertFieldDefinitionEntityToDto(contentField.contentFieldDefinition);
+            contentDefinitionDTO.addContentField(contentField.name, contentFieldDefinitionDTO, contentField.options);
         }
 
         return contentDefinitionDTO;
     }
 
     private convertFieldDefinitionDtoToEntity(contentFieldDefinitionDTO: ContentFieldDefinitionDTO): Result<ContentFieldDefinition> {
-        let contentFieldEntity!: ContentFieldDefinition;
+        let contentFieldDefinition: ContentFieldDefinition;
 
         switch (contentFieldDefinitionDTO.getType()) {
             case ContentFieldType.Array: {
                 const arrayContentFieldDefinitionDTO: ArrayContentFieldDefinitionDTO = contentFieldDefinitionDTO as ArrayContentFieldDefinitionDTO;
-
-                const arrayElementFieldResult = this.convertFieldDefinitionDtoToEntity(arrayContentFieldDefinitionDTO.getArrayElementType());
                 
-                if (arrayElementFieldResult.getIsFailing())
-                    return arrayElementFieldResult;
+                const convertArrayElementResult = this.convertFieldDefinitionDtoToEntity(arrayContentFieldDefinitionDTO.getArrayElementType());
+                if (convertArrayElementResult.getIsFailing())
+                    return convertArrayElementResult;
                 
-                const arrayFieldResult = ArrayContentFieldDefinition.create(
+                const instantiateArrayContentFieldResult = ArrayContentFieldDefinition.create(
                     arrayContentFieldDefinitionDTO.getId(),
                     arrayContentFieldDefinitionDTO.getName(),
-                    arrayElementFieldResult.getResult()!,
+                    convertArrayElementResult.getResult()!,
                     arrayContentFieldDefinitionDTO.getPath());
-                
-                if (arrayFieldResult.getIsSuccessful()) 
-                    contentFieldEntity = arrayFieldResult.getResult()!;
-                else 
-                    return arrayFieldResult;
+                if (instantiateArrayContentFieldResult.getIsFailing())
+                    return instantiateArrayContentFieldResult;
+
+                contentFieldDefinition = instantiateArrayContentFieldResult.getResult()!;
 
                 break;
             }
 
             case ContentFieldType.Date: {
-                const dateFieldResult = DateContentFieldDefinition.create(
+                const instantiateDateContentFieldResult = DateContentFieldDefinition.create(
                     contentFieldDefinitionDTO.getId(), 
                     contentFieldDefinitionDTO.getName(), 
                     contentFieldDefinitionDTO.getPath());
-
-                if (dateFieldResult.getIsSuccessful()) 
-                    contentFieldEntity = dateFieldResult.getResult()!;
-                else 
-                    return dateFieldResult;
+                if (instantiateDateContentFieldResult.getIsFailing()) 
+                    return instantiateDateContentFieldResult;
+                
+                contentFieldDefinition = instantiateDateContentFieldResult.getResult()!; 
 
                 break;
             }
 
             case ContentFieldType.Numeric: {
-                const numericFieldResult = NumericContentFieldDefinition.create(
+                const instantiateNumericContentFieldResult = NumericContentFieldDefinition.create(
                     contentFieldDefinitionDTO.getId(), 
                     contentFieldDefinitionDTO.getName(), 
                     contentFieldDefinitionDTO.getPath());
-
-                if (numericFieldResult.getIsSuccessful()) 
-                    contentFieldEntity = numericFieldResult.getResult()!;
-                else 
-                    return numericFieldResult;
-
+                if (instantiateNumericContentFieldResult.getIsFailing()) 
+                    return instantiateNumericContentFieldResult;
+                
+                contentFieldDefinition = instantiateNumericContentFieldResult.getResult()!;
+                
                 break;
             }
 
             case ContentFieldType.Text: {
-                const textFieldResult = TextContentFieldDefinition.create(
+                const instantiateTextContentFieldResult = TextContentFieldDefinition.create(
                     contentFieldDefinitionDTO.getId(), 
                     contentFieldDefinitionDTO.getName(), 
                     contentFieldDefinitionDTO.getPath());
-
-                if (textFieldResult.getIsSuccessful()) 
-                    contentFieldEntity = textFieldResult.getResult()!;
-                else 
-                    return textFieldResult;
+                if (instantiateTextContentFieldResult.getIsFailing()) 
+                    return instantiateTextContentFieldResult;
+                    
+                contentFieldDefinition = instantiateTextContentFieldResult.getResult()!;
 
                 break;
             }
@@ -276,29 +265,25 @@ class ContentDefinitionManager {
             case ContentFieldType.Group: {
                 const groupContentFieldDefinitionDTO: GroupContentFieldDefinitionDTO = contentFieldDefinitionDTO as GroupContentFieldDefinitionDTO;
                 
-                const groupFieldResult = GroupContentFieldDefinition.create(
+                const instantiateGroupFieldResult = GroupContentFieldDefinition.create(
                     contentFieldDefinitionDTO.getId(), 
                     contentFieldDefinitionDTO.getName(), 
                     contentFieldDefinitionDTO.getPath());
+                if (instantiateGroupFieldResult.getIsFailing()) 
+                    return instantiateGroupFieldResult;
                 
-                if (groupFieldResult.getIsSuccessful()) 
-                    contentFieldEntity = groupFieldResult.getResult()!;
-                else 
-                    return groupFieldResult;
-
-                const groupContentFieldEntity: GroupContentFieldDefinition = contentFieldEntity as GroupContentFieldDefinition;
+                contentFieldDefinition = instantiateGroupFieldResult.getResult()!; 
+                const groupContentFieldDefinition: GroupContentFieldDefinition = contentFieldDefinition as GroupContentFieldDefinition;
                 
                 for(const contentField of groupContentFieldDefinitionDTO.getContentFields()) {
-                    const groupElementFieldResult = this.convertFieldDefinitionDtoToEntity(contentField.contentFieldDefinition);
+                    const convertGroupElementResult = this.convertFieldDefinitionDtoToEntity(contentField.contentFieldDefinition);
+                    if (convertGroupElementResult.getIsFailing())
+                        return convertGroupElementResult;
 
-                    if (groupElementFieldResult.getIsFailing())
-                        return groupElementFieldResult;
-
-                    const addFieldResult = groupContentFieldEntity.addContentField(
+                    const addFieldResult = groupContentFieldDefinition.addContentField(
                         contentField.name, 
-                        groupElementFieldResult.getResult()!,
+                        convertGroupElementResult.getResult()!,
                         contentField.options);
-
                     if (addFieldResult.getIsFailing())
                         return Result.error(addFieldResult.getMessage());
                 }
@@ -310,74 +295,67 @@ class ContentDefinitionManager {
                 throw new Error(`Field type "${contentFieldDefinitionDTO.getType()}" is not valid.`);
         }
 
-        contentFieldDefinitionDTO.getValidators().forEach(validator => contentFieldEntity.addValidator(validator));
-        contentFieldDefinitionDTO.getDeterminations().forEach(determination => contentFieldEntity.addDetermination(determination));
+        contentFieldDefinitionDTO.getValidators().forEach(validator => contentFieldDefinition.addValidator(validator));
+        contentFieldDefinitionDTO.getDeterminations().forEach(determination => contentFieldDefinition.addDetermination(determination));
 
-        return Result.success(contentFieldEntity);
+        return Result.success(contentFieldDefinition);
     }
     
     private convertFieldDefinitionEntityToDto(contentFieldDefinition: ContentFieldDefinition): ContentFieldDefinitionDTO {
-        let contentFieldDTO!: ContentFieldDefinitionDTO;
+        let contentFieldDefinitionDTO: ContentFieldDefinitionDTO;
 
-        if (contentFieldDefinition.getPath() && contentFieldDefinition.getPath().trim() !== "") {
+        if (contentFieldDefinition.getPath() && contentFieldDefinition.getPath().trim() !== "") 
             // eslint-disable-next-line @typescript-eslint/no-var-requires
             return require(contentFieldDefinition.getPath()).default as ContentFieldDefinitionDTO;
-        }
 
         switch (contentFieldDefinition.getType()) {
             case ContentFieldType.Array: {
                 const arrayContentFieldDefinition: ArrayContentFieldDefinition = contentFieldDefinition as ArrayContentFieldDefinition;
-
-                const arrayElementField = this.convertFieldDefinitionEntityToDto(arrayContentFieldDefinition.getArrayElementType());
-                
-                const arrayField = new ArrayContentFieldDefinitionDTO(
+                const arrayElementDTO = this.convertFieldDefinitionEntityToDto(arrayContentFieldDefinition.getArrayElementType());
+                const arrayContentFieldDefinitionDTO = new ArrayContentFieldDefinitionDTO(
                     arrayContentFieldDefinition.getId(),
                     arrayContentFieldDefinition.getName(),
-                    arrayElementField);
+                    arrayElementDTO);
                 
-                contentFieldDTO = arrayField;
+                contentFieldDefinitionDTO = arrayContentFieldDefinitionDTO;
 
                 break;
             }
 
             case ContentFieldType.Date: {
-                const dateFieldDTO = new DateContentFieldDefinitionDTO(contentFieldDefinition.getId(), contentFieldDefinition.getName());
-
-                contentFieldDTO = dateFieldDTO;
+                const dateContentFieldDefinitionDTO = new DateContentFieldDefinitionDTO(contentFieldDefinition.getId(), contentFieldDefinition.getName());
+                contentFieldDefinitionDTO = dateContentFieldDefinitionDTO;
 
                 break;
             }
 
             case ContentFieldType.Numeric: {
-                const numericFieldDTO = new NumericContentFieldDefinitionDTO(contentFieldDefinition.getId(), contentFieldDefinition.getName());
-
-                contentFieldDTO = numericFieldDTO;
+                const numericContentFieldDefinitionDTO = new NumericContentFieldDefinitionDTO(contentFieldDefinition.getId(), contentFieldDefinition.getName());
+                contentFieldDefinitionDTO = numericContentFieldDefinitionDTO;
 
                 break;
             }
 
             case ContentFieldType.Text: {
-                const textFieldDTO = new TextContentFieldDefinitionDTO(contentFieldDefinition.getId(), contentFieldDefinition.getName());
-
-                contentFieldDTO = textFieldDTO;
+                const textContentFieldDefinitionDTO = new TextContentFieldDefinitionDTO(contentFieldDefinition.getId(), contentFieldDefinition.getName());
+                contentFieldDefinitionDTO = textContentFieldDefinitionDTO;
 
                 break;
             }
 
             case ContentFieldType.Group: {
                 const groupContentFieldDefinition: GroupContentFieldDefinition = contentFieldDefinition as GroupContentFieldDefinition;
+                const groupContentFieldDefinitionDTO = new GroupContentFieldDefinitionDTO(contentFieldDefinition.getId(), contentFieldDefinition.getName());
                 
-                const groupFieldDTO = new GroupContentFieldDefinitionDTO(contentFieldDefinition.getId(), contentFieldDefinition.getName());
-                
-                contentFieldDTO = groupFieldDTO;
-                const groupContentFieldDTO: GroupContentFieldDefinitionDTO = contentFieldDTO as GroupContentFieldDefinitionDTO;
+                contentFieldDefinitionDTO = groupContentFieldDefinitionDTO;
+                const groupContentFieldDTO: GroupContentFieldDefinitionDTO = contentFieldDefinitionDTO as GroupContentFieldDefinitionDTO;
                 
                 for(const contentField of groupContentFieldDefinition.getContentFields()) {
-                    const groupElementField = this.convertFieldDefinitionEntityToDto(contentField.contentFieldDefinition);
+                    const groupElement = this.convertFieldDefinitionEntityToDto(contentField.contentFieldDefinition);
 
                     groupContentFieldDTO.addContentField(
                         contentField.name, 
-                        groupElementField,
+                        groupElement,
                         contentField.options);
                 }
 
@@ -388,7 +366,7 @@ class ContentDefinitionManager {
                 throw new Error(`Field type "${contentFieldDefinition.getType()}" is not valid.`);
         }
 
-        return contentFieldDTO;
+        return contentFieldDefinitionDTO;
     }
 }
 

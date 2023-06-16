@@ -23,7 +23,7 @@ class ReadContentDefinition {
      * @param contentName name of the content definition to read
      * @returns result containing the content definition
      */
-    async execute(contentName: string): Promise<Result<ContentDefinition | undefined>> {
+    async byName(contentName: string): Promise<Result<ContentDefinition | undefined>> {
         this.logger.debug(`Start reading content definition "%s"...`, contentName);
 
         try {

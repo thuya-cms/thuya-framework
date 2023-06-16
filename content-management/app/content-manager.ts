@@ -43,7 +43,7 @@ class ContentManager {
      * @returns result containing the id o the content
      */
     async createContent(contentDefinitionName: string, content: any): Promise<Result<string>> {
-        const readContentDefinitionResult = await readContentDefinition.execute(contentDefinitionName);
+        const readContentDefinitionResult = await readContentDefinition.byName(contentDefinitionName);
         if (readContentDefinitionResult.getIsFailing())
             return Result.error(readContentDefinitionResult.getMessage());
 
@@ -58,7 +58,7 @@ class ContentManager {
      * @returns result
      */
     async updateContent(contentDefinitionName: string, content: UnknownContent): Promise<Result> {
-        const readContentDefinitionResult = await readContentDefinition.execute(contentDefinitionName);
+        const readContentDefinitionResult = await readContentDefinition.byName(contentDefinitionName);
         if (readContentDefinitionResult.getIsFailing())
             return Result.error(readContentDefinitionResult.getMessage());
 
