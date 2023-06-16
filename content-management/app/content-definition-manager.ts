@@ -20,7 +20,6 @@ import GroupContentFieldDefinitionDTO from "./dto/content-field-definition/group
 import NumericContentFieldDefinitionDTO from "./dto/content-field-definition/numeric-content-field-definition";
 import TextContentFieldDefinitionDTO from "./dto/content-field-definition/text-content-field-definition";
 import deleteContentFieldDefinition from "../domain/usecase/content-field-definition/delete-content-field-definition";
-import updateContentFieldDefinition from "../domain/usecase/content-field-definition/update-content-field-definition";
 import readContentFieldDefinition from "../domain/usecase/content-field-definition/read-content-field-definition";
 import listContentFieldDefinitions from "../domain/usecase/content-field-definition/list-content-field-definitions";
 
@@ -137,7 +136,7 @@ class ContentDefinitionManager {
      * read a content field definition by name.
      * 
      * @param contentFieldDefinitionName the content field definition name
-     * @returns the content field definition or undefined
+     * @returns result containing the content field definition or undefined
      * @async
      */
     async readContentFieldDefinitionByName(contentFieldDefinitionName: string): Promise<Result<ContentFieldDefinitionDTO | undefined>> {
@@ -150,6 +149,12 @@ class ContentDefinitionManager {
         return Result.success(contentFieldDefinitionDTO);
     }
 
+    /**
+     * List content field definitions.
+     * 
+     * @returns result containing the list of content field definitions 
+     * @async
+     */
     async listContentFieldDefinitions(): Promise<Result<ContentFieldDefinitionDTO[]>> {
         const contentFieldDefinitionDTOs: ContentFieldDefinitionDTO[] = [];
         

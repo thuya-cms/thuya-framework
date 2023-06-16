@@ -6,14 +6,7 @@ module.exports = {
     root: true,
     rules: {
         "@typescript-eslint/no-non-null-assertion": "off",
-        "@typescript-eslint/no-explicit-any": "off",
-        "@typescript-eslint/require-await": "warn"
+        "@typescript-eslint/no-explicit-any": "off"
     },
-    ignorePatterns: ["dist/**/*"],
-    overrides: [{
-        files: ['*.ts'],
-        parserOptions: {
-            project: ["./tsconfig-dev.json"]
-        }
-    }]
+    ignorePatterns: ["dist/**/*"]
 };
