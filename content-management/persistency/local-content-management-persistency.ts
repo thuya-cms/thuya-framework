@@ -136,6 +136,10 @@ class LocalContentManagementPersistency implements IContentDefinitionPersistency
         this.contentFieldDefinitions[index] = contentFieldDefinitionData;
     }
 
+    async listContentFieldDefinitions(): Promise<ContentFieldDefinitionData[]> {
+        return this.contentFieldDefinitions;
+    }
+
     
     createContent(contentName: string, content: any) {
         let existingContent = this.content.find(existingContent => existingContent.contentName === contentName);

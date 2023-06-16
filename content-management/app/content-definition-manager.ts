@@ -22,6 +22,7 @@ import TextContentFieldDefinitionDTO from "./dto/content-field-definition/text-c
 import deleteContentFieldDefinition from "../domain/usecase/content-field-definition/delete-content-field-definition";
 import updateContentFieldDefinition from "../domain/usecase/content-field-definition/update-content-field-definition";
 import readContentFieldDefinition from "../domain/usecase/content-field-definition/read-content-field-definition";
+import listContentFieldDefinitions from "../domain/usecase/content-field-definition/list-content-field-definitions";
 
 /**
  * Manager for content definition and content field definition.
@@ -147,6 +148,21 @@ class ContentDefinitionManager {
         const contentFieldDefinitionDTO = this.convertFieldDefinitionEntityToDto(readResult.getResult()!);
 
         return Result.success(contentFieldDefinitionDTO);
+    }
+
+    async listContentFieldDefinitions(): Promise<Result<ContentFieldDefinitionDTO[]>> {
+        const contentFieldDefinitionDTOs: ContentFieldDefinitionDTO[] = [];
+        
+        const listResult = await listContentFieldDefinitions.execute();
+        if (listResult.getIsFailing())
+            return Result.error(listResult.getMessage());
+
+        for (const contentFieldDefinition of listResult.getResult()!) {
+            const contentDefinitionDTO = this.convertFieldDefinitionEntityToDto(contentFieldDefinition);
+            contentFieldDefinitionDTOs.push(contentDefinitionDTO);
+        }
+
+        return Result.success(contentFieldDefinitionDTOs);
     }
 
 

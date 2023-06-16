@@ -255,6 +255,19 @@ class ContentDefinitionRepository implements IContentDefinitionRepository {
         await factory.getContentDefinitionPersistency().updateContentFieldDefinition(contentFieldDefinitionData);
     }
 
+    async listContentFieldDefinitions(): Promise<ContentFieldDefinition[]> {
+        const contentDefinitionPersistency = factory.getContentDefinitionPersistency();
+        const contentFieldDefinitionsData = await contentDefinitionPersistency.listContentFieldDefinitions();
+        const contentFields: ContentFieldDefinition[] = [];
+
+        for (const contentFieldDefinitionData of contentFieldDefinitionsData) {
+            const contentField = await this.convertFieldDataToEntity(contentFieldDefinitionData);
+            contentFields.push(contentField);
+        }
+
+        return contentFields;
+    }
+
 
     private async convertContentDefinitionDataToEntity(contentDefinitionData: ExpandedContentDefinitionData): Promise<ContentDefinition> {
         const contentDefinitionResult = ContentDefinition.create(contentDefinitionData.id, contentDefinitionData.name);

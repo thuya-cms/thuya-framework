@@ -128,6 +128,14 @@ interface IContentDefinitionPersistency {
      * @async
      */
     updateContentFieldDefinition(contentFieldDefinitionData: ContentFieldDefinitionData): Promise<void>;
+
+    /**
+     * List content field definitions.
+     * 
+     * @returns the list of content field definitions data
+     * @async
+     */
+    listContentFieldDefinitions(): Promise<ContentFieldDefinitionData[]>;
 }
 
 export default IContentDefinitionPersistency;
