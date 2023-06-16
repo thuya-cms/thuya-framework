@@ -80,6 +80,14 @@ interface IContentDefinitionRepository {
      * @async
      */
     updateContentFieldDefinition(contentFieldDefinition: ContentFieldDefinition): Promise<void>;
+
+    /**
+     * List content field definitions.
+     * 
+     * @returns a list of the existing content field definitions
+     * @async
+     */
+    listContentFieldDefinitions(): Promise<ContentFieldDefinition[]>;
 }
 
 export default IContentDefinitionRepository;
