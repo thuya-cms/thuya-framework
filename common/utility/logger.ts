@@ -1,11 +1,17 @@
 import correlator from "express-correlation-id";
 
+/**
+ * Log level order: `DEBUG`, `INFO`, `ERROR`.
+ */
 enum LogLevel {
-    Error = "ERROR",
+    Debug = "DEBUG",
     Info = "INFO",
-    Debug = "DEBUG"
+    Error = "ERROR"
 }
 
+/**
+ * Custom logger implementation.
+ */
 class Logger {
     private static logLevel: LogLevel = LogLevel.Info;
     private location = "";
@@ -18,11 +24,21 @@ class Logger {
 
 
 
+    /**
+     * Create a new Logger instance for an object.
+     * 
+     * @param location the location the {@link Logger} is used in, for example a class name
+     * @returns a new {@link Logger} instance
+     */
     static for(location: string): Logger {
         return new Logger(location);
     }
 
-    static initializeLogLevel() {
+    /**
+     * Initialize the log level of a {@link Logger}. Defaults to {@link LogLevel.Info}.
+     * Can be controlled by the `LOG_LEVEL` environment variable.
+     */
+    static initializeLogLevel(): void {
         const logLevel: string | undefined = process.env.LOG_LEVEL;
 
         if (logLevel) 
@@ -32,16 +48,34 @@ class Logger {
     }
 
 
+    /**
+     * Log a debug message.
+     * 
+     * @param message the message
+     * @param params parameters of the message
+     */
     debug(message: string, ...params: any[]): void {
         if (Logger.logLevel === LogLevel.Debug)
             console.debug(this.getPrefix("DEBUG") + message, ...params);
     }
 
-    info(message: string, ...params: any[]) {
+    /**
+     * Log an info message.
+     * 
+     * @param message the message
+     * @param params parameters of the message
+     */
+    info(message: string, ...params: any[]): void {
         if (Logger.logLevel === LogLevel.Debug || Logger.logLevel === LogLevel.Info)
             console.info(this.getPrefix("INFO") + message, ...params);
     }
 
+    /**
+     * Log an error message.
+     * 
+     * @param message the message
+     * @param params parameters of the message
+     */
     error(message: string, ...params: any[]): void {
         console.error(this.getPrefix("ERROR") + message, ...params);
     }    

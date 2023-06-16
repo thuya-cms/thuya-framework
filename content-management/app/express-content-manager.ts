@@ -7,12 +7,22 @@ import deleteContent from "../domain/usecase/content/delete-content";
 import updateContent from "../domain/usecase/content/update-content";
 import expressHelper from "../../common/utility/express-helper";
 
+/**
+ * Content manager based on express. 
+ */
 class ExpressContentManager {
-    async listContent(request: Request, response: Response) {
+    /**
+     * List all content.
+     * 
+     * @param request express request
+     * @param response express response
+     * @async
+     */
+    async listContent(request: Request, response: Response): Promise<void> {
+        const contentDefinitionName = expressHelper.getContentDefinitionName(request);
+        
         try {
-            const contentName = expressHelper.getContentName(request);
-
-            const listContentResult = await listContent.execute(contentName);
+            const listContentResult = await listContent.execute(contentDefinitionName);
             if (listContentResult.getIsFailing())
                 throw new Error(listContentResult.getMessage());
     
@@ -28,12 +38,19 @@ class ExpressContentManager {
         }
     }
 
-    async readContent(request: Request, response: Response) {
-        try {
-            const contentName = expressHelper.getContentName(request);
-            const id = request.params.id;
+    /**
+     * Read a content by id.
+     * 
+     * @param request express request
+     * @param response express response
+     * @async
+     */
+    async readContent(request: Request, response: Response): Promise<void> {
+        const contentDefinitionName = expressHelper.getContentDefinitionName(request);
+        const id = request.params.id;
 
-            const readContentResult = await readContent.byId(contentName, id);
+        try {
+            const readContentResult = await readContent.byId(contentDefinitionName, id);
             if (readContentResult.getIsFailing())
                 throw new Error(readContentResult.getMessage());
 
@@ -49,12 +66,19 @@ class ExpressContentManager {
         }
     }
     
-    async createContent(request: Request, response: Response) {
-        try {
-            const contentName = expressHelper.getContentName(request);
-            const content = request.body;
-            
-            const readContentDefinitionResult = await readContentDefinition.execute(contentName);
+    /**
+     * Create a content.
+     * 
+     * @param request express request
+     * @param response express result
+     * @async
+     */
+    async createContent(request: Request, response: Response): Promise<void> {
+        const contentDefinitionName = expressHelper.getContentDefinitionName(request);
+        const content = request.body;
+
+        try {    
+            const readContentDefinitionResult = await readContentDefinition.byName(contentDefinitionName);
             if (readContentDefinitionResult.getIsFailing())
                 throw new Error(readContentDefinitionResult.getMessage());
             
@@ -74,16 +98,19 @@ class ExpressContentManager {
         }
     }
 
-    async deleteContent(request: Request, response: Response) {
-        const contentName = expressHelper.getContentName(request);
+    /**
+     * Delete a content.
+     * 
+     * @param request express request
+     * @param response express response
+     * @async
+     */
+    async deleteContent(request: Request, response: Response): Promise<void> {
+        const contentDefinitionName = expressHelper.getContentDefinitionName(request);
         const id = request.params.id;
 
         try {
-            const readContentDefinitionResult = await readContentDefinition.execute(contentName);
-            if (readContentDefinitionResult.getIsFailing())
-                throw new Error(readContentDefinitionResult.getMessage());
-
-            const deleteContentResult = await deleteContent.execute(readContentDefinitionResult.getResult()!.getName(), id);
+            const deleteContentResult = await deleteContent.execute(contentDefinitionName, id);
             if (deleteContentResult.getIsFailing())
                 throw new Error(deleteContentResult.getMessage());
 
@@ -99,12 +126,19 @@ class ExpressContentManager {
         }
     }
 
-    async updateContent(request: Request, response: Response) {
-        const contentName = expressHelper.getContentName(request);
+    /**
+     * Update a content.
+     * 
+     * @param request express request
+     * @param response express response
+     * @async
+     */
+    async updateContent(request: Request, response: Response): Promise<void> {
+        const contentName = expressHelper.getContentDefinitionName(request);
         const content = request.body;
 
         try {
-            const readContentDefinitionResult = await readContentDefinition.execute(contentName);
+            const readContentDefinitionResult = await readContentDefinition.byName(contentName);
             if (readContentDefinitionResult.getIsFailing())
                 throw new Error(readContentDefinitionResult.getMessage());
 

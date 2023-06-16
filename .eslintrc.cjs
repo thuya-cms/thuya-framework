@@ -7,13 +7,22 @@ module.exports = {
     rules: {
         "@typescript-eslint/no-non-null-assertion": "off",
         "@typescript-eslint/no-explicit-any": "off",
+        "@typescript-eslint/explicit-function-return-type": "error",
+        "@typescript-eslint/member-ordering": "error",
         "jsdoc/tag-lines": [
             "warn",
             "any",
-            {
-              startLines: 1
+            { startLines: 1 }
+        ],
+        "jsdoc/require-jsdoc": [
+            "error",
+            { 
+                enableFixer: false,
+                checkConstructors: false,
+                contexts: [ 'ClassDeclaration', 'MethodDefinition:not([accessibility="private"])' ]
             }
-        ]
+        ],
+        "jsdoc/require-returns-description": "off"
     },
     ignorePatterns: ["dist/**/*"]
 };

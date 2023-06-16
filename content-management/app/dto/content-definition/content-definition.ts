@@ -1,4 +1,4 @@
-import { ContentFieldDefinitionDTO } from "./content-field-definition/content-field-definition";
+import { ContentFieldDefinitionDTO } from "../content-field-definition/content-field-definition";
 
 type ContentFieldOptions = {
     isRequired?: boolean,
@@ -7,6 +7,9 @@ type ContentFieldOptions = {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
+/**
+ * Content definition.
+ */
 class ContentDefinitionDTO<T = any> {
     private contentFields: { name: string, contentFieldDefinition: ContentFieldDefinitionDTO, options: ContentFieldOptions }[] = [];
 
@@ -16,26 +19,48 @@ class ContentDefinitionDTO<T = any> {
 
 
 
+    /**
+     * @returns the id of the content definition.
+     */
     getId(): string {
         return this.id;
     }
 
+    /**
+     * @returns the name of the content definition
+     */
     getName(): string {
         return this.name;
     }
 
-    addContentField(name: string, contentField: ContentFieldDefinitionDTO, options?: ContentFieldOptions) {
+    /**
+     * Add a content field to the content definition.
+     * 
+     * @param name name of the content field
+     * @param contentFieldDefinition the content field definition
+     * @param options options for the content field
+     */
+    addContentField(name: string, contentFieldDefinition: ContentFieldDefinitionDTO, options?: ContentFieldOptions): void {
         this.contentFields.push({
             name: name,
-            contentFieldDefinition: contentField,
+            contentFieldDefinition: contentFieldDefinition,
             options: options || {}
         });
     }
 
+    /**
+     * @returns the list of content fields 
+     */
     getContentFields(): { name: string, contentFieldDefinition: ContentFieldDefinitionDTO, options: ContentFieldOptions }[] {
         return this.contentFields;
     }
 
+    /**
+     * Clone the current {@link ContentDefinition}.
+     * 
+     * @param id new id for the content definition
+     * @returns a clone of the content definition
+     */
     clone(id?: string): ContentDefinitionDTO<T> {
         const newId = id || this.getId();
 
@@ -49,4 +74,5 @@ class ContentDefinitionDTO<T = any> {
     }
 }
 
+export { ContentFieldOptions };
 export default ContentDefinitionDTO;
