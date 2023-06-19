@@ -1,7 +1,7 @@
-import Entity from "../../../common/entity";
-import { ContentFieldDefinition } from "./content-field-definition/content-field-definition";
-import idContentFieldDefinition from "../../content/id-content-field-definition";
-import { Result, Logger } from "../../../common";
+import Entity from "../../../../common/entity";
+import { ContentFieldDefinition } from "../content-field-definition/content-field-definition";
+import idContentFieldDefinition from "../../../content/id-content-field-definition";
+import { Result, Logger } from "../../../../common";
 
 type ContentFieldOptions = {
     isRequired?: boolean,
@@ -9,6 +9,9 @@ type ContentFieldOptions = {
     isIndexed?: boolean
 }
 
+/**
+ * Defines a the structure and rules of a content.
+ */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 class ContentDefinition<T = any> extends Entity {
     private contentFields: { name: string, contentFieldDefinition: ContentFieldDefinition, options: ContentFieldOptions }[] = [];
@@ -32,6 +35,13 @@ class ContentDefinition<T = any> extends Entity {
 
 
 
+    /**
+     * Create a new content definition.
+     * 
+     * @param id id of the content definition
+     * @param name name of the content definition
+     * @returns result containing the new instance of a content definition
+     */
     public static create<T>(id: string, name: string): Result<ContentDefinition<T>> {
         try {
             return Result.success(new ContentDefinition<T>(id, name));
@@ -43,32 +53,46 @@ class ContentDefinition<T = any> extends Entity {
     }
 
 
+    /**
+     * @returns name of the content definition 
+     */
     getName(): string {
         return this.name;
     }
 
-    addContentField(name: string, contentField: ContentFieldDefinition, options?: ContentFieldOptions): Result {
+    /**
+     * Add a content field to the content definition.
+     * 
+     * @param name name of the content field
+     * @param contentFieldDefinition the content field definition
+     * @param options content field options
+     * @returns result
+     * @todo cleanup id handling
+     */
+    addContentField(name: string, contentFieldDefinition: ContentFieldDefinition, options?: ContentFieldOptions): Result {
         if (name === "id" && this.contentFields.find(existingContentField => existingContentField.name === "id")) {
             this.logger.debug(`Field "id" is already added.`);
             return Result.success();
         }
 
-        if (this.contentFields.find(existingContentField => existingContentField.name === name)) {
+        if (this.contentFields.findIndex(existingContentField => existingContentField.name === name) !== -1) {
             this.logger.error(`Field with name "%s" is already added.`, name);
             return Result.error(`Field with name "${ name }" is already added.`);
         }
 
         this.contentFields.push({
             name: name,
-            contentFieldDefinition: contentField,
+            contentFieldDefinition: contentFieldDefinition,
             options: options || {}
         });
 
         this.logger.debug(`Field "%s" is added to "%s".`, name, this.getName());
-
         return Result.success();
     }
 
+    /**
+     * @returns the content fields of the content definition
+     */
     getContentFields(): { name: string, contentFieldDefinition: ContentFieldDefinition, options: ContentFieldOptions }[] {
         return this.contentFields;
     }

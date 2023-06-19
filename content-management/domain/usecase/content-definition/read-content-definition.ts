@@ -1,7 +1,7 @@
 import { Result } from "../../../../common";
 import Logger from "../../../../common/utility/logger";
 import contentDefinitionRepository from "../../../repository/content-definition-repository";
-import { ContentDefinition } from "../../entity/content-definition";
+import { ContentDefinition } from "../../entity/content-definition/content-definition";
 
 /**
  * Use case to read content definition.

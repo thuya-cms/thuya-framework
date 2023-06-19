@@ -1,4 +1,4 @@
-import { ContentDefinition } from "../entity/content-definition";
+import { ContentDefinition } from "../entity/content-definition/content-definition";
 import { ContentFieldDefinition } from "../entity/content-field-definition/content-field-definition";
 
 /**

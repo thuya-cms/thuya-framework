@@ -7,6 +7,9 @@ type ContentFieldOptions = {
     isRequired?: boolean
 }
 
+/**
+ * Content field definition that represents a group of content fields.
+ */
 class GroupContentFieldDefinition<T = any> extends ContentFieldDefinition<T> {
     private contentFields: { name: string, contentFieldDefinition: ContentFieldDefinition, options: ContentFieldOptions }[] = [];
 
@@ -20,6 +23,14 @@ class GroupContentFieldDefinition<T = any> extends ContentFieldDefinition<T> {
 
 
 
+    /**
+     * Create a new instance of a group content field definition.
+     * 
+     * @param id id of the content field definition
+     * @param name name of the content field definition
+     * @param filePath the path of the content field definition implementation
+     * @returns an instance of a new content field definition
+     */
     static create(id: string, name: string, filePath?: string): Result<GroupContentFieldDefinition> {
         try {
             const contentFieldDefinition = new GroupContentFieldDefinition(id, name, filePath);
@@ -32,32 +43,45 @@ class GroupContentFieldDefinition<T = any> extends ContentFieldDefinition<T> {
     }
 
 
-    addContentField(name: string, contentField: ContentFieldDefinition, options?: ContentFieldOptions): Result {
+    /**
+     * Add a new content field to the group.
+     * 
+     * @param name name of the content field
+     * @param contentFieldDefinition the content field definition
+     * @param options options of the content field
+     * @returns result
+     */
+    addContentField(name: string, contentFieldDefinition: ContentFieldDefinition, options?: ContentFieldOptions): Result {
         if (this.contentFields.find(existingContentField => existingContentField.name === name)) {
-            this.logger.error(`Field with name "%s" is already added to group "%s".`, name, this.getName());
+            this.logger.debug(`Field with name "%s" is already added to group "%s".`, name, this.getName());
             return Result.error(`Field with name "${ name }" is already added to group "${ this.getName() }".`);
         }
 
         this.contentFields.push({
             name: name,
-            contentFieldDefinition: contentField,
+            contentFieldDefinition: contentFieldDefinition,
             options: options || {}
         });
 
         this.logger.debug(`Field "%s" is added to group "%s".`, name, this.getName());
-
         return Result.success();
     }
 
+    /**
+     * @returns the content fields of the group 
+     */
     getContentFields(): { name: string, contentFieldDefinition: ContentFieldDefinition, options: ContentFieldOptions }[] {
         return this.contentFields;
     }
 
+    /**
+     * @inheritdoc
+     */
     override validateValue(fieldValue: any): Result {
         for (const contentField of this.getContentFields()) {
             const singleFieldValue = contentHelper.getFieldValue(contentField.name, fieldValue);
 
-            if (contentField.options.isRequired && !singleFieldValue) {
+            if (contentField.options.isRequired && !singleFieldValue && singleFieldValue !== 0) {
                 this.logger.debug(`Value for field "%s" is required.`, contentField.name);
                 return Result.error(`Value for field "${ contentField.name }" is required.`);
             }
@@ -70,6 +94,9 @@ class GroupContentFieldDefinition<T = any> extends ContentFieldDefinition<T> {
         return super.validateValue(fieldValue);
     }
     
+    /**
+     * @inheritdoc
+     */
     override executeDeterminations(fieldValue: any): any {
         expressHelper.deleteNotExistingProperties(fieldValue, this.getContentFields().map(contentField => contentField.name));
         
