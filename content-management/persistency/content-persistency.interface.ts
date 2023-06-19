@@ -64,7 +64,7 @@ interface IContentPersistency {
      * @param id id of the content
      * @returns the data of the content
      */
-    readContent(contentName: string, id: string): Promise<UnknownContent>;
+    readContentByName(contentName: string, id: string): Promise<UnknownContent>;
 
     /**
      * Read a content by field value.

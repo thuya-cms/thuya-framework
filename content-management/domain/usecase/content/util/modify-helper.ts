@@ -1,4 +1,4 @@
-import { Result, contentHelper, expressHelper, Logger } from "../../../../../common";
+import { Result, contentHelper, Logger } from "../../../../../common";
 import { contentManager } from "../../../../app";
 import { ContentDefinition } from "../../../entity/content-definition/content-definition";
 import { ContentFieldType } from "../../../entity/content-field-definition/content-field-definition";
@@ -25,20 +25,19 @@ class ModifyHelper<T> {
      * @param content the content data
      * @returns result containing the converted data
      */
-    async convertData(contentDefinition: ContentDefinition<T>, content: T): Promise<Result<T>> {
+    async convertAndValidateData(contentDefinition: ContentDefinition<T>, content: T): Promise<Result<T>> {
         const finalContent: any = {};
 
-        expressHelper.deleteNotExistingProperties(
+        contentHelper.deleteNotExistingProperties(
             content, 
             contentDefinition.getContentFields().map(contentField => contentField.name));
 
         for (const contentField of contentDefinition.getContentFields()) {
             let fieldValue = contentHelper.getFieldValue(contentField.name, content);
 
-            if (contentField.options.isRequired && !fieldValue && fieldValue !== 0) {
-                this.logger.debug(`Value for field "%s" is required.`, contentField.name);
-                return Result.error(`Value for field ${ contentField.name } is required.`);
-            }
+            const isRequiredValidationResult = contentHelper.validateRequiredField(contentField.options.isRequired || false, fieldValue, contentField.name);
+            if (isRequiredValidationResult.getIsFailing())
+                return Result.error(isRequiredValidationResult.getMessage());
 
             if (fieldValue || fieldValue === 0) {
                 if (contentField.options.isUnique) {

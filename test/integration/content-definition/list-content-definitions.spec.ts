@@ -1,6 +1,6 @@
 import { expect } from "chai";
 import contentDefinitionManager from "../../../content-management/app/content-definition-manager";
-import ContentDefinitionDTO from "../../../content-management/app/dto/content-definition";
+import ContentDefinitionDTO from "../../../content-management/app/dto/content-definition/content-definition";
 import contentDefinitionUtil from "../helper/content-definition-util";
 import localContentManagementPersistency from "../../../content-management/persistency/local-content-management-persistency";
 import TextContentFieldDefinitionDTO from "../../../content-management/app/dto/content-field-definition/text-content-field-definition";

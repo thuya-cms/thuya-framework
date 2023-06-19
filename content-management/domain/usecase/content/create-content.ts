@@ -23,24 +23,19 @@ class CreateContent<T> {
      * @param contentDefinition the content definition of the content
      * @param content the content data
      * @returns result containing the id of the created content
+     * @async
      */
     async execute(contentDefinition: ContentDefinition<T>, content: T): Promise<Result<string>> {
         this.logger.debug(`Start creating content of type "%s"...`, contentDefinition.getName());
 
         try {
-            const finalContentResult = await modifyHelper.convertData(contentDefinition, content);
-            if (finalContentResult.getIsFailing())  {
+            const convertAndValidateContentResult = await modifyHelper.convertAndValidateData(contentDefinition, content);
+            if (convertAndValidateContentResult.getIsFailing())  {
                 this.logger.debug(`...Failed to create content of type "%s".`, contentDefinition.getName());
-                return Result.error(finalContentResult.getMessage());
+                return Result.error(convertAndValidateContentResult.getMessage());
             }
     
-            const indexedFields = contentDefinition.getContentFields()
-                .filter(contentField => contentField.options.isIndexed)
-                .map(contentField => contentField.name);
-    
-            const id = await factory.getContentPersistency().createContent(contentDefinition.getName(), finalContentResult.getResult(), {
-                indexedFields: indexedFields
-            });
+            const id = await factory.getContentPersistency().createContent(contentDefinition.getName(), convertAndValidateContentResult.getResult());
     
             this.logger.debug(`...Content of type "%s" created successfully.`, contentDefinition.getName());
             return Result.success(id);

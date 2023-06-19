@@ -18,21 +18,22 @@ class ListContent<T extends { id: string } = any> {
     /**
      * Execute the listing of contents for a content definition.
      * 
-     * @param contentName name of the content definition to use for content listing
+     * @param contentDefinitionName name of the content definition to use for content listing
      * @returns result containing the list of contents
+     * @async
      */
-    async execute(contentName: string): Promise<Result<T[]>> {
-        this.logger.debug(`Listing content for "%s"...`, contentName);
+    async execute(contentDefinitionName: string): Promise<Result<T[]>> {
+        this.logger.debug(`Listing content for "%s"...`, contentDefinitionName);
 
         try {
-            const contentList = await factory.getContentPersistency().listContent(contentName);
+            const contentList = await factory.getContentPersistency().listContent(contentDefinitionName);
 
-            this.logger.debug(`...Successfully listed content for "%s".`, contentName);
+            this.logger.debug(`...Successfully listed content for "%s".`, contentDefinitionName);
             return Result.success(contentList);
         }
 
         catch (error) {
-            this.logger.error(`...Failed to list content for "%s".`, contentName);
+            this.logger.error(`...Failed to list content for "%s".`, contentDefinitionName);
             throw error;
         }
     }
