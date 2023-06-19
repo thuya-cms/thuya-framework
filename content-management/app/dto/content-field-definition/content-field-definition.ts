@@ -1,4 +1,4 @@
-import IContentFieldHandlerProvider, { ContentFieldDetermination, ContentFieldValidator } from "../../../domain/entity/content-field-definition/content-field-handler-provider.interface";
+import IContentFieldDefinitionHandlerProvider, { ContentFieldDetermination, ContentFieldValidator } from "../../../domain/entity/content-field-definition/content-field-handler-provider.interface";
 
 enum ContentFieldType {
     Numeric = "numeric",
@@ -11,7 +11,7 @@ enum ContentFieldType {
 /**
  * Represents a content field definition. Abstract, the type specific implementations should be used.
  */
-abstract class ContentFieldDefinitionDTO<T = any> implements IContentFieldHandlerProvider<T> {
+abstract class ContentFieldDefinitionDTO<T = any> implements IContentFieldDefinitionHandlerProvider<T> {
     protected filePath = "";
     
     private validators: ContentFieldValidator<T>[] = [];
@@ -56,14 +56,14 @@ abstract class ContentFieldDefinitionDTO<T = any> implements IContentFieldHandle
     }
 
     /**
-     * @returns validators for the content field definition 
+     * @inheritdoc
      */
     getValidators(): ContentFieldValidator<T>[] {
         return this.validators;
     }
 
     /**
-     * @returns determinations of the content field definition 
+     * @inheritdoc
      */
     getDeterminations(): ContentFieldDetermination<T>[] {
         return this.determinations;

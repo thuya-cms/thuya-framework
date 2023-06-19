@@ -1,7 +1,7 @@
-import { ContentDefinition } from "../domain/entity/content-definition";
+import { ContentDefinition } from "../domain/entity/content-definition/content-definition";
 import ArrayContentFieldDefinition from "../domain/entity/content-field-definition/array-content-field-definition";
 import { ContentFieldDefinition, ContentFieldType } from "../domain/entity/content-field-definition/content-field-definition";
-import IContentFieldHandlerProvider from "../domain/entity/content-field-definition/content-field-handler-provider.interface";
+import IContentFieldDefinitionHandlerProvider from "../domain/entity/content-field-definition/content-field-handler-provider.interface";
 import DateContentFieldDefinition from "../domain/entity/content-field-definition/date-content-field-definition";
 import GroupContentFieldDefinition from "../domain/entity/content-field-definition/group-content-field-definition";
 import NumericContentFieldDefinition from "../domain/entity/content-field-definition/numeric-content-field-definition";
@@ -342,13 +342,13 @@ class ContentDefinitionRepository implements IContentDefinitionRepository {
         return contentSchemaElement;
     }
 
-    private getHandlerProvider(path: string): IContentFieldHandlerProvider | undefined {
+    private getHandlerProvider(path: string): IContentFieldDefinitionHandlerProvider | undefined {
         if (!path || path.trim() === "")
             return undefined;
 
         try {
             // eslint-disable-next-line @typescript-eslint/no-var-requires
-            return require(path).default as IContentFieldHandlerProvider;
+            return require(path).default as IContentFieldDefinitionHandlerProvider;
         }
 
         catch (error) {

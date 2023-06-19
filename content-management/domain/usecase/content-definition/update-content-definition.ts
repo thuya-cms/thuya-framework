@@ -1,6 +1,6 @@
 import { Logger, Result } from "../../../../common";
 import contentDefinitionRepository from "../../../repository/content-definition-repository";
-import { ContentDefinition } from "../../entity/content-definition";
+import { ContentDefinition } from "../../entity/content-definition/content-definition";
 
 class UpdateContentDefinition {
     private logger: Logger;

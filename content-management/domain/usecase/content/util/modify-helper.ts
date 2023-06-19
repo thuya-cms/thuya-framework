@@ -1,6 +1,6 @@
 import { Result, contentHelper, expressHelper, Logger } from "../../../../../common";
 import { contentManager } from "../../../../app";
-import { ContentDefinition } from "../../../entity/content-definition";
+import { ContentDefinition } from "../../../entity/content-definition/content-definition";
 import { ContentFieldType } from "../../../entity/content-field-definition/content-field-definition";
 
 /**
@@ -18,7 +18,8 @@ class ModifyHelper<T> {
 
 
     /**
-     * Convert the input data into a data that meets the requirements of the content definition.
+     * Convert the input data into a data that meets the requirements of the content definition 
+     * and validate the values.
      * 
      * @param contentDefinition the content definition of the content
      * @param content the content data

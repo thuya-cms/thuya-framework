@@ -1,4 +1,4 @@
-import { ContentDefinition } from "../../entity/content-definition";
+import { ContentDefinition } from "../../entity/content-definition/content-definition";
 import factory from "../../factory";
 import { Logger, Result } from "../../../../common";
 import modifyHelper from "./util/modify-helper";

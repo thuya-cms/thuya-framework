@@ -1,5 +1,5 @@
 import { Result } from "../../common";
-import { ContentDefinition } from "../domain/entity/content-definition";
+import { ContentDefinition } from "../domain/entity/content-definition/content-definition";
 import ArrayContentFieldDefinition from "../domain/entity/content-field-definition/array-content-field-definition";
 import { ContentFieldDefinition } from "../domain/entity/content-field-definition/content-field-definition";
 import DateContentFieldDefinition from "../domain/entity/content-field-definition/date-content-field-definition";
