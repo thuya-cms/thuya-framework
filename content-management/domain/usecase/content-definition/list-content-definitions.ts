@@ -16,6 +16,12 @@ class ListContentDefinitions {
 
     
     
+    /**
+     * Execute listing content definitions.
+     * 
+     * @returns 
+     * @async
+     */
     async execute(): Promise<Result<ContentDefinition[]>> {
         this.logger.debug("Listing content definitions...");
         

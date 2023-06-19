@@ -28,7 +28,6 @@ class ReadContentFieldDefinition {
 
         try {
             const contentFieldDefinition = await contentDefinitionRepository.readContentFieldDefinitionByName(contentFieldDefinitionName);
-    
             if (!contentFieldDefinition) {
                 this.logger.debug(`...Content field definition not found.`);
                 return Result.error(`Content field definition "${ contentFieldDefinitionName }" not found.`);
