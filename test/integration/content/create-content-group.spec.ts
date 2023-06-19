@@ -1,7 +1,7 @@
 import { should } from "chai";
 import contentDefinitionManager from "../../../content-management/app/content-definition-manager";
 import contentManager from "../../../content-management/app/content-manager";
-import ContentDefinitionDTO from "../../../content-management/app/dto/content-definition";
+import ContentDefinitionDTO from "../../../content-management/app/dto/content-definition/content-definition";
 import GroupContentFieldDefinitionDTO from "../../../content-management/app/dto/content-field-definition/group-content-field-definition";
 import NumericContentFieldDefinitionDTO from "../../../content-management/app/dto/content-field-definition/numeric-content-field-definition";
 import TextContentFieldDefinitionDTO from "../../../content-management/app/dto/content-field-definition/text-content-field-definition";

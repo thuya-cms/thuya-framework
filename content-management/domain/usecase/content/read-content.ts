@@ -18,27 +18,27 @@ class ReadContent<T extends { id: string } = any> {
     /**
      * Read content by id.
      * 
-     * @param contentName name of the content definition
+     * @param contentDefinitionName name of the content definition
      * @param id id of the content
      * @returns result containing the content
+     * @async
      */
-    async byId(contentName: string, id: string): Promise<Result<T>> {
-        this.logger.debug(`Reading content for "%s" by is "%s"...`, contentName, id);
+    async byId(contentDefinitionName: string, id: string): Promise<Result<T>> {
+        this.logger.debug(`Reading content for "%s" by is "%s"...`, contentDefinitionName, id);
         
         try {
-            const content = await factory.getContentPersistency().readContent(contentName, id);
-
-            if (content) {
-                this.logger.debug(`...Successfully read content of type "%s".`, contentName);
-                return Result.success(content);
+            const content = await factory.getContentPersistency().readContentByName(contentDefinitionName, id);
+            if (!content) {
+                this.logger.debug(`...Content of type "%s" not found.`, contentDefinitionName);
+                return Result.error(`...Failed to read content of type "${ contentDefinitionName }".`);
             }
-
-            this.logger.debug(`...Content of type "%s" not found.`, contentName);
-            return Result.error("Content not found.");
+            
+            this.logger.debug(`...Successfully read content of type "%s".`, contentDefinitionName);
+            return Result.success(content);
         }
 
         catch (error) {
-            this.logger.debug(`...Failed to read content of type "%s".`, contentName);
+            this.logger.debug(`...Failed to read content of type "%s".`, contentDefinitionName);
             throw error;
         }
     }
@@ -46,29 +46,29 @@ class ReadContent<T extends { id: string } = any> {
     /**
      * Read a single content by field value.
      * 
-     * @param contentName name of the content definition
+     * @param contentDefinitionName name of the content definition
      * @param fieldValue field key and value
      * @param fieldValue.name field key
      * @param fieldValue.value field value
      * @returns result containing the content
+     * @async
      */
-    async byFieldValue(contentName: string, fieldValue: { name: string, value: any }): Promise<Result<T>> {
-        this.logger.debug(`Reading content for "%s" by field value "%s":"%s"...`, contentName, fieldValue.name, fieldValue.value);
+    async byFieldValue(contentDefinitionName: string, fieldValue: { name: string, value: any }): Promise<Result<T>> {
+        this.logger.debug(`Reading content for "%s" by field value "%s":"%s"...`, contentDefinitionName, fieldValue.name, fieldValue.value);
         
         try {
-            const content = await factory.getContentPersistency().readContentByFieldValue(fieldValue, contentName);
-
-            if (content) {
-                this.logger.debug(`...Successfully read content for "%s" by field value "%s":"%s".`, contentName, fieldValue.name, fieldValue.value);
-                return Result.success(content);
+            const content = await factory.getContentPersistency().readContentByFieldValue(fieldValue, contentDefinitionName);
+            if (!content) {
+                this.logger.debug(`...Content not found for "%s" by field value "%s":"%s".`, contentDefinitionName, fieldValue.name, fieldValue.value);
+                return Result.error(`...Failed to read content for "${ contentDefinitionName }" by field value "${ fieldValue.name }":${ fieldValue.value }".`);
             }
             
-            this.logger.debug(`...Content not found for "%s" by field value "%s":"%s".`, contentName, fieldValue.name, fieldValue.value);
-            return Result.error("Content not found.");
+            this.logger.debug(`...Successfully read content for "%s" by field value "%s":"%s".`, contentDefinitionName, fieldValue.name, fieldValue.value);
+            return Result.success(content);
         }
         
         catch (error) {
-            this.logger.error(`...Failed to read content for "%s" by field value "%s":"%s".`, contentName, fieldValue.name, fieldValue.value);
+            this.logger.error(`...Failed to read content for "%s" by field value "%s":"%s".`, contentDefinitionName, fieldValue.name, fieldValue.value);
             throw error;
         }
     }

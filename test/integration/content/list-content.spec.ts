@@ -1,6 +1,6 @@
 import { expect } from "chai";
 import { contentManager } from "../../../content-management/app";
-import ContentDefinitionDTO from "../../../content-management/app/dto/content-definition";
+import ContentDefinitionDTO from "../../../content-management/app/dto/content-definition/content-definition";
 import ArrayContentFieldDefinitionDTO from "../../../content-management/app/dto/content-field-definition/array-content-field-definition";
 import DateContentFieldDefinitionDTO from "../../../content-management/app/dto/content-field-definition/date-content-field-definition";
 import NumericContentFieldDefinitionDTO from "../../../content-management/app/dto/content-field-definition/numeric-content-field-definition";

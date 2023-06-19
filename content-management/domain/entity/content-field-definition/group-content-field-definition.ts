@@ -1,6 +1,5 @@
 import { Result, Logger } from "../../../../common";
 import contentHelper from "../../../../common/utility/content-helper";
-import expressHelper from "../../../../common/utility/express-helper";
 import { ContentFieldDefinition, ContentFieldType } from "./content-field-definition";
 
 type ContentFieldOptions = {
@@ -81,10 +80,9 @@ class GroupContentFieldDefinition<T = any> extends ContentFieldDefinition<T> {
         for (const contentField of this.getContentFields()) {
             const singleFieldValue = contentHelper.getFieldValue(contentField.name, fieldValue);
 
-            if (contentField.options.isRequired && !singleFieldValue && singleFieldValue !== 0) {
-                this.logger.debug(`Value for field "%s" is required.`, contentField.name);
-                return Result.error(`Value for field "${ contentField.name }" is required.`);
-            }
+            const isRequiredValidationResult = contentHelper.validateRequiredField(contentField.options.isRequired || false, singleFieldValue, contentField.name);
+            if (isRequiredValidationResult.getIsFailing())
+                return Result.error(isRequiredValidationResult.getMessage());
 
             const result = contentField.contentFieldDefinition.validateValue(singleFieldValue);
 
@@ -98,7 +96,7 @@ class GroupContentFieldDefinition<T = any> extends ContentFieldDefinition<T> {
      * @inheritdoc
      */
     override executeDeterminations(fieldValue: any): any {
-        expressHelper.deleteNotExistingProperties(fieldValue, this.getContentFields().map(contentField => contentField.name));
+        contentHelper.deleteNotExistingProperties(fieldValue, this.getContentFields().map(contentField => contentField.name));
         
         return super.executeDeterminations(fieldValue);
     }

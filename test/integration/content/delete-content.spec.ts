@@ -2,7 +2,7 @@ import { expect } from "chai";
 import localContentManagementPersistency from "../../../content-management/persistency/local-content-management-persistency";
 import { contentManager } from "../../../content-management/app";
 import contentDefinitionUtil from "../helper/content-definition-util";
-import ContentDefinitionDTO from "../../../content-management/app/dto/content-definition";
+import ContentDefinitionDTO from "../../../content-management/app/dto/content-definition/content-definition";
 import TextContentFieldDefinitionDTO from "../../../content-management/app/dto/content-field-definition/text-content-field-definition";
 import NumericContentFieldDefinitionDTO from "../../../content-management/app/dto/content-field-definition/numeric-content-field-definition";
 import DateContentFieldDefinitionDTO from "../../../content-management/app/dto/content-field-definition/date-content-field-definition";

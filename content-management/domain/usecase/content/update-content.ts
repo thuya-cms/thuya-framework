@@ -28,13 +28,13 @@ class UpdateContent<T extends { id: string }> {
         this.logger.debug(`Updating content of type "%s"...`, contentDefinition.getName());
 
         try {
-            const finalContentResult = await modifyHelper.convertData(contentDefinition, content);
-            if (finalContentResult.getIsFailing()) {
-                this.logger.debug(`...Failed to update content of type "%s".`, contentDefinition.getName());
-                return Result.error(finalContentResult.getMessage());
+            const convertAndValidateContentResult = await modifyHelper.convertAndValidateData(contentDefinition, content);
+            if (convertAndValidateContentResult.getIsFailing())  {
+                this.logger.debug(`...Failed to create content of type "%s".`, contentDefinition.getName());
+                return Result.error(convertAndValidateContentResult.getMessage());
             }
     
-            await factory.getContentPersistency().updateContent(contentDefinition.getName(), finalContentResult.getResult());
+            await factory.getContentPersistency().updateContent(contentDefinition.getName(), convertAndValidateContentResult.getResult());
             
             this.logger.debug(`...Content of type "%s" is updated successfully.`, contentDefinition.getName());
             return Result.success();

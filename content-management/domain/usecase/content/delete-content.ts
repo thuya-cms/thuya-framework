@@ -18,22 +18,23 @@ class DeleteContent {
     /**
      * Execute content deletion.
      * 
-     * @param contentName name of the content definition
+     * @param contentDefinitionName name of the content definition
      * @param id id of the content to delete
      * @returns result
+     * @async
      */
-    async execute(contentName: string, id: string): Promise<Result> {
-        this.logger.debug(`Start deleting content for definition "%s"...`, contentName);
+    async execute(contentDefinitionName: string, id: string): Promise<Result> {
+        this.logger.debug(`Start deleting content for definition "%s"...`, contentDefinitionName);
 
         try {
-            await factory.getContentPersistency().deleteContent(contentName, id);
+            await factory.getContentPersistency().deleteContent(contentDefinitionName, id);
             
-            this.logger.debug(`...Content of type "%s" deleted successfully.`, contentName);
+            this.logger.debug(`...Content of type "%s" deleted successfully.`, contentDefinitionName);
             return Result.success();
         }
 
         catch (error) {
-            this.logger.error(`...Failed to delete content of type "%s".`, contentName);
+            this.logger.error(`...Failed to delete content of type "%s".`, contentDefinitionName);
             throw error;
         }
     }

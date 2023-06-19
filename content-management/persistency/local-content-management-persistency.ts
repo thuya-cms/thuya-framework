@@ -196,7 +196,7 @@ class LocalContentManagementPersistency implements IContentDefinitionPersistency
         return list ? Promise.resolve(list.content) : Promise.resolve([]);
     }
 
-    readContent(contentName: string, id: string) {
+    readContentByName(contentName: string, id: string) {
         const contentList = this.content.find(content => content.contentName === contentName);
         if (!contentList)
             return;
