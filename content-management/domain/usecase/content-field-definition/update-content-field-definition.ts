@@ -19,7 +19,7 @@ class UpdateContentFieldDefinition {
     /**
      * Execute update of a content field definition.
      * 
-     * @param contentFieldDefinition the content field definition
+     * @param contentFieldDefinition the updated content field definition
      * @returns result
      * @async
      */

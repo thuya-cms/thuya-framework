@@ -22,6 +22,7 @@ class CreateContentFieldDefinition {
      * 
      * @param contentFieldDefinition the content field definition to create
      * @returns result containing the id of the created content field definition
+     * @async
      */
     async execute(contentFieldDefinition: ContentFieldDefinition): Promise<Result<string>> {
         this.logger.debug(`Start creating content field definition "%s"...`, contentFieldDefinition.getName());

@@ -22,6 +22,7 @@ class CreateContentDefinition {
      * 
      * @param contentDefinition the content definition to create
      * @returns result containing the id of the created content definition as a result
+     * @async
      */
     async execute(contentDefinition: ContentDefinition): Promise<Result<string>> {
         this.logger.debug(`Start creating content definition "%s"...`, contentDefinition.getName());

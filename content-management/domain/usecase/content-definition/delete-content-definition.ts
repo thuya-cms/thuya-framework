@@ -15,6 +15,13 @@ class DeleteContentDefinition {
 
 
     
+    /**
+     * Delete a content definition by name.
+     * 
+     * @param contentDefinitionName the content definition name
+     * @returns result
+     * @async
+     */
     async byName(contentDefinitionName: string): Promise<Result> {
         this.logger.debug(`Deleting content definition "%s"...`, contentDefinitionName);
         

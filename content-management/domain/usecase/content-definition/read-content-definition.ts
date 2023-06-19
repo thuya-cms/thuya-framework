@@ -20,26 +20,27 @@ class ReadContentDefinition {
     /**
      * Execute reading content definition by name.
      * 
-     * @param contentName name of the content definition to read
+     * @param contentDefinitionName name of the content definition to read
      * @returns result containing the content definition
+     * @async
      */
-    async byName(contentName: string): Promise<Result<ContentDefinition | undefined>> {
-        this.logger.debug(`Start reading content definition "%s"...`, contentName);
+    async byName(contentDefinitionName: string): Promise<Result<ContentDefinition | undefined>> {
+        this.logger.debug(`Start reading content definition "%s"...`, contentDefinitionName);
 
         try {
-            const contentDefinition = await contentDefinitionRepository.readContentDefinition(contentName);
+            const contentDefinition = await contentDefinitionRepository.readContentDefinition(contentDefinitionName);
     
             if (!contentDefinition) {
-                this.logger.debug(`...Content definition not found.`);
-                return Result.error(`Content definition "${ contentName }" not found.`);
+                this.logger.debug(`...Content definition "%s" not found.`, contentDefinitionName);
+                return Result.error(`Content definition "${ contentDefinitionName }" not found.`);
             }
     
-            this.logger.debug(`...Content definition "%s" found.`, contentName);
+            this.logger.debug(`...Content definition "%s" found.`, contentDefinitionName);
             return Result.success(contentDefinition);
         }
 
         catch (error) {
-            this.logger.debug(`...Failed to read content definition "%s".`, contentName);
+            this.logger.debug(`...Failed to read content definition "%s".`, contentDefinitionName);
             throw error;
         }
     }
