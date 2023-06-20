@@ -54,8 +54,6 @@
   "scripts": {
     "eslint": "eslint . --max-warnings 0",
     "test": "mocha -r ts-node/register test/**/*.spec.ts",
-    "test:unit": "mocha -r ts-node/register test/unit/**/*.spec.ts",
-    "publish:dev": "npm publish --tag development",
     "build": "npx tsc",
     "build:dev": "npx tsc -p tsconfig-dev.json",
     "link": "npm link"
