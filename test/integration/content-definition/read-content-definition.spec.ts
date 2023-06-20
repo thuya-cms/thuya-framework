@@ -7,7 +7,7 @@ import contentDefinitionUtil from "../helper/content-definition-util";
 
 describe("read content definition", () => {
     beforeEach(async () => {
-        await contentDefinitionUtil.defineContentField(new TextContentFieldDefinitionDTO("", "id"));
+        await contentDefinitionUtil.createContentFieldDefinition(new TextContentFieldDefinitionDTO("", "id"));
     });
 
     afterEach(() => {
@@ -17,7 +17,7 @@ describe("read content definition", () => {
     
     
     it("should return existing content definition", async () => {
-        await contentDefinitionUtil.defineContent(new ContentDefinitionDTO("", "test-definition"));
+        await contentDefinitionUtil.createContentDefinition(new ContentDefinitionDTO("", "test-definition"));
 
         const readResult = await contentDefinitionManager.readContentDefinitionByName("test-definition");
         expect(readResult.getIsSuccessful(), readResult.getMessage()).to.be.true;

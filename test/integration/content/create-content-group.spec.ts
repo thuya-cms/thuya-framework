@@ -14,7 +14,7 @@ describe("create content with group", () => {
 
     
     beforeEach(async () => {
-        await contentDefinitionUtil.defineContentField(new TextContentFieldDefinitionDTO("", "id"));
+        await contentDefinitionUtil.createContentFieldDefinition(new TextContentFieldDefinitionDTO("", "id"));
         contentDefinition = new ContentDefinitionDTO("", "test-definition");
     });
 
@@ -27,16 +27,16 @@ describe("create content with group", () => {
         const textValue = "text-value";
         const numValue = 30;
 
-        const textField = await contentDefinitionUtil.defineContentField(new TextContentFieldDefinitionDTO("", "text-field-1"));
-        const numField = await contentDefinitionUtil.defineContentField(new NumericContentFieldDefinitionDTO("", "numeric-field-1"));
+        const textField = await contentDefinitionUtil.createContentFieldDefinition(new TextContentFieldDefinitionDTO("", "text-field-1"));
+        const numField = await contentDefinitionUtil.createContentFieldDefinition(new NumericContentFieldDefinitionDTO("", "numeric-field-1"));
 
         groupField = new GroupContentFieldDefinitionDTO("", "group-field-1");
         groupField.addContentField("textField", textField);
         groupField.addContentField("numericField", numField);
-        await contentDefinitionUtil.defineContentField(groupField);
+        await contentDefinitionUtil.createContentFieldDefinition(groupField);
 
         contentDefinition.addContentField("groupField", groupField);
-        await contentDefinitionUtil.defineContent(contentDefinition);
+        await contentDefinitionUtil.createContentDefinition(contentDefinition);
 
         const createContentResult = await contentManager.createContent(contentDefinition.getName(), {
             groupField: {
@@ -57,8 +57,8 @@ describe("create content with group", () => {
     });
 
     it("should fail with duplicate fields", async () => {
-        const textField1 = await contentDefinitionUtil.defineContentField(new TextContentFieldDefinitionDTO("", "text-field-1"));
-        const textField2 = await contentDefinitionUtil.defineContentField(new TextContentFieldDefinitionDTO("", "text-field-2"));
+        const textField1 = await contentDefinitionUtil.createContentFieldDefinition(new TextContentFieldDefinitionDTO("", "text-field-1"));
+        const textField2 = await contentDefinitionUtil.createContentFieldDefinition(new TextContentFieldDefinitionDTO("", "text-field-2"));
 
         groupField = new GroupContentFieldDefinitionDTO("", "group-field-1");
         groupField.addContentField("textField", textField1);
@@ -71,14 +71,14 @@ describe("create content with group", () => {
     });
 
     it("should fail with missing required value", async () => {
-        const textField = await contentDefinitionUtil.defineContentField(new TextContentFieldDefinitionDTO("", "text-field"));
+        const textField = await contentDefinitionUtil.createContentFieldDefinition(new TextContentFieldDefinitionDTO("", "text-field"));
 
         groupField = new GroupContentFieldDefinitionDTO("", "group-field-1");
         groupField.addContentField("textField", textField, { isRequired: true });
-        await contentDefinitionUtil.defineContentField(groupField);
+        await contentDefinitionUtil.createContentFieldDefinition(groupField);
 
         contentDefinition.addContentField("groupField", groupField);
-        await contentDefinitionUtil.defineContent(contentDefinition);
+        await contentDefinitionUtil.createContentDefinition(contentDefinition);
 
         const createContentResult = await contentManager.createContent(contentDefinition.getName(), {});
         should().equal(createContentResult.getIsFailing(), true);

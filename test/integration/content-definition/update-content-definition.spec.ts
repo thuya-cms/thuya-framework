@@ -7,7 +7,7 @@ import contentDefinitionUtil from "../helper/content-definition-util";
 
 describe("update content definition", () => {
     beforeEach(async () => {
-        await contentDefinitionUtil.defineContentField(new TextContentFieldDefinitionDTO("", "id"));
+        await contentDefinitionUtil.createContentFieldDefinition(new TextContentFieldDefinitionDTO("", "id"));
     });
 
     afterEach(() => {
@@ -16,9 +16,9 @@ describe("update content definition", () => {
 
 
     it("should be updated with a new field", async () => {
-        const contentDefinitionDTO = await contentDefinitionUtil.defineContent(new ContentDefinitionDTO("", "test-definition"));
+        const contentDefinitionDTO = await contentDefinitionUtil.createContentDefinition(new ContentDefinitionDTO("", "test-definition"));
 
-        const contentFieldDefinitionDTO = await contentDefinitionUtil.defineContentField(new TextContentFieldDefinitionDTO("", "new-field"));
+        const contentFieldDefinitionDTO = await contentDefinitionUtil.createContentFieldDefinition(new TextContentFieldDefinitionDTO("", "new-field"));
         contentDefinitionDTO.addContentField("new-field", contentFieldDefinitionDTO);
          
         const updateResult = await contentDefinitionManager.updateContentDefinition(contentDefinitionDTO);
@@ -30,9 +30,9 @@ describe("update content definition", () => {
     });
     
     it("should fail with duplicate fields", async () => {
-        const contentDefinitionDTO = await contentDefinitionUtil.defineContent(new ContentDefinitionDTO("", "test-definition"));
+        const contentDefinitionDTO = await contentDefinitionUtil.createContentDefinition(new ContentDefinitionDTO("", "test-definition"));
 
-        const contentFieldDefinitionDTO = await contentDefinitionUtil.defineContentField(new TextContentFieldDefinitionDTO("", "new-field"));
+        const contentFieldDefinitionDTO = await contentDefinitionUtil.createContentFieldDefinition(new TextContentFieldDefinitionDTO("", "new-field"));
         contentDefinitionDTO.addContentField("new-field", contentFieldDefinitionDTO);
         contentDefinitionDTO.addContentField("new-field", contentFieldDefinitionDTO);
          

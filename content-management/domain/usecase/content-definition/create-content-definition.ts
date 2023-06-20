@@ -28,7 +28,7 @@ class CreateContentDefinition {
         this.logger.debug(`Start creating content definition "%s"...`, contentDefinition.getName());
         
         try {
-            const existingContentDefinition = await contentDefinitionRepository.readContentDefinition(contentDefinition.getName());
+            const existingContentDefinition = await contentDefinitionRepository.readContentDefinitionByName(contentDefinition.getName());
             if (existingContentDefinition) {
                 this.logger.debug(`Content definition "%s" already exists.`, contentDefinition.getName());
                 return Result.error(`Content definition "${ contentDefinition.getName() }" already exists.`);

@@ -48,23 +48,26 @@ interface IContentDefinitionPersistency {
     /**
      * Read a content definition by name.
      * 
-     * @param contentName the name of the content definition to read
+     * @param contentDefinitionName the name of the content definition to read
      * @returns the data of the content definition
+     * @async
      */
-    readContentDefinition(contentName: string): Promise<ContentDefinitionData | undefined>;
+    readContentDefinitionByName(contentDefinitionName: string): Promise<ContentDefinitionData | undefined>;
 
     /**
      * Read a content definition by name expanding the content fields.
      * 
-     * @param contentName the name of the content definition to read
+     * @param contentDefinitionName the name of the content definition to read
      * @returns the data of the expanded content definition
+     * @async
      */
-    readContentDefinitionExpandingFields(contentName: string): Promise<ExpandedContentDefinitionData | undefined>;
+    readContentDefinitionExpandingFields(contentDefinitionName: string): Promise<ExpandedContentDefinitionData | undefined>;
 
     /**
      * List content definitions.
      * 
      * @returns the list of content definitions data
+     * @async
      */
     listContentDefinitions(): Promise<ExpandedContentDefinitionData[]>;
 
@@ -73,22 +76,25 @@ interface IContentDefinitionPersistency {
      * 
      * @param id the id of the content definition to read
      * @returns the data of the content field definition
+     * @async
      */
     readContentFieldDefinitionById(id: string): Promise<ContentFieldDefinitionData | undefined>;
 
     /**
      * Read a content field definition by name.
      * 
-     * @param name the name of the content field definition to read
+     * @param contentFieldDefinitionName the name of the content field definition to read
      * @returns the data of the content field definition
+     * @async
      */
-    readContentFieldDefinitionByName(name: string): Promise<ContentFieldDefinitionData| undefined>;
+    readContentFieldDefinitionByName(contentFieldDefinitionName: string): Promise<ContentFieldDefinitionData| undefined>;
 
     /**
      * Create a content definition.
      * 
      * @param contentDefinitionData the data of content definition to create 
      * @returns the id of the created content definition
+     * @async
      */
     createContentDefinition(contentDefinitionData: ContentDefinitionData): Promise<string>;
     
@@ -96,21 +102,24 @@ interface IContentDefinitionPersistency {
      * Update a content definition.
      * 
      * @param contentDefinitionData the data of content definition to update 
+     * @async
      */
     updateContentDefinition(contentDefinitionData: ContentDefinitionData): Promise<void>;
 
     /**
      * Delete a content definition by name.
      * 
-     * @param contentName the name of the content definition
+     * @param contentDefinitionName the name of the content definition
+     * @async
      */
-    deleteContentDefinitionByName(contentName: string): Promise<void>;
+    deleteContentDefinitionByName(contentDefinitionName: string): Promise<void>;
 
     /**
      * Create a content field definition.
      * 
      * @param contentFieldDefinitionData the data of the content field definition to create
      * @returns the id of the created content field definition
+     * @async
      */
     createContentFieldDefinition(contentFieldDefinitionData: ContentFieldDefinitionData): Promise<string>;
 
@@ -118,6 +127,7 @@ interface IContentDefinitionPersistency {
      * Delete a content field definition by name.
      * 
      * @param contentFieldDefinitionName the name of the content field definition
+     * @async
      */
     deleteContentFieldDefinitionByName(contentFieldDefinitionName: string): Promise<void>;
 

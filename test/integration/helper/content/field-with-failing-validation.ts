@@ -1,6 +1,9 @@
 import { Result } from "../../../../common";
 import TextContentFieldDefinitionDTO from "../../../../content-management/app/dto/content-field-definition/text-content-field-definition";
 
+/**
+ * A field with a failing validation.
+ */
 class FieldWithFailingValidation extends TextContentFieldDefinitionDTO {
     protected filePath: string = __filename;
 

@@ -15,6 +15,7 @@ import frameworkSettingsContentDefinition from './content/framework-settings-con
 import frameworkSettingsContentProvider from './content/framework-settings-content-provider';
 import { IContentPersistency } from './content-management/persistency';
 import Logger from './common/utility/logger';
+import { contentManager } from './content-management/app';
 
 /**
  * Main entry point for a Thuya CMS application.
@@ -46,18 +47,27 @@ class ThuyaApp {
 
     /**
      * Initialize the Thuya CMS application.
+     * 
+     * @throws will throw an exception if framework settings cannot be read
+     * @async
      */
-    public async initialize() {
+    public async initialize(): Promise<void> {
         this.logger.debug("Initializing framework...");
 
         const frameworkSettingsContentDefinitionResult = await contentDefinitionManager.readContentDefinitionByName(frameworkSettingsContentDefinition.getName());
         if (frameworkSettingsContentDefinitionResult.getIsFailing()) {
             this.logger.debug("Framework not yet initialized. Starting initialization.");
             await this.useContentProvider(frameworkSettingsContentProvider);
-        }
-        else{
+        } else {
             this.logger.debug(`Framework is already initialized.`);
-            this._frameworkSettings = frameworkSettingsContentDefinitionResult.getResult()!; // TODO: Should read settings content.
+            
+            const listFrameworkSettingsResult = await contentManager.listContent(frameworkSettingsContentDefinition.getName());
+            if (listFrameworkSettingsResult.getIsFailing()) {
+                this.logger.error(listFrameworkSettingsResult.getMessage());
+                throw new Error("Failed to get framework settings.");
+            }
+
+            this._frameworkSettings = listFrameworkSettingsResult.getResult()![0];
         }
 
         this.logger.debug("...Framework initialization complete.");
@@ -99,6 +109,7 @@ class ThuyaApp {
      * Use a module in the Thuya CMS application.
      * 
      * @param module the module to use
+     * @async
      */
     public async useModule(module: Module): Promise<void> {
         this.logger.debug(`Using module "%s"...`, module.getMetadata().name);
@@ -119,7 +130,7 @@ class ThuyaApp {
      * 
      * @param persistency the persistency to use
      */
-    public useContentDefinitionPersistency(persistency: IContentDefinitionPersistency) {
+    public useContentDefinitionPersistency(persistency: IContentDefinitionPersistency): void {
         factory.setContentDefinitionPersistency(persistency);
     }
     
@@ -128,12 +139,12 @@ class ThuyaApp {
      * 
      * @param persistency the persistency to use
      */
-    public useContentPersistency(persistency: IContentPersistency) {
+    public useContentPersistency(persistency: IContentPersistency): void {
         factory.setContentPersistency(persistency);
     }
 
 
-    private async useContentProvider(contentProvider: ContentProvider) {
+    private async useContentProvider(contentProvider: ContentProvider): Promise<void> {
         if (!this._frameworkSettings) {
             this.logger.debug(`Creating content field definitions.`);
             for (const contentFieldDefinition of contentProvider.getContentFieldDefinitions()) {
@@ -155,7 +166,7 @@ class ThuyaApp {
         }
     }
 
-    private registerContentDefinition(contentDefinition: ContentDefinitionDTO) {
+    private registerContentDefinition(contentDefinition: ContentDefinitionDTO): void {
         this._expressApp.get("/" + contentDefinition.getName(), expressContentManager.listContent.bind(expressContentManager));
         this._expressApp.get("/" + contentDefinition.getName() + "/:id", expressContentManager.readContent.bind(expressContentManager));
         this._expressApp.post("/" + contentDefinition.getName(), expressContentManager.createContent.bind(expressContentManager));

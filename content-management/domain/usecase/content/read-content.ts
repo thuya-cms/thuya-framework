@@ -27,7 +27,7 @@ class ReadContent<T extends { id: string } = any> {
         this.logger.debug(`Reading content for "%s" by is "%s"...`, contentDefinitionName, id);
         
         try {
-            const content = await factory.getContentPersistency().readContentByName(contentDefinitionName, id);
+            const content = await factory.getContentPersistency().readContentById(contentDefinitionName, id);
             if (!content) {
                 this.logger.debug(`...Content of type "%s" not found.`, contentDefinitionName);
                 return Result.error(`...Failed to read content of type "${ contentDefinitionName }".`);
@@ -57,7 +57,7 @@ class ReadContent<T extends { id: string } = any> {
         this.logger.debug(`Reading content for "%s" by field value "%s":"%s"...`, contentDefinitionName, fieldValue.name, fieldValue.value);
         
         try {
-            const content = await factory.getContentPersistency().readContentByFieldValue(fieldValue, contentDefinitionName);
+            const content = await factory.getContentPersistency().readContentByFieldValue(contentDefinitionName, fieldValue);
             if (!content) {
                 this.logger.debug(`...Content not found for "%s" by field value "%s":"%s".`, contentDefinitionName, fieldValue.name, fieldValue.value);
                 return Result.error(`...Failed to read content for "${ contentDefinitionName }" by field value "${ fieldValue.name }":${ fieldValue.value }".`);

@@ -7,7 +7,7 @@ import TextContentFieldDefinitionDTO from "../../../content-management/app/dto/c
 
 describe("list content definitions", () => {
     beforeEach(async () => {
-        await contentDefinitionUtil.defineContentField(new TextContentFieldDefinitionDTO("", "id"));
+        await contentDefinitionUtil.createContentFieldDefinition(new TextContentFieldDefinitionDTO("", "id"));
     });
 
     afterEach(() => {
@@ -16,8 +16,8 @@ describe("list content definitions", () => {
 
     
     it("should return existing items", async () => {
-        await contentDefinitionUtil.defineContent(new ContentDefinitionDTO("", "test-definition-1"));
-        await contentDefinitionUtil.defineContent(new ContentDefinitionDTO("", "test-definition-2"));
+        await contentDefinitionUtil.createContentDefinition(new ContentDefinitionDTO("", "test-definition-1"));
+        await contentDefinitionUtil.createContentDefinition(new ContentDefinitionDTO("", "test-definition-2"));
 
         const listContentDefinitionsResult = await contentDefinitionManager.listContentDefinitions();
         expect(listContentDefinitionsResult.getIsSuccessful(), listContentDefinitionsResult.getMessage()).to.be.true;

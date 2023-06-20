@@ -8,11 +8,11 @@ interface IContentDefinitionRepository {
     /**
      * Read a content definition by name.
      * 
-     * @param contentName name of the content definition
+     * @param contentDefinitionName name of the content definition
      * @returns the content definition or undefined
      * @async
      */
-    readContentDefinition(contentName: string): Promise<ContentDefinition | void>;
+    readContentDefinitionByName(contentDefinitionName: string): Promise<ContentDefinition | void>;
 
     /**
      * List content definitions.
@@ -42,10 +42,10 @@ interface IContentDefinitionRepository {
     /**
      * Delete a content definition by name.
      * 
-     * @param contentName name of the content definition
+     * @param contentDefinitionName name of the content definition
      * @async
      */
-    deleteContentDefinitionByName(contentName: string): Promise<void>;
+    deleteContentDefinitionByName(contentDefinitionName: string): Promise<void>;
 
     /**
      * Create a content field definition.
@@ -59,19 +59,19 @@ interface IContentDefinitionRepository {
     /**
      * Read a content field definition by name.
      * 
-     * @param contentFieldName name of the content field definition
+     * @param contentFieldDefinitionName name of the content field definition
      * @returns the content field definition or undefined
      * @async
      */
-    readContentFieldDefinitionByName(contentFieldName: string): Promise<ContentFieldDefinition | void>;
+    readContentFieldDefinitionByName(contentFieldDefinitionName: string): Promise<ContentFieldDefinition | void>;
 
     /**
      * Delete a content field definition by name.
      * 
-     * @param contentFieldName name of the content field definition
+     * @param contentFieldDefinitionName name of the content field definition
      * @async
      */
-    deleteContentFieldDefinitionByName(contentFieldName: string): Promise<void>;
+    deleteContentFieldDefinitionByName(contentFieldDefinitionName: string): Promise<void>;
 
     /**
      * Update a content field definition.

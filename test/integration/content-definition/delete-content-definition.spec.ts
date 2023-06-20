@@ -7,7 +7,7 @@ import contentDefinitionUtil from "../helper/content-definition-util";
 
 describe("delete content definition", () => {
     beforeEach(async () => {
-        await contentDefinitionUtil.defineContentField(new TextContentFieldDefinitionDTO("", "id"));
+        await contentDefinitionUtil.createContentFieldDefinition(new TextContentFieldDefinitionDTO("", "id"));
     });
 
     afterEach(() => {
@@ -16,7 +16,7 @@ describe("delete content definition", () => {
 
 
     it("should delete existing content definition", async () => {
-        await contentDefinitionUtil.defineContent(new ContentDefinitionDTO("", "test-definition"));
+        await contentDefinitionUtil.createContentDefinition(new ContentDefinitionDTO("", "test-definition"));
 
         const deleteResult = await contentDefinitionManager.deleteContentDefinitionByName("test-definition");
         expect(deleteResult.getIsSuccessful(), deleteResult.getMessage()).to.be.true;

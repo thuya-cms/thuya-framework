@@ -62,7 +62,7 @@ class ContentHelper {
         
     
     private contentFieldExists(contentFieldNames: string[], contentProperty: Extract<keyof any, string>): boolean {
-        return !contentFieldNames.find(contentFieldName => contentFieldName === contentProperty);
+        return contentFieldNames.findIndex(contentFieldName => contentFieldName === contentProperty) !== -1;
     }
 }
 

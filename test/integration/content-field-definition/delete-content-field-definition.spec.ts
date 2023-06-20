@@ -11,7 +11,7 @@ describe("delete content field definition", () => {
 
     
     it("should delete the content field definition if exists", async () => {
-        await contentDefinitionUtil.defineContentField(new TextContentFieldDefinitionDTO("", "field"));
+        await contentDefinitionUtil.createContentFieldDefinition(new TextContentFieldDefinitionDTO("", "field"));
         const deleteResult = await contentDefinitionManager.deleteContentFieldDefinitionByName("field");
         expect(deleteResult.getIsSuccessful(), deleteResult.getMessage()).to.be.true;
     });

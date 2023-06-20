@@ -8,7 +8,7 @@ import fieldWithDetermination from "../helper/content/field-with-determination";
 
 describe("determinations when creating content", () => {
     beforeEach(async () => {
-        await contentDefinitionUtil.defineContentField(new TextContentFieldDefinitionDTO("", "id"));
+        await contentDefinitionUtil.createContentFieldDefinition(new TextContentFieldDefinitionDTO("", "id"));
     });
     
     afterEach(() => {
@@ -18,11 +18,11 @@ describe("determinations when creating content", () => {
     
     it("should update the value with determination", async () => {
         const contentField = fieldWithDetermination;
-        await contentDefinitionUtil.defineContentField(contentField);
+        await contentDefinitionUtil.createContentFieldDefinition(contentField);
 
         const contentDefinition = new ContentDefinitionDTO("", "definition");
         contentDefinition.addContentField("fieldOne", contentField);
-        await contentDefinitionUtil.defineContent(contentDefinition);
+        await contentDefinitionUtil.createContentDefinition(contentDefinition);
 
         const createContentResult = await contentManager.createContent("definition", {
             fieldOne: "data1"
