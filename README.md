@@ -1,2 +1,1 @@
-# thuya-framework
-Thuya CMS - Framework
+# Thuya CMS - Framework
