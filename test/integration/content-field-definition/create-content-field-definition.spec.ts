@@ -11,11 +11,11 @@ describe("create content field definition", () => {
 
 
     it("should create field with valid data", async () => {
-        await contentDefinitionUtil.defineContentField(new TextContentFieldDefinitionDTO("", "field-1"));
+        await contentDefinitionUtil.createContentFieldDefinition(new TextContentFieldDefinitionDTO("", "field-1"));
     });
     
     it("should fail with existing field name", async () => {
-        await contentDefinitionUtil.defineContentField(new TextContentFieldDefinitionDTO("", "field-1"));
+        await contentDefinitionUtil.createContentFieldDefinition(new TextContentFieldDefinitionDTO("", "field-1"));
         
         const createContentFieldDefinitionResult = await contentDefinitionManager.createContentFieldDefinition(new TextContentFieldDefinitionDTO("", "field-1"));
         expect(createContentFieldDefinitionResult.getIsFailing()).to.be.true;

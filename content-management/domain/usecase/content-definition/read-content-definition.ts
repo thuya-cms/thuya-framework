@@ -28,7 +28,7 @@ class ReadContentDefinition {
         this.logger.debug(`Start reading content definition "%s"...`, contentDefinitionName);
 
         try {
-            const contentDefinition = await contentDefinitionRepository.readContentDefinition(contentDefinitionName);
+            const contentDefinition = await contentDefinitionRepository.readContentDefinitionByName(contentDefinitionName);
     
             if (!contentDefinition) {
                 this.logger.debug(`...Content definition "%s" not found.`, contentDefinitionName);

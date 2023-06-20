@@ -1,5 +1,8 @@
 import TextContentFieldDefinitionDTO from "../../../../content-management/app/dto/content-field-definition/text-content-field-definition";
 
+/**
+ * Field with a determination.
+ */
 class FieldWithDetermination extends TextContentFieldDefinitionDTO {
     protected filePath: string = __filename;
     

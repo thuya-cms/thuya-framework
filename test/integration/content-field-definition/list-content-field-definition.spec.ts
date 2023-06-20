@@ -11,8 +11,8 @@ describe("list content field definitions", () => {
 
     
     it("should return existing items", async () => {
-        await contentDefinitionUtil.defineContentField(new TextContentFieldDefinitionDTO("", "test-field-1"));
-        await contentDefinitionUtil.defineContentField(new TextContentFieldDefinitionDTO("", "test-field-2"));
+        await contentDefinitionUtil.createContentFieldDefinition(new TextContentFieldDefinitionDTO("", "test-field-1"));
+        await contentDefinitionUtil.createContentFieldDefinition(new TextContentFieldDefinitionDTO("", "test-field-2"));
 
         const listContentDefinitionsResult = await contentDefinitionManager.listContentFieldDefinitions();
         expect(listContentDefinitionsResult.getIsSuccessful(), listContentDefinitionsResult.getMessage()).to.be.true;

@@ -11,7 +11,7 @@ describe("read content field definition", () => {
    
     
     it("should return existing content definition", async () => {
-        await contentDefinitionUtil.defineContentField(new TextContentFieldDefinitionDTO("", "test-field"));
+        await contentDefinitionUtil.createContentFieldDefinition(new TextContentFieldDefinitionDTO("", "test-field"));
 
         const readResult = await contentDefinitionManager.readContentFieldDefinitionByName("test-field");
         expect(readResult.getIsSuccessful(), readResult.getMessage()).to.be.true;

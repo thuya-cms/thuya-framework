@@ -1,18 +1,29 @@
 import IContentDefinitionPersistency, { ContentDefinitionData, ContentFieldDefinitionData, ExpandedContentDefinitionData } from "./content-definition-persistency.interface";
 import {v4 as uuid} from 'uuid';
 import IContentPersistency from "./content-persistency.interface";
+import UnknownContent from "../domain/usecase/content/unknown-content.type";
 
+/**
+ * Persistency for content, content definition and content field definition. 
+ * It stores the data in memory.
+ */
 class LocalContentManagementPersistency implements IContentDefinitionPersistency, IContentPersistency {
     private contentDefinitions: ContentDefinitionData[] = [];
     private contentFieldDefinitions: ContentFieldDefinitionData[] = [];
-    private content: { contentName: string, content: any[] }[] = [];
+    private content: any = {};
     
     
     
+    /**
+     * @inheritdoc
+     */
     createContentSchema(): Promise<void> {
         return Promise.resolve();
     }
 
+    /**
+     * @inheritdoc
+     */
     async createContentDefinition(contentDefinitionData: ContentDefinitionData): Promise<string> {
         contentDefinitionData.id = uuid();
         this.contentDefinitions.push(contentDefinitionData);
@@ -20,30 +31,40 @@ class LocalContentManagementPersistency implements IContentDefinitionPersistency
         return contentDefinitionData.id;
     }
 
+    /**
+     * @inheritdoc
+     */
     async updateContentDefinition(contentDefinitionData: ContentDefinitionData): Promise<void> {
         const index = this.contentDefinitions.findIndex(contentDefinition => contentDefinition.id === contentDefinitionData.id);
-
         if (index === -1) 
             throw new Error(`Content definition with id "${ contentDefinitionData.id }" not found.`);
 
         this.contentDefinitions[index] = contentDefinitionData;
     }
 
+    /**
+     * @inheritdoc
+     */
     async deleteContentDefinitionByName(contentName: string): Promise<void> {
         const index = this.contentDefinitions.findIndex(contentDefinition => contentDefinition.name === contentName);
-
         if (index === -1) 
             throw new Error("Content definition not found.");
 
         this.contentDefinitions.splice(index, 1);
     }
 
-    async readContentDefinition(contentName: string): Promise<ContentDefinitionData | undefined> {
+    /**
+     * @inheritdoc
+     */
+    async readContentDefinitionByName(contentName: string): Promise<ContentDefinitionData | undefined> {
         const contentDefinitionData = this.contentDefinitions.find(contentDefinition => contentDefinition.name === contentName);
 
         return contentDefinitionData;
     }
 
+    /**
+     * @inheritdoc
+     */
     async listContentDefinitions(): Promise<ExpandedContentDefinitionData[]> {
         const expandedDataList: ExpandedContentDefinitionData[] = [];
 
@@ -56,7 +77,6 @@ class LocalContentManagementPersistency implements IContentDefinitionPersistency
 
             for (const fieldReference of contentDefinitionData.fields) {
                 const field = this.contentFieldDefinitions.find(field => field.id === fieldReference.id);
-    
                 if (!field)
                     throw new Error("Not existing field.");
     
@@ -73,9 +93,11 @@ class LocalContentManagementPersistency implements IContentDefinitionPersistency
         return expandedDataList;
     }
 
+    /**
+     * @inheritdoc
+     */
     async readContentDefinitionExpandingFields(contentName: string): Promise<ExpandedContentDefinitionData | undefined> {
         const contentDefinitionData = this.contentDefinitions.find(contentDefinition => contentDefinition.name === contentName);
-        
         if (!contentDefinitionData)
             return;
         
@@ -101,16 +123,25 @@ class LocalContentManagementPersistency implements IContentDefinitionPersistency
         return expandedData;
     }
     
+    /**
+     * @inheritdoc
+     */
     async readContentFieldDefinitionById(id: string): Promise<ContentFieldDefinitionData | undefined> {
         const contentFieldDefinitionData = this.contentFieldDefinitions.find(contentFieldDefinition => contentFieldDefinition.id === id);
         return contentFieldDefinitionData;
     }
     
+    /**
+     * @inheritdoc
+     */
     async readContentFieldDefinitionByName(name: string): Promise<ContentFieldDefinitionData | undefined> {
         const contentFieldDefinitionData = this.contentFieldDefinitions.find(contentFieldDefinition => contentFieldDefinition.name === name);
         return contentFieldDefinitionData;
     }
 
+    /**
+     * @inheritdoc
+     */
     async createContentFieldDefinition(contentFieldDefinitionData: ContentFieldDefinitionData): Promise<string> {
         contentFieldDefinitionData.id = uuid();
         this.contentFieldDefinitions.push(contentFieldDefinitionData);
@@ -118,6 +149,9 @@ class LocalContentManagementPersistency implements IContentDefinitionPersistency
         return contentFieldDefinitionData.id;
     }
 
+    /**
+     * @inheritdoc
+     */
     async deleteContentFieldDefinitionByName(contentFieldDefinitionName: string): Promise<void> {
         const contentFieldDefinitionIndex = this.contentFieldDefinitions.findIndex(contentFieldDefinition => contentFieldDefinition.name === contentFieldDefinitionName);
 
@@ -127,100 +161,109 @@ class LocalContentManagementPersistency implements IContentDefinitionPersistency
         this.contentFieldDefinitions.splice(contentFieldDefinitionIndex, 1);
     }
 
+    /**
+     * @inheritdoc
+     */
     async updateContentFieldDefinition(contentFieldDefinitionData: ContentFieldDefinitionData): Promise<void> {
         const index = this.contentFieldDefinitions.findIndex(contentFieldDefinition => contentFieldDefinition.id === contentFieldDefinitionData.id);
-
         if (index === -1) 
             throw new Error(`Content field definition with id "${ contentFieldDefinitionData.id }" not found.`);
 
         this.contentFieldDefinitions[index] = contentFieldDefinitionData;
     }
 
+    /**
+     * @inheritdoc
+     */
     async listContentFieldDefinitions(): Promise<ContentFieldDefinitionData[]> {
         return this.contentFieldDefinitions;
     }
 
     
-    createContent(contentName: string, content: any) {
-        let existingContent = this.content.find(existingContent => existingContent.contentName === contentName);
-
+    /**
+     * @inheritdoc
+     */
+    async createContent(contentDefinitionName: string, content: any): Promise<any> {
+        let existingContent = this.content[contentDefinitionName];
         if (!existingContent) {
-            existingContent = {
-                contentName: contentName,
-                content: []
-            };
-
-            this.content.push(existingContent);
+            existingContent = [];
+            this.content[contentDefinitionName] = existingContent;
         }
 
         content.id = uuid();
-        existingContent.content.push(content);
+        existingContent.push(content);
 
-        return Promise.resolve(content.id);
+        return content.id;
     }
 
-    deleteContent(contentName: string, id: string): Promise<void> {
-        const contentList = this.content.find(content => content.contentName === contentName);
-        
+    /**
+     * @inheritdoc
+     */
+    async deleteContent(contentDefinitionName: string, id: string): Promise<void> {
+        const contentList = this.content[contentDefinitionName];
         if (!contentList)
             throw new Error("Content not found.");
 
-        const contentIndex = contentList.content.findIndex(content => content["id"] === id);
-
+        const contentIndex = contentList.findIndex((content: any) => content["id"] === id);
         if (contentIndex === -1)
             throw new Error("Content not found.");
 
-        contentList.content.splice(contentIndex, 1);
-
-        return Promise.resolve();
+        contentList.splice(contentIndex, 1);
     }
 
-    updateContent(contentName: string, content: any): Promise<void> {
-        const contentList = this.content.find(content => content.contentName === contentName);
+    /**
+     * @inheritdoc
+     */
+    async updateContent(contentDefinitionName: string, content: UnknownContent): Promise<void> {
+        const contentList = this.content[contentDefinitionName];
         if (!contentList)
             throw new Error("Content not found.");
 
-        const oldContentIndex = contentList.content.findIndex(content => content["id"] === content.id);
+        const oldContentIndex = contentList.findIndex((content: any) => content["id"] === content.id);
         if (oldContentIndex === -1)
             throw new Error("Content not found.");
 
-        contentList.content.splice(oldContentIndex, 1);
-        contentList.content.push(content);
-
-        return Promise.resolve();
+        contentList.splice(oldContentIndex, 1);
+        contentList.push(content);
     }
 
-    listContent(contentName: string) {
-        const list = this.content.find(content => content.contentName === contentName);
+    /**
+     * @inheritdoc
+     */
+    async listContent(contentDefinitionName: string): Promise<UnknownContent> {
+        const list = this.content[contentDefinitionName];
 
-        return list ? Promise.resolve(list.content) : Promise.resolve([]);
+        return list ? Promise.resolve(list) : Promise.resolve([]);
     }
 
-    readContentByName(contentName: string, id: string) {
-        const contentList = this.content.find(content => content.contentName === contentName);
+    /**
+     * @inheritdoc
+     */
+    async readContentById(contentDefinitionName: string, id: string): Promise<UnknownContent> {
+        const contentList = this.content[contentDefinitionName];
         if (!contentList)
             return;
 
-        const content = contentList.content.find(content => content["id"] === id);
-        if (!content)
-            return;
-
+        const content = contentList.find((content: any) => content["id"] === id);
         return content;
     }
 
-    readContentByFieldValue(fieldValue: { name: string; value: any; }, contentName: string) {
-        const contentList = this.content.find(content => content.contentName === contentName);
+    /**
+     * @inheritdoc
+     */
+    async readContentByFieldValue(contentDefinitionName: string, fieldValue: { name: string; value: any; }): Promise<UnknownContent> {
+        const contentList = this.content[contentDefinitionName];
         if (!contentList)
             return;
 
-        const content = contentList.content.find(content => content[fieldValue.name] === fieldValue.value);
-        if (!content)
-            return;
-
+        const content = contentList.find((content: any) => content[fieldValue.name] === fieldValue.value);
         return content;
     }
 
-    clear() {
+    /**
+     * Clear the stored values.
+     */
+    clear(): void {
         this.content = [];
         this.contentDefinitions = [];
         this.contentFieldDefinitions = [];

@@ -8,7 +8,7 @@ import fieldWithFailingValidation from "../helper/content/field-with-failing-val
 
 describe("validations when creating content", () => {
     beforeEach(async () => {
-        await contentDefinitionUtil.defineContentField(new TextContentFieldDefinitionDTO("", "id"));
+        await contentDefinitionUtil.createContentFieldDefinition(new TextContentFieldDefinitionDTO("", "id"));
     });
     
     afterEach(() => {
@@ -18,11 +18,11 @@ describe("validations when creating content", () => {
     
     it("should fail with failing validation", async () => {
         const contentField = fieldWithFailingValidation;
-        await contentDefinitionUtil.defineContentField(contentField);
+        await contentDefinitionUtil.createContentFieldDefinition(contentField);
 
         const contentDefinition = new ContentDefinitionDTO("", "definition");
         contentDefinition.addContentField("fieldOne", contentField);
-        await contentDefinitionUtil.defineContent(contentDefinition);
+        await contentDefinitionUtil.createContentDefinition(contentDefinition);
 
         const createContentResult = await contentManager.createContent("definition", {
             fieldOne: "data1"
