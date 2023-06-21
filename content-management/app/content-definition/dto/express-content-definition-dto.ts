@@ -4,7 +4,7 @@ type ExpressContentFieldDTO = {
     options: {
         isRequired: boolean,
         isUnique: boolean,
-        IsIndex: boolean
+        isIndexed: boolean
     }
 };
 

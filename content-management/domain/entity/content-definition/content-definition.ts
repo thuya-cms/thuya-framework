@@ -30,7 +30,7 @@ class ContentDefinition<T = any> extends Entity {
         }
 
         if (!this.getContentFields().find(contentField => contentField.contentFieldDefinition.getName() === "id"))
-            this.addContentField("id", idContentFieldDefinition);
+            this.addContentField("id", idContentFieldDefinition, { isUnique: true });
     }
 
 
