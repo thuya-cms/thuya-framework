@@ -42,7 +42,7 @@ class UpdateContent<T extends { id: string }> {
 
             const existingContent = readExistingContentResult.getResult()!;
             for (const contentField of contentDefinition.getContentFields()) {
-                if (!contentField.options.IsImmutable) {
+                if (!contentField.options.isImmutable) {
                     existingContent[contentField.name] = (content as any)[contentField.name];
                 }
             }

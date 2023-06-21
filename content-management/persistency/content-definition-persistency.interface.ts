@@ -7,7 +7,8 @@ type ContentDefinitionData = {
         options: {
             isRequired: boolean,
             isUnique: boolean,
-            isIndexed: boolean
+            isIndexed: boolean,
+            isImmutable: boolean
         }
     }[]
 }
@@ -21,7 +22,8 @@ type ExpandedContentDefinitionData = {
         options: {
             isRequired: boolean,
             isUnique: boolean,
-            isIndexed: boolean
+            isIndexed: boolean,
+            isImmutable: boolean
         }
     }[]
 }

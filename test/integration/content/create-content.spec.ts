@@ -25,7 +25,7 @@ describe("create content", () => {
         contentDefinition.addContentField(
             "textField", 
             textField, 
-            { isRequired: true, isUnique: true });
+            { isRequired: true, isUnique: true, isImmutable: true });
 
         contentDefinition.addContentField("numericField", numField);
         contentDefinition.addContentField("dateField", dateField);

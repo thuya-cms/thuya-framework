@@ -13,7 +13,8 @@ type ContentSchemaElement = {
     options: {
         isRequired: boolean,
         isUnique: boolean,
-        isIndexed: boolean
+        isIndexed: boolean,
+        isImmutable: boolean
     }
 }
 
