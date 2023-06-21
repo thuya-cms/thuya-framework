@@ -16,6 +16,7 @@ import frameworkSettingsContentProvider from './content/framework-settings-conte
 import { IContentPersistency } from './content-management/persistency';
 import Logger from './common/utility/logger';
 import { contentManager } from './content-management/app';
+import expressContentDefinitionController from './content-management/app/content-definition/express-content-definition.controller';
 
 /**
  * Main entry point for a Thuya CMS application.
@@ -34,14 +35,16 @@ class ThuyaApp {
 
         Logger.initializeLogLevel();
         this.logger = Logger.for(ThuyaApp.name);
-
+        
+        this._expressServer = undefined;
         this._expressApp = express();
+
         this._expressApp.use(cors());
         this._expressApp.use(correlator());
         this._expressApp.use(bodyParser.json());	
 		this._expressApp.use(bodyParser.urlencoded({ extended: false }));
 
-        this._expressServer = undefined;
+        this._expressApp.use(expressContentDefinitionController.getRouter());
     }
 
 
@@ -79,13 +82,11 @@ class ThuyaApp {
      * @throws will throw an exception if the app is already running
      */
     public start(): void {
-        this.logger.debug(`Starting Thuya application...`);
-
         if (this._expressServer)
             throw new Error("App is already running.");
 
         this._expressServer = this._expressApp.listen(this._port, () => {
-            this.logger.debug(`...Thuya application started on port ${this._port}.`);
+            this.logger.info(`Thuya application started on port ${this._port}.`);
         });
     }
 
