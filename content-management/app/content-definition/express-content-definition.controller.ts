@@ -3,7 +3,6 @@ import IController from "../../../common/controller";
 import ExpressContentDefinitionDTO from "./dto/express-content-definition-dto";
 import contentDefinitionManager from "../content-definition-manager";
 import ContentDefinitionDTO from "../dto/content-definition/content-definition";
-import { Result } from "../../../common";
 
 /**
  * Controller for definition management through express.
@@ -17,8 +16,9 @@ class ExpressContentDefinitionController implements IController {
         this.router = Router();
 
         this.router.post("/content-definition", this.createContentDefinition.bind(this));
-        this.router.get("/content-definition/name/:name", this.readContentDefinition.bind(this));
+        this.router.get("/content-definition/name/:name", this.readContentDefinitionByName.bind(this));
         this.router.get("/content-definition", this.listContentDefinitions.bind(this));
+        this.router.patch("/content-definition", this.updateContentDefinition.bind(this));
     }
     
     
@@ -52,8 +52,30 @@ class ExpressContentDefinitionController implements IController {
             });
         }
     }
+    
+    private async updateContentDefinition(request: Request, response: Response): Promise<void> {
+        try {
+            const expressContentDefinitionDTO: ExpressContentDefinitionDTO = request.body;
+            const contentDefinitionDTO = await this.convertExpressToAppDTO(expressContentDefinitionDTO);
+    
+            const updateContentDefinitionResult = await contentDefinitionManager.updateContentDefinition(contentDefinitionDTO);
+            if (updateContentDefinitionResult.getIsFailing()) {
+                throw new Error(updateContentDefinitionResult.getMessage());
+            }
 
-    private async readContentDefinition(request: Request, response: Response): Promise<void> {
+            response.status(201).json({
+                id: updateContentDefinitionResult.getResult()!
+            });
+        }
+
+        catch (error: any) {
+            response.status(500).json({
+                message: error.message
+            });
+        }
+    }
+
+    private async readContentDefinitionByName(request: Request, response: Response): Promise<void> {
         try {
             const name: string = request.params.name;
             const readContentDefinitionResult = await contentDefinitionManager.readContentDefinitionByName(name);
@@ -97,7 +119,7 @@ class ExpressContentDefinitionController implements IController {
     }
     
     private async convertExpressToAppDTO(expressContentDefinitionDTO: ExpressContentDefinitionDTO): Promise<ContentDefinitionDTO> {
-        const contentDefinitionDTO = new ContentDefinitionDTO("", expressContentDefinitionDTO.name);
+        const contentDefinitionDTO = new ContentDefinitionDTO(expressContentDefinitionDTO.id || "", expressContentDefinitionDTO.name);
 
         if (expressContentDefinitionDTO.contentFields) {
             for (const expressContentFieldDTO of expressContentDefinitionDTO.contentFields) {
