@@ -17,6 +17,7 @@ import { IContentPersistency } from './content-management/persistency';
 import Logger from './common/utility/logger';
 import { contentManager } from './content-management/app';
 import expressContentDefinitionController from './content-management/app/content-definition/express-content-definition.controller';
+import expressContentFieldDefinitionController from './content-management/app/content-field-definition/express-content-field-definition.controller';
 
 /**
  * Main entry point for a Thuya CMS application.
@@ -45,6 +46,7 @@ class ThuyaApp {
 		this._expressApp.use(bodyParser.urlencoded({ extended: false }));
 
         this._expressApp.use(expressContentDefinitionController.getRouter());
+        this._expressApp.use(expressContentFieldDefinitionController.getRouter());
     }
 
 

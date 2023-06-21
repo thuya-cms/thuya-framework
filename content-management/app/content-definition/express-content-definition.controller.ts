@@ -5,7 +5,7 @@ import contentDefinitionManager from "../content-definition-manager";
 import ContentDefinitionDTO from "../dto/content-definition/content-definition";
 
 /**
- * Controller for definition management through express.
+ * Controller for content definition management through express.
  */
 class ExpressContentDefinitionController implements IController {
     private router: Router;
