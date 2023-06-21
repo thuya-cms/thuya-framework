@@ -89,6 +89,16 @@ interface IContentPersistency {
      * @async
      */
     listContent(contentDefinitionName: string): Promise<UnknownContent[]>;
+
+    /**
+     * List content by field value.
+     * 
+     * @param fieldValue key and value of a field to be used as a filter
+     * @param contentDefinitionName name of the content definition 
+     * @returns the data of all content matching the field value
+     * @async
+     */
+    listContentByFieldValue(contentDefinitionName: string, fieldValue: { name: string; value: any; }): Promise<UnknownContent[]>;
 }
 
 export { ContentSchema, ContentSchemaElement, ArrayElement };

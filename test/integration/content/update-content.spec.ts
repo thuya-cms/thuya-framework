@@ -114,7 +114,7 @@ describe("update content", () => {
         const createContentResult = await contentManager.createContent(contentDefinition.getName(), { textField: newTextValue });
         expect(createContentResult.getIsSuccessful(), createContentResult.getMessage()).to.be.true;
         
-        const updateContentResult = await contentManager.updateContent(contentDefinition.getName(), { id: id, textField: originalTextValue });
+        const updateContentResult = await contentManager.updateContent(contentDefinition.getName(), { id: createContentResult.getResult(), textField: originalTextValue });
         expect(updateContentResult.getIsFailing()).to.be.true;
     }); 
 });

@@ -6,7 +6,8 @@ import { Result, Logger } from "../../../../common";
 type ContentFieldOptions = {
     isRequired?: boolean,
     isUnique?: boolean,
-    isIndexed?: boolean
+    isIndexed?: boolean,
+    IsImmutable?: boolean
 }
 
 /**
