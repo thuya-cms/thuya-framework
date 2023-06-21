@@ -3,6 +3,7 @@ import IController from "../../../common/controller";
 import ExpressContentDefinitionDTO from "./dto/express-content-definition-dto";
 import contentDefinitionManager from "../content-definition-manager";
 import ContentDefinitionDTO from "../dto/content-definition/content-definition";
+import { Result } from "../../../common";
 
 /**
  * Controller for definition management through express.
@@ -16,7 +17,8 @@ class ExpressContentDefinitionController implements IController {
         this.router = Router();
 
         this.router.post("/content-definition", this.createContentDefinition.bind(this));
-        this.router.get("/content-definition/:name", this.readContentDefinition.bind(this));
+        this.router.get("/content-definition/name/:name", this.readContentDefinition.bind(this));
+        this.router.get("/content-definition", this.listContentDefinitions.bind(this));
     }
     
     
@@ -54,32 +56,37 @@ class ExpressContentDefinitionController implements IController {
     private async readContentDefinition(request: Request, response: Response): Promise<void> {
         try {
             const name: string = request.params.name;
-
             const readContentDefinitionResult = await contentDefinitionManager.readContentDefinitionByName(name);
             if (readContentDefinitionResult.getIsFailing()) {
                 throw new Error(readContentDefinitionResult.getMessage());
             }
 
-            const contentDefinitionDTO = readContentDefinitionResult.getResult()!;
-            const expressContentDefinitionDTO: ExpressContentDefinitionDTO = {
-                id: contentDefinitionDTO.getId(),
-                name: contentDefinitionDTO.getName(),
-                contentFields: []
-            };
-
-            for (const contentField of contentDefinitionDTO.getContentFields()) {
-                expressContentDefinitionDTO.contentFields.push({
-                    contentFieldDefinitionName: contentField.contentFieldDefinition.getName(),
-                    name: contentField.name,
-                    options:{
-                        isRequired: contentField.options.isRequired || false,
-                        isUnique: contentField.options.isUnique || false,
-                        isIndexed: contentField.options.isIndexed || false
-                    }
-                });
-            }
+            const expressContentDefinitionDTO = this.convertAppToExpressDTO(readContentDefinitionResult.getResult()!);
 
             response.status(200).json(expressContentDefinitionDTO);
+        }
+
+        catch (error: any) {
+            response.status(500).json({
+                message: error.message
+            });
+        }
+    }
+
+    private async listContentDefinitions(request: Request, response: Response): Promise<void> {
+        try {
+            const expressContentDefinitionDTOs: ExpressContentDefinitionDTO[] = [];
+            const listContentDefinitionResult = await contentDefinitionManager.listContentDefinitions();
+            if (listContentDefinitionResult.getIsFailing()) {
+                throw new Error(listContentDefinitionResult.getMessage());
+            }
+
+            for (const contentDefinitionDTO of listContentDefinitionResult.getResult()!) {
+                const expressContentDefinitionDTO = this.convertAppToExpressDTO(contentDefinitionDTO);
+                expressContentDefinitionDTOs.push(expressContentDefinitionDTO);
+            }
+
+            response.status(200).json(expressContentDefinitionDTOs);
         }
 
         catch (error: any) {
@@ -104,6 +111,28 @@ class ExpressContentDefinitionController implements IController {
         }
         
         return contentDefinitionDTO;
+    }
+
+    private convertAppToExpressDTO(contentDefinitionDTO: ContentDefinitionDTO<any>): ExpressContentDefinitionDTO {
+        const expressContentDefinitionDTO: ExpressContentDefinitionDTO = {
+            id: contentDefinitionDTO.getId(),
+            name: contentDefinitionDTO.getName(),
+            contentFields: []
+        };
+
+        for (const contentField of contentDefinitionDTO.getContentFields()) {
+            expressContentDefinitionDTO.contentFields.push({
+                contentFieldDefinitionName: contentField.contentFieldDefinition.getName(),
+                name: contentField.name,
+                options: {
+                    isRequired: contentField.options.isRequired || false,
+                    isUnique: contentField.options.isUnique || false,
+                    isIndexed: contentField.options.isIndexed || false
+                }
+            });
+        }
+        
+        return expressContentDefinitionDTO;
     }
 }
 
