@@ -81,7 +81,8 @@ class ContentDefinitionRepository implements IContentDefinitionRepository {
                 options: {
                     isRequired: false,
                     isUnique: false,
-                    isIndexed: false
+                    isIndexed: false,
+                    isImmutable: false
                 }
             };
 
@@ -89,6 +90,7 @@ class ContentDefinitionRepository implements IContentDefinitionRepository {
                 contentFieldData.options.isRequired = contentField.options.isRequired || false;
                 contentFieldData.options.isUnique = contentField.options.isUnique || false;
                 contentFieldData.options.isIndexed = contentField.options.isIndexed || false;
+                contentFieldData.options.isImmutable = contentField.options.isImmutable || false;
             }
 
             const contentSchemaElement = await this.getContentSchemaElement(contentFieldDefinition, contentFieldData);
@@ -124,7 +126,8 @@ class ContentDefinitionRepository implements IContentDefinitionRepository {
                 options: {
                     isRequired: contentField.options.isRequired || false,
                     isUnique: contentField.options.isUnique || false,
-                    isIndexed: contentField.options.isIndexed || false
+                    isIndexed: contentField.options.isIndexed || false,
+                    isImmutable: contentField.options.isImmutable || false
                 }
             };
 
@@ -276,7 +279,8 @@ class ContentDefinitionRepository implements IContentDefinitionRepository {
             options: {
                 isIndexed: contentFieldData.options?.isIndexed || false,
                 isRequired: contentFieldData.options?.isRequired || false,
-                isUnique: contentFieldData.options?.isUnique || false
+                isUnique: contentFieldData.options?.isUnique || false,
+                isImmutable: contentFieldData.options?.isImmutable || false
             }
         };
 

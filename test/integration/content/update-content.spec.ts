@@ -27,6 +27,11 @@ describe("update content", () => {
             "textField", 
             textField, 
             { isRequired: true, isUnique: true });
+        
+        contentDefinition.addContentField(
+            "immutableTextField", 
+            textField, 
+            { isImmutable: true });
 
         contentDefinition.addContentField("numericField", numField);
         contentDefinition.addContentField("dateField", dateField);
@@ -43,7 +48,8 @@ describe("update content", () => {
             textField: textValue,
             numericField: numValue,
             dateField: dateValue,
-            arrayField: arrayValue
+            arrayField: arrayValue,
+            immutableTextField: textValue
         });
         expect(createContentResult.getIsSuccessful(), createContentResult.getMessage()).to.be.true;
         id = createContentResult.getResult()!;
@@ -65,7 +71,8 @@ describe("update content", () => {
             textField: textValue,
             numericField: numValue,
             dateField: dateValue,
-            arrayField: arrayValue
+            arrayField: arrayValue,
+            immutableTextField: textValue
         });
         expect(updateContentResult.getIsSuccessful(), updateContentResult.getMessage()).to.be.true;
 
@@ -78,6 +85,7 @@ describe("update content", () => {
         expect(content.textField).to.equal(textValue);
         expect(content.numericField).to.equal(numValue);
         expect(content.dateField).to.equal(dateValue);
+        expect(content.immutableTextField).to.equal("text-value");
         expect(JSON.stringify(content.arrayField)).to.equal(JSON.stringify(arrayValue));
     });
 

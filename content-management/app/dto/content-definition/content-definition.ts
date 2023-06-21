@@ -3,7 +3,8 @@ import { ContentFieldDefinitionDTO } from "../content-field-definition/content-f
 type ContentFieldOptions = {
     isRequired?: boolean,
     isUnique?: boolean,
-    isIndexed?: boolean
+    isIndexed?: boolean,
+    isImmutable?: boolean
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars

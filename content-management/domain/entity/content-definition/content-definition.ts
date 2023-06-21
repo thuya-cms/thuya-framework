@@ -7,7 +7,7 @@ type ContentFieldOptions = {
     isRequired?: boolean,
     isUnique?: boolean,
     isIndexed?: boolean,
-    IsImmutable?: boolean
+    isImmutable?: boolean
 }
 
 /**
