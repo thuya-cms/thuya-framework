@@ -37,6 +37,32 @@ class ListContent<T extends { id: string } = any> {
             throw error;
         }
     }
+
+    /**
+     * List content by field value.
+     * 
+     * @param contentDefinitionName name of the content definition
+     * @param fieldValue field key and value
+     * @param fieldValue.name field key
+     * @param fieldValue.value field value
+     * @returns result containing all content matching the field value
+     * @async
+     */
+    async byFieldValue(contentDefinitionName: string, fieldValue: { name: string, value: any }): Promise<Result<T[]>> {
+        this.logger.debug(`Listing content for "%s" by field value "%s":"%s"...`, contentDefinitionName, fieldValue.name, fieldValue.value);
+        
+        try {
+            const content = await factory.getContentPersistency().listContentByFieldValue(contentDefinitionName, fieldValue);
+            
+            this.logger.debug(`...Successfully listed content for "%s" by field value "%s":"%s".`, contentDefinitionName, fieldValue.name, fieldValue.value);
+            return Result.success(content);
+        }
+        
+        catch (error) {
+            this.logger.error(`...Failed to list content for "%s" by field value "%s":"%s".`, contentDefinitionName, fieldValue.name, fieldValue.value);
+            throw error;
+        }
+    }
 }
 
 export default new ListContent();

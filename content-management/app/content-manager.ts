@@ -17,22 +17,37 @@ class ContentManager {
      * @param contentDefinitionName name of the content definition 
      * @param id id of the content
      * @returns result containing the data of the content
+     * @async
      */
     async readContent<T = UnknownContent>(contentDefinitionName: string, id: string,): Promise<Result<T>> {
         return await readContent.byId(contentDefinitionName, id);
     }
 
     /**
-     * Read a content by field value.
+     * Read a single content by field value.
      * 
      * @param contentDefinitionName name of the content definition 
      * @param fieldValue key and value of the field that is used as a filter
      * @param fieldValue.name key of the field that is used as a filter
      * @param fieldValue.value value of the field that is used as a filter
      * @returns result containing the data of the content
+     * @async
      */
     async readContentByFieldValue<T = UnknownContent>(contentDefinitionName: string, fieldValue: { name: string, value: any }): Promise<Result<T>> {
         return await readContent.byFieldValue(contentDefinitionName, fieldValue);
+    }
+
+    /**
+     * List content matching a field value.
+     * 
+     * @param contentDefinitionName name of the content definition 
+     * @param fieldValue key and value of the field that is used as a filter
+     * @param fieldValue.name key of the field that is used as a filter
+     * @param fieldValue.value value of the field that is used as a filter
+     * @returns result containing the data of all matching content
+     */
+    async listContentByFieldValue<T = UnknownContent>(contentDefinitionName: string, fieldValue: { name: string, value: any }): Promise<Result<T[]>> {
+        return await listContent.byFieldValue(contentDefinitionName, fieldValue);
     }
 
     /**
@@ -41,6 +56,7 @@ class ContentManager {
      * @param contentDefinitionName name of the content definition 
      * @param content data of the content
      * @returns result containing the id o the content
+     * @async
      */
     async createContent(contentDefinitionName: string, content: any): Promise<Result<string>> {
         const readContentDefinitionResult = await readContentDefinition.byName(contentDefinitionName);
@@ -56,6 +72,7 @@ class ContentManager {
      * @param contentDefinitionName name of the content definition
      * @param content data of the content
      * @returns result
+     * @async
      */
     async updateContent(contentDefinitionName: string, content: UnknownContent): Promise<Result> {
         const readContentDefinitionResult = await readContentDefinition.byName(contentDefinitionName);
@@ -71,6 +88,7 @@ class ContentManager {
      * @param contentDefinitionName name of the content definition
      * @param id id of the content
      * @returns result
+     * @async
      */
     async deleteContent(contentDefinitionName: string, id: string): Promise<Result> {
         return await deleteContent.execute(contentDefinitionName, id);
@@ -81,6 +99,7 @@ class ContentManager {
      * 
      * @param contentDefinitionName name of the content definition
      * @returns result containing the content list
+     * @async
      */
     async listContent(contentDefinitionName: string): Promise<Result<UnknownContent>> {
         return await listContent.execute(contentDefinitionName);

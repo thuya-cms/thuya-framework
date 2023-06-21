@@ -2,6 +2,7 @@ import { ContentDefinition } from "../../entity/content-definition/content-defin
 import factory from "../../factory";
 import { Logger, Result } from "../../../../common";
 import modifyHelper from "./util/modify-helper";
+import { contentManager } from "../../../app";
 
 /**
  * Use case to update a content.
@@ -28,7 +29,25 @@ class UpdateContent<T extends { id: string }> {
         this.logger.debug(`Updating content of type "%s"...`, contentDefinition.getName());
 
         try {
-            const convertAndValidateContentResult = await modifyHelper.convertAndValidateData(contentDefinition, content);
+            if (!content.id) {
+                this.logger.debug("Id is required for update.");
+                return Result.error("Id is required for update.");
+            }
+
+            const readExistingContentResult = await contentManager.readContent(contentDefinition.getName(), content.id);
+            if (readExistingContentResult.getIsFailing()) {
+                this.logger.debug(`Content with id "%s" does not exist.`, content.id);
+                return Result.error(`Content with id "${ content.id }" does not exist.`);
+            }
+
+            const existingContent = readExistingContentResult.getResult()!;
+            for (const contentField of contentDefinition.getContentFields()) {
+                if (!contentField.options.IsImmutable) {
+                    existingContent[contentField.name] = (content as any)[contentField.name];
+                }
+            }
+            
+            const convertAndValidateContentResult = await modifyHelper.convertAndValidateData(contentDefinition, existingContent);
             if (convertAndValidateContentResult.getIsFailing())  {
                 this.logger.debug(`...Failed to create content of type "%s".`, contentDefinition.getName());
                 return Result.error(convertAndValidateContentResult.getMessage());

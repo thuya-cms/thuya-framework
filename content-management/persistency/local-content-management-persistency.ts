@@ -261,6 +261,18 @@ class LocalContentManagementPersistency implements IContentDefinitionPersistency
     }
 
     /**
+     * @inheritdoc
+     */
+    async listContentByFieldValue(contentDefinitionName: string, fieldValue: { name: string; value: any; }): Promise<any[]> {
+        const contentList: any[] = this.content[contentDefinitionName];
+        if (!contentList)
+            return [];
+
+        const matchingContent = contentList.filter((content: any) => content[fieldValue.name] === fieldValue.value);
+        return matchingContent;
+    }
+
+    /**
      * Clear the stored values.
      */
     clear(): void {

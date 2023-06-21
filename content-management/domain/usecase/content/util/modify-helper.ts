@@ -41,7 +41,7 @@ class ModifyHelper<T> {
 
             if (fieldValue || fieldValue === 0) {
                 if (contentField.options.isUnique) {
-                    const uniquenessResult = await this.validateUniqueness(contentDefinition, contentField.name, fieldValue);
+                    const uniquenessResult = await this.validateUniqueness(contentDefinition, (content as any).id, contentField.name, fieldValue);
                     if (uniquenessResult.getIsFailing()) 
                         return Result.error(uniquenessResult.getMessage());
                 }
@@ -69,17 +69,22 @@ class ModifyHelper<T> {
     }
 
 
-    private async validateUniqueness(contentDefinition: ContentDefinition<T>, fieldName: string, fieldValue: any): Promise<Result> {
+    private async validateUniqueness(contentDefinition: ContentDefinition<T>, id: string, fieldName: string, fieldValue: any): Promise<Result> {
         this.logger.debug(`Validating uniqueness of field "%s" with value "%s".`, fieldName, fieldValue);
-        const readContentResult = await contentManager.readContentByFieldValue(contentDefinition.getName(), { name: fieldName, value: fieldValue });
+        const listContentByFieldValueResult = await contentManager.listContentByFieldValue(contentDefinition.getName(), { name: fieldName, value: fieldValue });
+        if (listContentByFieldValueResult.getIsFailing()) {
+            throw new Error(listContentByFieldValueResult.getMessage());
+        }
+        
+        const matchingContents = listContentByFieldValueResult.getResult()!;
+        const hasOtherMatchingContent = matchingContents.some(matchingContent => matchingContent.id !== id);
 
-        if (readContentResult.getIsSuccessful()) {
+        if (hasOtherMatchingContent) {
             this.logger.debug(`Value "%s" of field "%s" is not unique.`, fieldValue, fieldName);
             return Result.error(`Value "${ fieldValue }" of field ${fieldName} is not unique.`);
-        } else {
-            this.logger.debug(`Value of field "%s" is unique.`, fieldName);
-            return Result.success();
         }
+
+        return Result.success();
     }
 }
 
