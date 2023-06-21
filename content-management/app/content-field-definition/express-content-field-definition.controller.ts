@@ -21,8 +21,8 @@ class ExpressContentFieldDefinitionController implements IController {
         this.router = Router();
 
         this.router.post("/content-field-definition", this.createContentFieldDefinition.bind(this));
-        // this.router.get("/content-definition/name/:name", this.readContentDefinitionByName.bind(this));
-        // this.router.get("/content-definition", this.listContentDefinitions.bind(this));
+        this.router.get("/content-field-definition/name/:name", this.readContentFieldDefinitionByName.bind(this));
+        this.router.get("/content-field-definition", this.listContentFieldDefinitionsByName.bind(this));
         this.router.delete("/content-field-definition/name/:name", this.deleteContentFieldDefinitionByName.bind(this));
     }
     
@@ -49,6 +49,49 @@ class ExpressContentFieldDefinitionController implements IController {
             response.status(201).json({
                 id: createResult.getResult()!
             });
+        }
+
+        catch (error: any) {
+            response.status(500).json({
+                message: error.message
+            });
+        }
+    }
+    
+    private async readContentFieldDefinitionByName(request: Request, response: Response): Promise<void> {
+        try {
+            const name: string = request.params.name;
+            const readResult = await contentDefinitionManager.readContentFieldDefinitionByName(name);
+            if (readResult.getIsFailing()) {
+                throw new Error(readResult.getMessage());
+            }
+
+            const expressContentDefinitionDTO = this.convertAppToExpressDTO(readResult.getResult()!);
+
+            response.status(200).json(expressContentDefinitionDTO);
+        }
+
+        catch (error: any) {
+            response.status(500).json({
+                message: error.message
+            });
+        }
+    }
+    
+    private async listContentFieldDefinitionsByName(request: Request, response: Response): Promise<void> {
+        try {
+            const expressContentFieldDefinitionDTOs: ExpressContentFieldDefinitionDTO[] = [];
+            const listResult = await contentDefinitionManager.listContentFieldDefinitions();
+            if (listResult.getIsFailing()) {
+                throw new Error(listResult.getMessage());
+            }
+
+            for (const contentFieldDefinitionDTO of listResult.getResult()!) {
+                const expressContentDefinitionDTO = this.convertAppToExpressDTO(contentFieldDefinitionDTO);
+                expressContentFieldDefinitionDTOs.push(expressContentDefinitionDTO);
+            }
+
+            response.status(200).json(expressContentFieldDefinitionDTOs);
         }
 
         catch (error: any) {
@@ -137,6 +180,33 @@ class ExpressContentFieldDefinitionController implements IController {
         }
 
         return contentFieldDefinitionDTO;
+    }
+
+    private convertAppToExpressDTO(contentFieldDefinitionDTO: ContentFieldDefinitionDTO): ExpressContentFieldDefinitionDTO {
+        const expressContentFieldDefinitionDTO: ExpressContentFieldDefinitionDTO = {
+            id: contentFieldDefinitionDTO.getId(),
+            name: contentFieldDefinitionDTO.getName(),
+            type: contentFieldDefinitionDTO.getType()
+        }
+
+        if (contentFieldDefinitionDTO.getType() === ContentFieldType.Array) {
+            expressContentFieldDefinitionDTO.arrayElementDefinitionName = (contentFieldDefinitionDTO as ArrayContentFieldDefinitionDTO).getArrayElementType().getName();
+        } else if (contentFieldDefinitionDTO.getType() === ContentFieldType.Group) {
+            const groupContentFieldDefinition = contentFieldDefinitionDTO as GroupContentFieldDefinitionDTO;
+            expressContentFieldDefinitionDTO.groupElements = [];
+
+            for (const groupElement of groupContentFieldDefinition.getContentFields()) {
+                expressContentFieldDefinitionDTO.groupElements.push({
+                    contentDefinitionName: groupElement.contentFieldDefinition.getName(),
+                    name: groupElement.name,
+                    options: {
+                        isRequired: groupElement.options.isRequired || false
+                    }
+                });
+            }
+        }
+
+        return expressContentFieldDefinitionDTO;
     }
 }
 
