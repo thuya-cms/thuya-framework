@@ -23,8 +23,7 @@ class ExpressContentFieldDefinitionController implements IController {
         this.router.post("/content-field-definition", this.createContentFieldDefinition.bind(this));
         // this.router.get("/content-definition/name/:name", this.readContentDefinitionByName.bind(this));
         // this.router.get("/content-definition", this.listContentDefinitions.bind(this));
-        // this.router.patch("/content-definition", this.updateContentDefinition.bind(this));
-        // this.router.delete("/content-definition/name/:name", this.deleteContentDefinitionByName.bind(this));
+        this.router.delete("/content-field-definition/name/:name", this.deleteContentFieldDefinitionByName.bind(this));
     }
     
     
@@ -50,6 +49,25 @@ class ExpressContentFieldDefinitionController implements IController {
             response.status(201).json({
                 id: createResult.getResult()!
             });
+        }
+
+        catch (error: any) {
+            response.status(500).json({
+                message: error.message
+            });
+        }
+    }
+    
+    private async deleteContentFieldDefinitionByName(request: Request, response: Response): Promise<void> {
+        try {
+            const contentFieldDefinitionName = request.params.name;
+    
+            const deleteResult = await contentDefinitionManager.deleteContentFieldDefinitionByName(contentFieldDefinitionName);
+            if (deleteResult.getIsFailing()) {
+                throw new Error(deleteResult.getMessage());
+            }
+
+            response.status(200).send();
         }
 
         catch (error: any) {
