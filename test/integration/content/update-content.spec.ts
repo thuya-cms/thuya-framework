@@ -78,7 +78,7 @@ describe("update content", () => {
         expect(content.textField).to.equal(textValue);
         expect(content.numericField).to.equal(numValue);
         expect(content.dateField).to.equal(dateValue);
-        expect(content.arrayField).to.equal(arrayValue);
+        expect(JSON.stringify(content.arrayField)).to.equal(JSON.stringify(arrayValue));
     });
 
     it("should be created with missing not required fields", async () => {

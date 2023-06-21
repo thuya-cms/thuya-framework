@@ -56,7 +56,7 @@ describe("read content", () => {
         
         const content = readResult.getResult()!;
         expect(content.id).to.equal(id);
-        expect(content.arrayField).to.equal(originalContent.arrayField);
+        expect(JSON.stringify(content.arrayField)).to.equal(JSON.stringify(originalContent.arrayField));
         expect(content.dateField).to.equal(originalContent.dateField);
         expect(content.numericField).to.equal(originalContent.numericField);
         expect(content.textField).to.equal(originalContent.textField);
@@ -84,7 +84,7 @@ describe("read content", () => {
         
         const content = readResult.getResult()!;
         expect(content.id).to.equal(id);
-        expect(content.arrayField).to.equal(originalContent.arrayField);
+        expect(JSON.stringify(content.arrayField)).to.equal(JSON.stringify(originalContent.arrayField));
         expect(content.dateField).to.equal(originalContent.dateField);
         expect(content.numericField).to.equal(originalContent.numericField);
         expect(content.textField).to.equal(originalContent.textField);

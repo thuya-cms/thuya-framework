@@ -62,7 +62,7 @@ describe("create content", () => {
         should().equal(content.textField, textValue);
         should().equal(content.numericField, numValue);
         should().equal(content.dateField, dateValue);
-        should().equal(content.arrayField, arrayValue);
+        should().equal(JSON.stringify(content.arrayField), JSON.stringify(arrayValue));
     });
 
     it("should be created with missing not required fields", async () => {

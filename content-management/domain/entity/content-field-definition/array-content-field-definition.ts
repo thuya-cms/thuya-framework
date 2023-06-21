@@ -43,7 +43,7 @@ class ArrayContentFieldDefinition<T = any> extends ContentFieldDefinition<T[]> {
     /**
      * @inheritdoc
      */
-    override validateValue(fieldValue: any[]): Result {
+    override validateValue(fieldValue: T[]): Result {
         if (!Array.isArray(fieldValue)) {
             this.logger.debug(`Invalid array value "%s" for "%s".`, fieldValue, this.getName());
             return Result.error(`Invalid array value "${ fieldValue }" for "${ this.getName() }".`);
@@ -56,6 +56,20 @@ class ArrayContentFieldDefinition<T = any> extends ContentFieldDefinition<T[]> {
         }
         
         return super.validateValue(fieldValue);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    override executeDeterminations(fieldValue: T[]): T[] {
+        const newValues: T[] = [];
+
+        for (const arrayElementValue of fieldValue) {
+            const updatedElementValue = this.arrayElementType.executeDeterminations(arrayElementValue);
+            newValues.push(updatedElementValue);
+        }
+
+        return newValues;
     }
 }
 

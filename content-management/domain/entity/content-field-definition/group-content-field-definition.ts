@@ -97,6 +97,13 @@ class GroupContentFieldDefinition<T = any> extends ContentFieldDefinition<T> {
      */
     override executeDeterminations(fieldValue: any): any {
         contentHelper.deleteNotExistingProperties(fieldValue, this.getContentFields().map(contentField => contentField.name));
+
+        for (const contentField of this.getContentFields()) {
+            const singleFieldValue = contentHelper.getFieldValue(contentField.name, fieldValue);
+            const updatedFieldValue = contentField.contentFieldDefinition.executeDeterminations(singleFieldValue);
+            
+            fieldValue[contentField.name] = updatedFieldValue;
+        }
         
         return super.executeDeterminations(fieldValue);
     }
