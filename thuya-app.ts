@@ -11,8 +11,6 @@ import dotenv from "dotenv";
 import IContentDefinitionPersistency from './content-management/persistency/content-definition-persistency.interface';
 import factory from './content-management/domain/factory';
 import correlator from 'express-correlation-id';
-import frameworkSettingsContentDefinition from './content/module-metadata-content-definition';
-import frameworkSettingsContentProvider from './content/framework-content-provider';
 import { IContentPersistency } from './content-management/persistency';
 import Logger from './common/utility/logger';
 import { contentManager } from './content-management/app';
