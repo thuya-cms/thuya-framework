@@ -13,13 +13,6 @@ enum MigrationOperation {
  */
 abstract class ContentProvider {
     /**
-     * @returns the migration version of the content provider
-     */
-    getVersion(): number {
-        return 1;
-    }
-
-    /**
      * @returns an array of content field definitions 
      */
     getContentFieldDefinitions(): ContentFieldDefinitionDTO[] {

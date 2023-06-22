@@ -5,19 +5,21 @@ import http from 'http';
 import ContentProvider, { MigrationOperation } from './content-management/app/content-provider';
 import expressContentManager from './content-management/app/express-content-manager';
 import contentDefinitionManager from './content-management/app/content-definition-manager';
-import Module from './module';
+import Module, { ModuleMetadata } from './module';
 import ContentDefinitionDTO from './content-management/app/dto/content-definition/content-definition';
 import dotenv from "dotenv";
 import IContentDefinitionPersistency from './content-management/persistency/content-definition-persistency.interface';
 import factory from './content-management/domain/factory';
 import correlator from 'express-correlation-id';
-import frameworkSettingsContentDefinition from './content/framework-settings-content-definition';
-import frameworkSettingsContentProvider from './content/framework-settings-content-provider';
+import frameworkSettingsContentDefinition from './content/module-metadata-content-definition';
+import frameworkSettingsContentProvider from './content/framework-content-provider';
 import { IContentPersistency } from './content-management/persistency';
 import Logger from './common/utility/logger';
 import { contentManager } from './content-management/app';
 import expressContentDefinitionController from './content-management/app/content-definition/express-content-definition.controller';
 import expressContentFieldDefinitionController from './content-management/app/content-field-definition/express-content-field-definition.controller';
+import moduleMetadataContentDefinition from './content/module-metadata-content-definition';
+import frameworkContentProvider from './content/framework-content-provider';
 
 /**
  * Main entry point for a Thuya CMS application.
@@ -26,7 +28,6 @@ class ThuyaApp {
     private _expressApp: express.Application;
     private _port: string = process.env.PORT || "8080";
     private _expressServer?: http.Server;
-    private _frameworkSettings: any;
     private logger: Logger;
     
 
@@ -59,21 +60,11 @@ class ThuyaApp {
     public async initialize(): Promise<void> {
         this.logger.debug("Initializing framework...");
 
-        const frameworkSettingsContentDefinitionResult = await contentDefinitionManager.readContentDefinitionByName(frameworkSettingsContentDefinition.getName());
-        if (frameworkSettingsContentDefinitionResult.getIsFailing()) {
+        const readModuleMetadataContentDefinitionResult = await contentDefinitionManager.readContentDefinitionByName(moduleMetadataContentDefinition.getName());
+        if (readModuleMetadataContentDefinitionResult.getIsFailing()) {
             this.logger.debug("Framework not yet initialized. Starting initialization.");
-            await this.useContentProvider(frameworkSettingsContentProvider);
-        } else {
-            this.logger.debug(`Framework is already initialized.`);
-            
-            const listFrameworkSettingsResult = await contentManager.listContent(frameworkSettingsContentDefinition.getName());
-            if (listFrameworkSettingsResult.getIsFailing()) {
-                this.logger.error(listFrameworkSettingsResult.getMessage());
-                throw new Error("Failed to get framework settings.");
-            }
-
-            this._frameworkSettings = listFrameworkSettingsResult.getResult()![0];
-        }
+            await this.useContentProvider(frameworkContentProvider, { name: "framework", version: 1 });
+        } 
 
         this.logger.debug("...Framework initialization complete.");
     }
@@ -123,7 +114,7 @@ class ThuyaApp {
 
         this.logger.debug(`Using content providers of module "%s".`, module.getMetadata().name);
         for (const contentProvider of module.getContentProviders()) 
-            await this.useContentProvider(contentProvider);
+            await this.useContentProvider(contentProvider, module.getMetadata());
 
         this.logger.debug(`...Module "%s" is successfully used.`, module.getMetadata().name);
     }
@@ -147,8 +138,13 @@ class ThuyaApp {
     }
 
 
-    private async useContentProvider(contentProvider: ContentProvider): Promise<void> {
-        if (!this._frameworkSettings) {
+    private async useContentProvider(contentProvider: ContentProvider, moduleMetadata: ModuleMetadata): Promise<void> {
+        let actualModuleVersion = moduleMetadata.version;
+        const readActualModuleVersionResult = await contentManager.readContentByFieldValue("module-version", { name: "module", value: moduleMetadata.name });
+        if (readActualModuleVersionResult.getIsSuccessful()) {
+            actualModuleVersion = readActualModuleVersionResult.getResult()!.version;
+            await this.executeMigrations(contentProvider, actualModuleVersion);
+        } else {
             this.logger.debug(`Creating content field definitions.`);
             for (const contentFieldDefinition of contentProvider.getContentFieldDefinitions()) {
                 await contentDefinitionManager.createContentFieldDefinition(contentFieldDefinition);
@@ -163,23 +159,36 @@ class ThuyaApp {
             const initialContents = await contentProvider.getInitialContent();
             for (const initialContent of initialContents) {
                 await contentManager.createContent(initialContent.contentDefinitionName, initialContent.content);
-            }
-        }  
-        
-        await this.executeMigrations(contentProvider);
-        
+            } 
+        }
+
         this.logger.debug(`Registering content definitions.`);
         for (const contentDefinition of contentProvider.getContentDefinitions()) {
             this.registerContentDefinition(contentDefinition);
         }
+
+        if (actualModuleVersion === moduleMetadata.version) {
+            const createModuleMetadataResult = await contentManager.createContent(moduleMetadataContentDefinition.getName(), { module: moduleMetadata.name, version: moduleMetadata.version });
+            if (createModuleMetadataResult.getIsFailing()) {
+                this.logger.error("Failed to create module metadata.");
+                throw new Error("Failed to create module metadata.");
+            }
+        } else {
+            const updateModuleMetadataResult = await contentManager.updateContent(moduleMetadataContentDefinition.getName(), { 
+                id: readActualModuleVersionResult.getResult()!.id, 
+                module: moduleMetadata.name, 
+                version: moduleMetadata.version });
+            if (updateModuleMetadataResult.getIsFailing()) {
+                this.logger.error("Failed to update module metadata.");
+                throw new Error("Failed to update module metadata.");
+            }
+        }
     }
 
-    private async executeMigrations(contentProvider: ContentProvider): Promise<void> {
-        const currentVersion = contentProvider.getVersion();
-
-        await this.executeContentFieldDefinitionMigrations(contentProvider, currentVersion);
-        await this.executeContentDefinitionMigrations(contentProvider, currentVersion);
-        await this.executeContentMigrations(contentProvider, currentVersion);
+    private async executeMigrations(contentProvider: ContentProvider, moduleVersion: number): Promise<void> {
+        await this.executeContentFieldDefinitionMigrations(contentProvider, moduleVersion);
+        await this.executeContentDefinitionMigrations(contentProvider, moduleVersion);
+        await this.executeContentMigrations(contentProvider, moduleVersion);
     }
 
     private async executeContentFieldDefinitionMigrations(contentProvider: ContentProvider, currentVersion: number): Promise<void> {
