@@ -1,4 +1,4 @@
-import { ContentProvider, contentManager } from "../content-management/app";
+import { ContentProvider } from "../content-management/app";
 import ContentDefinitionDTO from "../content-management/app/dto/content-definition/content-definition";
 import { ContentFieldDefinitionDTO } from "../content-management/app/dto/content-field-definition/content-field-definition";
 import frameworkVersionContentFieldDefinition from "./framework-version-content-field-definition";
@@ -10,24 +10,29 @@ import TextContentFieldDefinitionDTO from "../content-management/app/dto/content
  */
 class SettingsContentProvider extends ContentProvider {
     /**
-     * @returns the content fields required for a Thuya CMS app
+     * @inheritdoc
      */
     override getContentFieldDefinitions(): ContentFieldDefinitionDTO[] {
         return [frameworkVersionContentFieldDefinition, new TextContentFieldDefinitionDTO("", "id")];
     }
 
     /**
-     * @returns content definitions required or a Thuya CMS app
+     * @inheritdoc
      */
     override getContentDefinitions(): ContentDefinitionDTO<any>[] {
         return [frameworkSettingsContentDefinition];
     }
 
-    /** */
-    override async createContent(): Promise<void> {
-        await contentManager.createContent(frameworkSettingsContentDefinition.getName(), {
-            frameworkVersion: 1
-        });
+    /**
+     * @inheritdoc
+     */
+    override getInitialContent():{ contentDefinitionName: string, content: any }[] {
+        return [{
+            contentDefinitionName: frameworkSettingsContentDefinition.getName(),
+            content: {
+                frameworkVersion: 1
+            }
+        }];
     }
 }
 

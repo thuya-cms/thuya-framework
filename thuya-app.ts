@@ -2,7 +2,7 @@ import express from 'express';
 import cors from "cors";
 import bodyParser from 'body-parser';
 import http from 'http';
-import ContentProvider from './content-management/app/content-provider';
+import ContentProvider, { MigrationOperation } from './content-management/app/content-provider';
 import expressContentManager from './content-management/app/express-content-manager';
 import contentDefinitionManager from './content-management/app/content-definition-manager';
 import Module from './module';
@@ -160,12 +160,104 @@ class ThuyaApp {
             }
             
             this.logger.debug(`Creating content.`);
-            await contentProvider.createContent();
-        }   
+            const initialContents = await contentProvider.getInitialContent();
+            for (const initialContent of initialContents) {
+                await contentManager.createContent(initialContent.contentDefinitionName, initialContent.content);
+            }
+        }  
+        
+        await this.executeMigrations(contentProvider);
         
         this.logger.debug(`Registering content definitions.`);
         for (const contentDefinition of contentProvider.getContentDefinitions()) {
             this.registerContentDefinition(contentDefinition);
+        }
+    }
+
+    private async executeMigrations(contentProvider: ContentProvider): Promise<void> {
+        const currentVersion = contentProvider.getVersion();
+
+        await this.executeContentFieldDefinitionMigrations(contentProvider, currentVersion);
+        await this.executeContentDefinitionMigrations(contentProvider, currentVersion);
+        await this.executeContentMigrations(contentProvider, currentVersion);
+    }
+
+    private async executeContentFieldDefinitionMigrations(contentProvider: ContentProvider, currentVersion: number): Promise<void> {
+        const relevantContentFieldDefinitionMigrationVersions = contentProvider.getContentFieldDefinitionMigrations()
+            .filter(contentFieldDefinitionMigration => contentFieldDefinitionMigration.version > currentVersion);
+
+        if (relevantContentFieldDefinitionMigrationVersions.length > 0) {
+            this.logger.debug(`Executing content field definition migrations.`);
+            for (const contentFieldDefinitionMigrationVersion of relevantContentFieldDefinitionMigrationVersions) {
+                for (const contentFieldDefinitionMigration of contentFieldDefinitionMigrationVersion.migration)
+                    switch (contentFieldDefinitionMigration.operation) {
+                        case MigrationOperation.Created: {
+                            await contentDefinitionManager.createContentFieldDefinition(contentFieldDefinitionMigration.contentFieldDefinition);
+                            break;
+                        }
+
+                        case MigrationOperation.Deleted: {
+                            await contentDefinitionManager.deleteContentFieldDefinitionByName(contentFieldDefinitionMigration.contentFieldDefinition.getName());
+                            break;
+                        }
+                    }
+            }
+        }
+    }
+    
+    private async executeContentDefinitionMigrations(contentProvider: ContentProvider, currentVersion: number): Promise<void> {
+        const relevantContentDefinitionMigrationVersions = contentProvider.getContentDefinitionMigrations()
+            .filter(contentDefinitionMigration => contentDefinitionMigration.version > currentVersion);
+
+        if (relevantContentDefinitionMigrationVersions.length > 0) {
+            this.logger.debug(`Executing content definition migrations.`);
+            for (const contentDefinitionMigrationVersion of relevantContentDefinitionMigrationVersions) {
+                for (const contentDefinitionMigration of contentDefinitionMigrationVersion.migration)
+                    switch (contentDefinitionMigration.operation) {
+                        case MigrationOperation.Created: {
+                            await contentDefinitionManager.createContentDefinition(contentDefinitionMigration.contentDefinition);
+                            break;
+                        }
+                        
+                        case MigrationOperation.Updated: {
+                            await contentDefinitionManager.updateContentDefinition(contentDefinitionMigration.contentDefinition);
+                            break;
+                        }
+
+                        case MigrationOperation.Deleted: {
+                            await contentDefinitionManager.deleteContentDefinitionByName(contentDefinitionMigration.contentDefinition.getName());
+                            break;
+                        }
+                    }
+            }
+        }
+    }
+    
+    private async executeContentMigrations(contentProvider: ContentProvider, currentVersion: number): Promise<void> {
+        const relevantContentMigrationVersions = contentProvider.getContentMigrations()
+            .filter(contentMigration => contentMigration.version > currentVersion);
+
+        if (relevantContentMigrationVersions.length > 0) {
+            this.logger.debug(`Executing content migrations.`);
+            for (const contentMigrationVersion of relevantContentMigrationVersions) {
+                for (const contentMigration of contentMigrationVersion.migration)
+                    switch (contentMigration.operation) {
+                        case MigrationOperation.Created: {
+                            await contentManager.createContent(contentMigration.contentDefinitionName, contentMigration.content);
+                            break;
+                        }
+                        
+                        case MigrationOperation.Updated: {
+                            await contentManager.updateContent(contentMigration.contentDefinitionName, contentMigration.content);
+                            break;
+                        }
+
+                        case MigrationOperation.Deleted: {
+                            await contentManager.deleteContent(contentMigration.contentDefinitionName, contentMigration.content.id);
+                            break;
+                        }
+                    }
+            }
         }
     }
 
