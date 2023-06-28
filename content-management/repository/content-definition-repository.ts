@@ -11,6 +11,7 @@ import IContentDefinitionRepository from "../domain/usecase/content-definition-r
 import { ContentSchema, ContentSchemaElement } from "../persistency/content-persistency.interface";
 import { ContentDefinitionData, ContentFieldDefinitionData, ExpandedContentDefinitionData } from "../persistency/content-definition-persistency.interface";
 import Logger from "../../common/utility/logger";
+import BooleanContentFieldDefinition from "../domain/entity/content-field-definition/boolean-content-field-definitin";
 
 /**
  * Repository for content definitions and content field definitions.
@@ -420,6 +421,18 @@ class ContentDefinitionRepository implements IContentDefinitionRepository {
                 }
 
                 contentFieldDefinition = instantiateTextFieldDefinitionResult.getResult()!;
+
+                break;
+            }
+            
+            case ContentFieldType.Boolean: {
+                const instantiateBooleanFieldDefinitionResult = BooleanContentFieldDefinition.create(contentFieldDefinitionData.id, contentFieldDefinitionData.name);
+                if (instantiateBooleanFieldDefinitionResult.getIsFailing()) {
+                    this.logger.error(instantiateBooleanFieldDefinitionResult.getMessage());
+                    throw new Error(instantiateBooleanFieldDefinitionResult.getMessage());
+                }
+
+                contentFieldDefinition = instantiateBooleanFieldDefinitionResult.getResult()!;
 
                 break;
             }

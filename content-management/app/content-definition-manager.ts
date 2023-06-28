@@ -22,6 +22,8 @@ import TextContentFieldDefinitionDTO from "./dto/content-field-definition/text-c
 import deleteContentFieldDefinition from "../domain/usecase/content-field-definition/delete-content-field-definition";
 import readContentFieldDefinition from "../domain/usecase/content-field-definition/read-content-field-definition";
 import listContentFieldDefinitions from "../domain/usecase/content-field-definition/list-content-field-definitions";
+import BooleanContentFieldDefinitionDTO from "./dto/content-field-definition/boolean-content-field-definition";
+import BooleanContentFieldDefinition from "../domain/entity/content-field-definition/boolean-content-field-definitin";
 
 /**
  * Manager for content definition and content field definition.
@@ -235,6 +237,19 @@ class ContentDefinitionManager {
 
                 break;
             }
+            
+            case ContentFieldType.Boolean: {
+                const instantiateBooleanContentFieldResult = BooleanContentFieldDefinition.create(
+                    contentFieldDefinitionDTO.getId(), 
+                    contentFieldDefinitionDTO.getName(), 
+                    contentFieldDefinitionDTO.getPath());
+                if (instantiateBooleanContentFieldResult.getIsFailing()) 
+                    return instantiateBooleanContentFieldResult;
+                
+                contentFieldDefinition = instantiateBooleanContentFieldResult.getResult()!; 
+
+                break;
+            }
 
             case ContentFieldType.Numeric: {
                 const instantiateNumericContentFieldResult = NumericContentFieldDefinition.create(
@@ -332,6 +347,13 @@ class ContentDefinitionManager {
             case ContentFieldType.Numeric: {
                 const numericContentFieldDefinitionDTO = new NumericContentFieldDefinitionDTO(contentFieldDefinition.getId(), contentFieldDefinition.getName());
                 contentFieldDefinitionDTO = numericContentFieldDefinitionDTO;
+
+                break;
+            }
+            
+            case ContentFieldType.Boolean: {
+                const booleanContentFieldDefinitionDTO = new BooleanContentFieldDefinitionDTO(contentFieldDefinition.getId(), contentFieldDefinition.getName());
+                contentFieldDefinitionDTO = booleanContentFieldDefinitionDTO;
 
                 break;
             }

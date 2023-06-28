@@ -5,6 +5,7 @@ import IContentFieldDefinitionHandlerProvider, { ContentFieldDetermination, Cont
 enum ContentFieldType {
     Numeric = "numeric",
     Text = "text",
+    Boolean = "boolean",
     Date = "date",
     Array = "array",
     Group = "group"

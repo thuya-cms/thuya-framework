@@ -4,6 +4,7 @@ enum ContentFieldType {
     Numeric = "numeric",
     Text = "text",
     Date = "date",
+    Boolean = "boolean",
     Array = "array",
     Group = "group"
 }
