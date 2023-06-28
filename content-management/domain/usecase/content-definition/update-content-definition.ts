@@ -27,6 +27,17 @@ class UpdateContentDefinition {
         this.logger.debug(`Start updating content definition "%s"...`, contentDefinition.getName());
         
         try {
+            const existingContentDefinition = await contentDefinitionRepository.readContentDefinitionByName(contentDefinition.getName());
+            if (!existingContentDefinition) {
+                this.logger.debug(`Content definition "%s" does not exist.`, contentDefinition.getName());
+                return Result.error(`Content definition "${ contentDefinition.getName() }" does not already exist.`);
+            }
+
+            if (existingContentDefinition.getName() !== contentDefinition.getName()) {
+                this.logger.debug(`Name of a content definition cannot be changed.`);
+                return Result.error(`Name of a content definition cannot be changed.`);
+            }
+
             await contentDefinitionRepository.updateContentDefinition(contentDefinition);
     
             this.logger.debug(`...Content definition "%s" updated successfully.`, contentDefinition.getName());
