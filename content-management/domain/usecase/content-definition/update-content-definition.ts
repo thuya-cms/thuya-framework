@@ -30,7 +30,7 @@ class UpdateContentDefinition {
             const existingContentDefinition = await contentDefinitionRepository.readContentDefinitionByName(contentDefinition.getName());
             if (!existingContentDefinition) {
                 this.logger.debug(`Content definition "%s" does not exist.`, contentDefinition.getName());
-                return Result.error(`Content definition "${ contentDefinition.getName() }" does not already exist.`);
+                return Result.error(`Content definition "${ contentDefinition.getName() }" does not exist.`);
             }
 
             if (existingContentDefinition.getName() !== contentDefinition.getName()) {

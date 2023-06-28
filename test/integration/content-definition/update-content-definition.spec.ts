@@ -41,15 +41,10 @@ describe("update content definition", () => {
     });
     
     it("should fail for not existing content definition", async () => {
-        try {
-            const contentDefinitionDTO = new ContentDefinitionDTO("some-id", "dummy");
-             
-            await contentDefinitionManager.updateContentDefinition(contentDefinitionDTO);
-            expect.fail();
-        }
-
-        catch (error: any) {
-            expect(error.message).to.equal(`Content definition with id "some-id" not found.`);
-        }
+        const contentDefinitionDTO = new ContentDefinitionDTO("some-id", "dummy");
+            
+        const updateResult = await contentDefinitionManager.updateContentDefinition(contentDefinitionDTO);
+        expect(updateResult.getIsFailing()).to.be.true;
+        expect(updateResult.getMessage()).to.equal(`Content definition "dummy" does not exist.`)
     });
 });
