@@ -7,6 +7,7 @@ import DateContentFieldDefinitionDTO from "../../../content-management/app/dto/c
 import ArrayContentFieldDefinitionDTO from "../../../content-management/app/dto/content-field-definition/array-content-field-definition";
 import localContentManagementPersistency from "../../../content-management/persistency/local-content-management-persistency";
 import contentDefinitionUtil from "../helper/content-definition-util";
+import BooleanContentFieldDefinitionDTO from "../../../content-management/app/dto/content-field-definition/boolean-content-field-definition";
 
 describe("create content", () => {    
     let contentDefinition: ContentDefinitionDTO;
@@ -18,6 +19,7 @@ describe("create content", () => {
         const textField = await contentDefinitionUtil.createContentFieldDefinition(new TextContentFieldDefinitionDTO("", "text-field"));
         const numField = await contentDefinitionUtil.createContentFieldDefinition(new NumericContentFieldDefinitionDTO("", "numeric-field-1"));
         const dateField = await contentDefinitionUtil.createContentFieldDefinition(new DateContentFieldDefinitionDTO("", "date-field-1"));
+        const booleanField = await contentDefinitionUtil.createContentFieldDefinition(new BooleanContentFieldDefinitionDTO("", "boolean-field-1"));
         const arrayElementField = await contentDefinitionUtil.createContentFieldDefinition(new TextContentFieldDefinitionDTO("", "array-content"));
         const arrayField = await contentDefinitionUtil.createContentFieldDefinition(new ArrayContentFieldDefinitionDTO("", "array-field-1", arrayElementField));
 
@@ -29,6 +31,7 @@ describe("create content", () => {
 
         contentDefinition.addContentField("numericField", numField);
         contentDefinition.addContentField("dateField", dateField);
+        contentDefinition.addContentField("booleanField", booleanField);
         contentDefinition.addContentField("arrayField", arrayField);
         
         await contentDefinitionUtil.createContentDefinition(contentDefinition);
@@ -49,7 +52,8 @@ describe("create content", () => {
             textField: textValue,
             numericField: numValue,
             dateField: dateValue,
-            arrayField: arrayValue
+            arrayField: arrayValue,
+            booleanField: true
         });
         should().equal(createContentResult.getIsSuccessful(), true, createContentResult.getMessage());
 
@@ -62,6 +66,7 @@ describe("create content", () => {
         should().equal(content.textField, textValue);
         should().equal(content.numericField, numValue);
         should().equal(content.dateField, dateValue);
+        should().equal(content.booleanField, true);
         should().equal(JSON.stringify(content.arrayField), JSON.stringify(arrayValue));
     });
 
