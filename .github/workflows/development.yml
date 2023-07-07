@@ -25,4 +25,4 @@ jobs:
       
       - name: npm publish development
         run: |
-          npm run publish:dev
+          npm publish --tag development
