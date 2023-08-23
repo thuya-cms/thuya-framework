@@ -1,4 +1,4 @@
-name: Publish development version
+name: Publish new development version
 
 on:
   workflow_dispatch:
@@ -13,7 +13,10 @@ jobs:
       - name: Set up Node.js version
         uses: actions/setup-node@v1
         with:
-          node-version: '18.x'
+          node-version: '18.x'  
+
+      - name: Authenticate with NPM
+        run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
 
       - name: npm install, build
         run: |
