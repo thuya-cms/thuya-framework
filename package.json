@@ -1,6 +1,6 @@
 {
   "name": "@thuya/framework",
-  "version": "0.0.16",
+  "version": "1.0.0",
   "description": "Thuya CMS - Framework",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

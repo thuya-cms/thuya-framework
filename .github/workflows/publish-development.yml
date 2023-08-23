@@ -15,9 +15,6 @@ jobs:
         with:
           node-version: '18.x'
 
-      - name: Authenticate with private NPM package
-        run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
-
       - name: npm install, build
         run: |
           npm i
