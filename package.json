@@ -1,6 +1,6 @@
 {
   "name": "@thuya/framework",
-  "version": "0.0.15",
+  "version": "0.0.16",
   "description": "Thuya CMS - Framework",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -20,9 +20,9 @@
   "author": "Gergely Simándi",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/Geri101/thuya-framework/issues"
+    "url": "https://github.com/thuya-cms/thuya-framework/issues"
   },
-  "homepage": "https://github.com/Geri101/thuya-framework#readme",
+  "homepage": "https://thuya-cms.github.io/",
   "dependencies": {
     "@types/body-parser": "^1.19.2",
     "@types/express": "^4.17.15",
