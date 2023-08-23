@@ -141,6 +141,17 @@ class ContentEventHandler implements IContentEventHandler {
             handler.callback(contentDefinitionName, contents);
         }
     }
+
+    /**
+     * Clear the event handlers.
+     */
+    clear(): void {
+        this.createContentHandlers = [];
+        this.updateContentHandlers = [];
+        this.deleteContentHandlers = [];
+        this.readContentHandlers = [];
+        this.listContentHandlers = [];
+    }
 }
 
 export default new ContentEventHandler();
