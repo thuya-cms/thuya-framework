@@ -29,6 +29,7 @@ class DeleteContent {
         try {
             await factory.getContentPersistency().deleteContent(contentDefinitionName, id);
             
+            factory.getContentEventHandler().raiseContentDeleted(contentDefinitionName, id)
             this.logger.debug(`...Content of type "%s" deleted successfully.`, contentDefinitionName);
             return Result.success();
         }

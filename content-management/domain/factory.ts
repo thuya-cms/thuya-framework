@@ -1,6 +1,8 @@
 import localContentManagementPersistency from "../persistency/local-content-management-persistency";
 import IContentDefinitionPersistency from "../persistency/content-definition-persistency.interface";
 import IContentPersistency from "../persistency/content-persistency.interface";
+import IContentEventHandler from "./usecase/content/content-event-handler.interface";
+import contentEventHandler from "../service/content-event-handler";
 
 /**
  * Factory to get and set objects used by the domain.
@@ -8,12 +10,14 @@ import IContentPersistency from "../persistency/content-persistency.interface";
 class Factory {
     private contentDefinitionPersistency: IContentDefinitionPersistency;
     private contentPersistency: IContentPersistency;
+    private contentEventHandler: IContentEventHandler;
     
 
 
     constructor() {
         this.contentDefinitionPersistency = localContentManagementPersistency;
         this.contentPersistency = localContentManagementPersistency;
+        this.contentEventHandler = contentEventHandler;
     }
 
 
@@ -48,6 +52,13 @@ class Factory {
      */
     getContentPersistency(): IContentPersistency {
         return this.contentPersistency;
+    }
+
+    /**
+     * @returns the content event handler implementation
+     */
+    getContentEventHandler(): IContentEventHandler {
+        return this.contentEventHandler;
     }
 }
 

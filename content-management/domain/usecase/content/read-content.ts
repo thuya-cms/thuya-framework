@@ -33,6 +33,7 @@ class ReadContent<T extends { id: string } = any> {
                 return Result.error(`...Failed to read content of type "${ contentDefinitionName }".`);
             }
             
+            factory.getContentEventHandler().raiseContentRead(contentDefinitionName, content);
             this.logger.debug(`...Successfully read content of type "%s".`, contentDefinitionName);
             return Result.success(content);
         }
