@@ -48,13 +48,14 @@ class UpdateContent<T extends { id: string }> {
             }
             
             const convertAndValidateContentResult = await modifyHelper.convertAndValidateData(contentDefinition, existingContent);
-            if (convertAndValidateContentResult.getIsFailing())  {
+            if (convertAndValidateContentResult.getIsFailing()) {
                 this.logger.debug(`...Failed to create content of type "%s".`, contentDefinition.getName());
                 return Result.error(convertAndValidateContentResult.getMessage());
             }
     
             await factory.getContentPersistency().updateContent(contentDefinition.getName(), convertAndValidateContentResult.getResult());
             
+            factory.getContentEventHandler().raiseContentUpdated(contentDefinition.getName(), convertAndValidateContentResult.getResult());
             this.logger.debug(`...Content of type "%s" is updated successfully.`, contentDefinition.getName());
             return Result.success();
         }

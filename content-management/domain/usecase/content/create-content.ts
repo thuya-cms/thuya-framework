@@ -37,6 +37,7 @@ class CreateContent<T> {
     
             const id = await factory.getContentPersistency().createContent(contentDefinition.getName(), convertAndValidateContentResult.getResult());
     
+            factory.getContentEventHandler().raiseContentCreated(contentDefinition.getName(), convertAndValidateContentResult.getResult());
             this.logger.debug(`...Content of type "%s" created successfully.`, contentDefinition.getName());
             return Result.success(id);
         }

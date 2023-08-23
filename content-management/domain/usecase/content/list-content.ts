@@ -28,6 +28,7 @@ class ListContent<T extends { id: string } = any> {
         try {
             const contentList = await factory.getContentPersistency().listContent(contentDefinitionName);
 
+            factory.getContentEventHandler().raiseContentListed(contentDefinitionName, contentList);
             this.logger.debug(`...Successfully listed content for "%s".`, contentDefinitionName);
             return Result.success(contentList);
         }
