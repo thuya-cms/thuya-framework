@@ -61,7 +61,13 @@ class ModifyHelper<T> {
                         return Result.error(validationResult.getMessage());
                 }
 
-                this.logger.debug(`No value provided for field "%s".`, contentField.name);
+                fieldValue = contentField.contentFieldDefinition.executeDeterminations(fieldValue);
+                finalContent[contentField.name] = fieldValue;
+
+                if (fieldValue || fieldValue === 0)
+                    this.logger.debug(`Setting value "%s" for field "%s".`, fieldValue, contentField.name);
+                else 
+                    this.logger.debug(`No value provided for field "%s".`, contentField.name);
             }
         }
 
