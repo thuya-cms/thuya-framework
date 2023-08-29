@@ -114,6 +114,8 @@ class ThuyaApp {
         for (const contentProvider of module.getContentProviders()) 
             await this.useContentProvider(contentProvider, module.getMetadata());
 
+        await module.onLoaded();
+
         this.logger.debug(`...Module "%s" is successfully used.`, module.getMetadata().name);
     }
 
@@ -181,6 +183,8 @@ class ThuyaApp {
                 throw new Error("Failed to update module metadata.");
             }
         }
+
+        await contentProvider.onLoaded();
     }
 
     private async executeMigrations(contentProvider: ContentProvider, moduleVersion: number): Promise<void> {

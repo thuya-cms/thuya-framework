@@ -56,6 +56,16 @@ abstract class ContentProvider {
     getContentMigrations(): { version: number, migration: { operation: MigrationOperation, contentDefinitionName: string, content: any }[] }[] {
         return [];
     }
+
+    /**
+     * Called when a content provider is successfully loaded.
+     * 
+     * @returns
+     * @async
+     */
+    onLoaded(): Promise<void> {
+        return Promise.resolve();
+    }
 }
 
 export { MigrationOperation };
