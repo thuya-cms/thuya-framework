@@ -22,6 +22,16 @@ abstract class Module {
     }
 
     /**
+     * Called when a module is successfully loaded.
+     * 
+     * @returns
+     * @async
+     */
+    onLoaded(): Promise<void> {
+        return Promise.resolve();
+    }
+
+    /**
      * @returns the metadata of the module
      */
     abstract getMetadata(): ModuleMetadata
